@@ -21,11 +21,14 @@ export const formatDateToLocal = (
   return formatter.format(date);
 };
 
-export const generateYAxis = (revenue: Revenue[]) => {
+export const generateYAxis = (revenue: Revenue[] = []) => {
+  if (!Array.isArray(revenue) || revenue.length === 0) {   // TODO: a hack to handle map not being defined in defeinitions.ts
+    return { yAxisLabels: ['$0K'], topLabel: 0 };
+  }
   // Calculate what labels we need to display on the y-axis
   // based on highest record and in 1000s
   const yAxisLabels = [];
-  const highestRecord = 0; //Math.max(...revenue.map((month) => month.revenue));
+  const highestRecord = Math.max(...revenue.map((month) => month.revenue));
   const topLabel = Math.ceil(highestRecord / 1000) * 1000;
 
   for (let i = topLabel; i >= 0; i -= 1000) {
