@@ -3,10 +3,12 @@ import AcmeLogo from '@/app/ui/acme-logo';
 import { lusitana } from '@/app/ui/fonts';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [message, setMessage] = useState('');
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -16,7 +18,11 @@ export default function RegisterPage() {
       body: JSON.stringify(form),
     });
     const data = await res.json();
-    setMessage(data.message || data.error);
+    if (data.message) {
+      router.push('/login');
+    } else {
+      setMessage(data.error);
+    }
   }
 
   return (
