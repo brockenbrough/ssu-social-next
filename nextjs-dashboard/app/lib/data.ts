@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import postgres from 'postgres';
 import {
   CustomerField,
@@ -9,8 +10,15 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 
+
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
+// Notice that this file contains utility functions that are called internally by the server components.
+// Example: the user requests a page that contains a server component <RevenueChart> that calls fetchRevenue().
+// This is done on the server side, not on the client side.  The data is fetched from the database 
+// and returned to the server component.  The server component then renders the page containing the 
+// RevenueChart including the data.  This is different than an API endpoint which is provided by the server
+// to be called externally by the client.
 export async function fetchRevenue() {
   try {
     // Artificially delay a response for demo purposes.
@@ -215,4 +223,21 @@ export async function fetchFilteredCustomers(query: string) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch customer table.');
   }
+}
+
+export async function registerUser(name: string, email: string, password: string) {
+  // Check if user already exists
+  const existing = await sql`SELECT * FROM users WHERE email = ${email}`;
+  if (existing.length > 0) {
+    throw new Error('User already exists');
+  }
+
+  // Hash the password
+  const hashed = await bcrypt.hash(password, 10);
+
+  // Insert new user
+  await sql`
+    INSERT INTO users (name, email, password)
+    VALUES (${name}, ${email}, ${hashed})
+  `;
 }
