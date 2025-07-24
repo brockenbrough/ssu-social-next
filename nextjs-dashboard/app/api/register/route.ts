@@ -1,3 +1,6 @@
+// This API route is externally available.
+// It is used by the register page to create a new user.
+
 import { NextResponse } from 'next/server';
 import { registerUser } from '@/app/lib/data';
 
