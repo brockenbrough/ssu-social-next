@@ -1,5 +1,5 @@
-## Next.js App Router Course - Starter
+## Next.js SSU Professor Brockenbrough's starter Next app.
 
-This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.
+This is a starter template based on Next.js App Router Course. It contains the starting code for an application.
 
-For more information, see the [course curriculum](https://nextjs.org/learn) on the Next.js Website.
+For more information or the what this is based on, see the [course curriculum](https://nextjs.org/learn) on the Next.js Website.
