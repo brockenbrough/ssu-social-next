@@ -12,7 +12,7 @@ export default function Page() {
   return (
     <main className="flex min-h-screen flex-col p-6">
 
-      <div className="flex h-20 shrink-0 items-end rounded-lg bg-blue-500 p-4 md:h-52">
+      <div className="flex h-20 shrink-0 items-end rounded-lg bg-orange-500 p-4 md:h-52">
         <AcmeLogo />
         {/* */}
       </div>
@@ -22,13 +22,13 @@ export default function Page() {
           <p className={`${comicNeue.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}>
             <strong>Welcome to Professor Brockenbrough&apos;s Next skeleton.</strong> This is a modified version of 
             the one described in the{' '}
-            <a href="https://nextjs.org/learn/" className="text-blue-500">
+            <a href="https://nextjs.org/learn/" className="text-orange-500">
               Next.js Learn Course
             </a>
           </p>
           <Link
             href="/portal/login"
-            className="flex items-center gap-5 self-start rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
+            className="flex items-center gap-5 self-start rounded-lg bg-orange-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
           >
             <span>Log in</span> <ArrowRightIcon className="w-5 md:w-6" />
           </Link>
