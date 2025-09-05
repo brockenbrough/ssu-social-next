@@ -1,6 +1,6 @@
 'use client';
 import AcmeLogo from '@/app/ui/acme-logo';
-import { lusitana } from '@/app/ui/fonts';
+import { comicNeue } from '@/app/ui/fonts';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -35,7 +35,7 @@ export default function RegisterPage() {
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
-            <h1 className={`${lusitana.className} mb-3 text-2xl`}>
+            <h1 className={`${comicNeue.className} mb-3 text-2xl`}>
               Register a new account
             </h1>
             <div className="w-full">
