@@ -40,7 +40,7 @@ export default function InvoicesPage() {
     <div className="p-6">
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Invoices</h1>
+          <h1 className="text-2xl font-semibold">Hard coded Invoices</h1>
           <p className="text-sm text-gray-500">
             {filtered.length} result{filtered.length !== 1 ? "s" : ""} ·
             &nbsp;Unpaid total:{" "}
