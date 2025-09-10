@@ -13,8 +13,8 @@ export default async function Page() {
       <table className="table-auto min-w-full border border-gray-300">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-2 border border-gray-300 text-left">Customer ID</th>
             <th className="px-4 py-2 border border-gray-300 text-left">Name</th>
+            <th className="px-4 py-2 border border-gray-300 text-left">Customer ID</th>
             <th className="px-4 py-2 border border-gray-300 text-left">Email</th>
           </tr>
         </thead>
@@ -24,8 +24,9 @@ export default async function Page() {
               key={customer.id}
               className={index % 2 === 0 ? "bg-white" : "bg-gray-50 hover:bg-gray-100"}
             >
-              <td className="px-4 py-2 border border-gray-300">{customer.id}</td>
               <td className="px-4 py-2 border border-gray-300">{customer.name}</td>
+              {/* Kutman: Change displaying Customer id, replacing letters with numbers for display purpose. */}
+              <td className="px-4 py-2 border border-gray-300">{customer.id.replace(/\D/g, '')}</td>
               <td className="px-4 py-2 border border-gray-300">{customer.email}</td>
             </tr>
           ))}
