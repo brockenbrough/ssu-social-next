@@ -56,7 +56,6 @@ export default function RegisterPage() {
           </div>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
-<<<<<<< HEAD
           <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8 dark:bg-gray-900">
             <div className="mb-2 flex justify-end">
               <button
@@ -78,11 +77,7 @@ export default function RegisterPage() {
                 )}
               </button>
             </div>
-            <h1 className={`${lusitana.className} mb-3 text-2xl dark:text-gray-100`}>
-=======
-          <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
-            <h1 className={`${comicNeue.className} mb-3 text-2xl`}>
->>>>>>> a650be9146b8e4f978128f6c6d16dc8b6e9f9798
+            <h1 className={`${comicNeue.className} mb-3 text-2xl dark:text-gray-100`}>
               Register a new account
             </h1>
             <div className="w-full">
