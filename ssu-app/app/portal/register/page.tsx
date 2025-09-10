@@ -2,13 +2,35 @@
 import AcmeLogo from '@/app/ui/acme-logo';
 import { lusitana } from '@/app/ui/fonts';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 
 export default function RegisterPage() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [message, setMessage] = useState('');
   const router = useRouter();
+
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const stored = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
+    const prefersDark =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    const shouldDark = stored ? stored === 'dark' : prefersDark;
+    setIsDark(shouldDark);
+    document.documentElement.classList.toggle('dark', shouldDark);
+  }, []);
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('theme', next ? 'dark' : 'light');
+  };
+
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,8 +56,28 @@ export default function RegisterPage() {
           </div>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
-            <h1 className={`${lusitana.className} mb-3 text-2xl`}>
+          <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8 dark:bg-gray-900">
+            <div className="mb-2 flex justify-end">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                aria-pressed={isDark}
+                className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 dark:focus:ring-gray-700"
+              >
+                {isDark ? (
+                  <>
+                    <SunIcon className="h-4 w-4" />
+                    Light
+                  </>
+                ) : (
+                  <>
+                    <MoonIcon className="h-4 w-4" />
+                    Dark
+                  </>
+                )}
+              </button>
+            </div>
+            <h1 className={`${lusitana.className} mb-3 text-2xl dark:text-gray-100`}>
               Register a new account
             </h1>
             <div className="w-full">
