@@ -1,6 +1,6 @@
 'use client';
  
-import { lusitana } from '@/app/ui/fonts';
+import { comicNeue } from '@/app/ui/fonts';
 import {
   AtSymbolIcon,
   KeyIcon,
@@ -50,6 +50,7 @@ export default function LoginForm() {
  
   return (
     <form action={formAction} className="space-y-3">
+<<<<<<< HEAD
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8 dark:bg-gray-900">
 
 <div className="mb-2 flex justify-end">
@@ -75,6 +76,11 @@ export default function LoginForm() {
 
         <h1 className={`${lusitana.className} mb-3 text-2xl dark:text-gray-100`}>
           Please log in to continue.
+=======
+      <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
+        <h1 className={`${comicNeue.className} mb-3 text-2xl`}>
+          If this breaks blame Thomas Yarossi.
+>>>>>>> a650be9146b8e4f978128f6c6d16dc8b6e9f9798
         </h1>
         <div className="w-full">
           <div>
@@ -82,7 +88,7 @@ export default function LoginForm() {
               className="mb-3 mt-5 block text-xs font-medium text-gray-900 dark:text-gray-200"
               htmlFor="email"
             >
-              Email
+              electronic correspondence address
             </label>
             <div className="relative">
               <input
@@ -90,7 +96,7 @@ export default function LoginForm() {
                 id="email"
                 type="email"
                 name="email"
-                placeholder="Enter your email address"
+                placeholder="give me your email address, I probably wont fill your inbox with spam..."
                 required
               />
               <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900 dark:text-gray-400 dark:peer-focus:text-gray-100" />
@@ -119,11 +125,11 @@ export default function LoginForm() {
         </div>
         <input type="hidden" name="redirectTo" value={callbackUrl} />
         <Button className="mt-4 w-full" aria-disabled={isPending}>
-          Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+          This Log In is brought to you by the Malevolent Being Transit Authority <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
         </Button>
         <a href="/portal/register" className="block mt-2">
           <Button className="w-full" type="button">
-            New User? Register <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+            New User? Good luck... <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
           </Button>
         </a>
         <div

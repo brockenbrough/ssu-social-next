@@ -1,6 +1,6 @@
 'use client';
 import AcmeLogo from '@/app/ui/acme-logo';
-import { lusitana } from '@/app/ui/fonts';
+import { comicNeue } from '@/app/ui/fonts';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -56,6 +56,7 @@ export default function RegisterPage() {
           </div>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
+<<<<<<< HEAD
           <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8 dark:bg-gray-900">
             <div className="mb-2 flex justify-end">
               <button
@@ -78,6 +79,10 @@ export default function RegisterPage() {
               </button>
             </div>
             <h1 className={`${lusitana.className} mb-3 text-2xl dark:text-gray-100`}>
+=======
+          <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
+            <h1 className={`${comicNeue.className} mb-3 text-2xl`}>
+>>>>>>> a650be9146b8e4f978128f6c6d16dc8b6e9f9798
               Register a new account
             </h1>
             <div className="w-full">
@@ -93,7 +98,7 @@ export default function RegisterPage() {
                   id="name"
                   type="text"
                   name="name"
-                  placeholder="Enter your name"
+                  placeholder="Enter any display name"
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
                   required
@@ -111,7 +116,7 @@ export default function RegisterPage() {
                   id="email"
                   type="email"
                   name="email"
-                  placeholder="Enter your email address"
+                  placeholder="Enter any email address"
                   value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
                   required
@@ -129,7 +134,7 @@ export default function RegisterPage() {
                   id="password"
                   type="password"
                   name="password"
-                  placeholder="Enter password"
+                  placeholder="Enter any password"
                   value={form.password}
                   onChange={e => setForm({ ...form, password: e.target.value })}
                   required
@@ -137,7 +142,7 @@ export default function RegisterPage() {
                 />
               </div>
             </div>
-            <button className="mt-4 w-full rounded-lg bg-blue-500 py-2 text-white font-medium hover:bg-blue-400 transition-colors" type="submit">
+            <button className="mt-4 w-full rounded-lg bg-orange-500 py-2 text-white font-medium hover:bg-orange-400 transition-colors" type="submit">
               Register
             </button>
             <div className="flex h-8 items-end space-x-1" aria-live="polite" aria-atomic="true">
