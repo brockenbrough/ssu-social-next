@@ -1,8 +1,8 @@
-import { Inter, Comic_Neue } from 'next/font/google';
+import { Roboto, Montserrat } from 'next/font/google';
  
-export const inter = Inter({ subsets: ['latin'] });
+export const roboto = Roboto({ subsets: ['latin'] });
  
-export const comicNeue = Comic_Neue({
+export const montserrat = Montserrat({
   weight: ['400', '700'],
   subsets: ['latin'],
 });

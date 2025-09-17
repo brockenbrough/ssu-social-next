@@ -1,6 +1,6 @@
 'use client';
  
-import { comicNeue } from '@/app/ui/fonts';
+import { montserrat } from '@/app/ui/fonts';
 import {
   AtSymbolIcon,
   KeyIcon,
@@ -73,7 +73,7 @@ export default function LoginForm() {
   </button>
 </div>
 
-        <h1 className={`${comicNeue.className} mb-3 text-2xl dark:text-gray-100`}>
+        <h1 className={`${montserrat.className} mb-3 text-2xl dark:text-gray-100`}>
           Please log in to continue.
         </h1>
         <div className="w-full">

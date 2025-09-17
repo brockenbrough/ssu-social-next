@@ -1,5 +1,5 @@
 import '@/app/ui/global.css';
-import { inter } from '@/app/ui/fonts';
+import { roboto } from '@/app/ui/fonts';
 
 // This is the root layout of the application.  
 // It is used to wrap all the pages in the application.
@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-        <body className={`${inter.className} antialiased`}>{children}</body>
+        <body className={`${roboto.className} antialiased`}>{children}</body>
     </html>
   );
 }

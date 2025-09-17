@@ -1,10 +1,10 @@
 import { GlobeAltIcon } from '@heroicons/react/24/outline';
-import { comicNeue } from '@/app/ui/fonts';
+import { montserrat } from '@/app/ui/fonts';
 
 export default function AcmeLogo() {
   return (
     <div
-      className={`${comicNeue.className} flex flex-row items-center leading-none text-white`}
+      className={`${montserrat.className} flex flex-row items-center leading-none text-white`}
     >
       <GlobeAltIcon className="h-12 w-12 rotate-[15deg]" />
       <p className="text-[44px]">Salem State Skeleton😎</p>
