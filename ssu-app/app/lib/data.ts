@@ -180,7 +180,9 @@ export async function fetchCustomers() {
     const customers = await sql<CustomerField[]>`
       SELECT
         id,
-        name
+        name,
+        email,
+        image_url
       FROM customers
       ORDER BY name ASC
     `;
@@ -194,6 +196,8 @@ export async function fetchCustomers() {
 
 export async function fetchFilteredCustomers(query: string) {
   try {
+
+    // Yannie modified, added email and image_url to the select statement
     const data = await sql<CustomersTableType[]>`
 		SELECT
 		  customers.id,
@@ -211,7 +215,8 @@ export async function fetchFilteredCustomers(query: string) {
 		GROUP BY customers.id, customers.name, customers.email, customers.image_url
 		ORDER BY customers.name ASC
 	  `;
-
+    // Yannie modified ends here
+    
     const customers = data.map((customer) => ({
       ...customer,
       total_pending: formatCurrency(customer.total_pending),
