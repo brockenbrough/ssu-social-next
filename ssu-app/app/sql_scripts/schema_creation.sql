@@ -99,6 +99,14 @@ CREATE TABLE chatrooms (
   CONSTRAINT chk_creator_is_participant CHECK (created_by = user_1 OR created_by = user_2)
 );
 
+-- Prevent duplicate rooms for the same unordered pair (A,B) vs (B,A)
+CREATE UNIQUE INDEX ux_chatrooms_pair
+  ON chatrooms (LEAST(user_1, user_2), GREATEST(user_1, user_2));
+
+-- Helpful lookup indexes
+CREATE INDEX idx_chatrooms_user_1 ON chatrooms(user_1);
+CREATE INDEX idx_chatrooms_user_2 ON chatrooms(user_2);
+
 
 -- Drop table if it exists (removes FKs, indexes automatically)
 DROP TABLE IF EXISTS messages CASCADE;
@@ -138,8 +146,15 @@ CREATE INDEX idx_messages_sender_id ON messages(sender_id);
 CREATE INDEX idx_messages_receiver_id ON messages(receiver_id);
 CREATE INDEX idx_messages_created_at ON messages(created_at);
 
-DROP TABLE IF EXISTS views;
-CREATE TABLE views ();
+DROP TABLE IF EXISTS views CASCADE;
+CREATE TABLE views (
+  user_id   UUID NOT NULL,
+  post_id   UUID NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, post_id),
+  CONSTRAINT fk_views_user FOREIGN KEY (user_id) REFERENCES ssu_users(user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_views_post FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE
+);
 
 DROP TABLE IF EXISTS bookmarks;
 CREATE TABLE bookmarks ();
