@@ -1,14 +1,14 @@
 -- Drop the app_users table if it exists
 DROP TABLE IF EXISTS ssu_users;
 
--- Create the ssu_users table
+CREATE TYPE user_role as ENUM('user','admin');
 CREATE TABLE ssu_users (
   user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   username VARCHAR(64) NOT NULL UNIQUE,
   email VARCHAR(255) NOT NULL UNIQUE,
-  password VARCHAR(128) NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  role VARCHAR(20) DEFAULT 'user',
+  password VARCHAR(255) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  role user_role DEFAULT 'user',
   profile_image TEXT,
   biography VARCHAR(500)
 );
@@ -25,8 +25,21 @@ CREATE TABLE posts (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-DROP TABLE IF EXISTS comments;
-CREATE TABLE comments ();
+DROP TABLE IF EXISTS comments CASCADE;
+CREATE TABLE comments (
+		comment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+		CONSTRAINT fk_users 
+			FOREIGN KEY (user_id)
+			REFERENCES ssu_users (user_id)
+			ON DELETE CASCADE,
+		comment_content VARCHAR(500) NOT NULL,
+		created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+		post_id UUID NOT NULL,
+		CONSTRAINT fk_posts
+			FOREIGN KEY (post_id)
+			REFERENCES posts (post_id)
+			ON DELETE CASCADE);
 
 DROP TABLE IF EXISTS notifications;
 CREATE TABLE notifications ();
