@@ -1,7 +1,10 @@
 -- Drop the app_users table if it exists
-DROP TABLE IF EXISTS ssu_users;
+DROP TABLE IF EXISTS ssu_users CASCADE;
 
+-- Create the ssu_users table
+DROP TYPE IF EXISTS user_role CASCADE;
 CREATE TYPE user_role as ENUM('user','admin');
+
 CREATE TABLE ssu_users (
   user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   username VARCHAR(64) NOT NULL UNIQUE,
@@ -14,7 +17,7 @@ CREATE TABLE ssu_users (
 );
 
 -- Drop and create other empty tables
-DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS posts CASCADE;
 CREATE TABLE posts (
     post_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES ssu_users(user_id) ON DELETE CASCADE,
@@ -44,11 +47,31 @@ CREATE TABLE comments (
 DROP TABLE IF EXISTS notifications;
 CREATE TABLE notifications ();
 
-DROP TABLE IF EXISTS likes;
-CREATE TABLE likes ();
+DROP TABLE IF EXISTS likes CASCADE;
 
-DROP TABLE IF EXISTS followers;
-CREATE TABLE followers ();
+CREATE TABLE likes (
+  post_id  UUID NOT NULL,
+  user_id  UUID NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+  PRIMARY KEY (post_id, user_id),
+
+  CONSTRAINT fk_likes_post
+    FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
+  CONSTRAINT fk_likes_user
+    FOREIGN KEY (user_id) REFERENCES ssu_users(user_id) ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS followers CASCADE;
+
+CREATE TABLE followers (
+		user_id UUID NOT NULL REFERENCES ssu_users(user_id) ON DELETE CASCADE,
+		follower_id UUID NOT NULL REFERENCES ssu_users(user_id) ON DELETE CASCADE,
+		created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+		PRIMARY KEY (user_id, follower_id),
+		CHECK (user_id <> follower_id)  -- Prevent self-following
+);
+CREATE INDEX idx_follows_follower ON followers(follower_id); -- Easier access to followings.
 
 DROP TABLE IF EXISTS chatRoom;
 CREATE TABLE chatRoom ();
