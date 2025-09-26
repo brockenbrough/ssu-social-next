@@ -73,11 +73,70 @@ CREATE TABLE followers (
 );
 CREATE INDEX idx_follows_follower ON followers(follower_id); -- Easier access to followings.
 
-DROP TABLE IF EXISTS chatRoom;
-CREATE TABLE chatRoom ();
+DROP TABLE IF EXISTS chatrooms CASCADE;
 
-DROP TABLE IF EXISTS message;
-CREATE TABLE message ();
+CREATE TABLE chatrooms (
+  chat_room_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_1 UUID NOT NULL,
+  user_2 UUID NOT NULL,
+  created_by UUID NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+  CONSTRAINT fk_chatrooms_created_by
+    FOREIGN KEY (created_by) REFERENCES ssu_users(user_id)
+    ON UPDATE CASCADE ON DELETE SET NULL,
+
+  CONSTRAINT fk_chatrooms_user_1
+    FOREIGN KEY (user_1) REFERENCES ssu_users(user_id)
+    ON UPDATE CASCADE ON DELETE SET NULL,
+
+  CONSTRAINT fk_chatrooms_user_2
+    FOREIGN KEY (user_2) REFERENCES ssu_users(user_id)
+    ON UPDATE CASCADE ON DELETE SET NULL,
+
+  -- integrity rules
+  CONSTRAINT chk_distinct_users CHECK (user_1 <> user_2),
+  CONSTRAINT chk_creator_is_participant CHECK (created_by = user_1 OR created_by = user_2)
+);
+
+
+-- Drop table if it exists (removes FKs, indexes automatically)
+DROP TABLE IF EXISTS messages CASCADE;
+
+-- Recreate table
+CREATE TABLE messages (
+  message_id   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  chat_room_id UUID NOT NULL,
+  sender_id    UUID NOT NULL,
+  receiver_id  UUID NOT NULL,
+  message_text TEXT NOT NULL,
+  is_read      BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT fk_messages_chatroom
+    FOREIGN KEY (chat_room_id)
+    REFERENCES chatrooms (chat_room_id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_messages_sender
+    FOREIGN KEY (sender_id)
+    REFERENCES ssu_users (user_id)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL,
+
+  CONSTRAINT fk_messages_receiver
+    FOREIGN KEY (receiver_id)
+    REFERENCES ssu_users (user_id)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL
+);
+
+-- Supporting indexes
+CREATE INDEX idx_messages_chat_room_id ON messages(chat_room_id);
+CREATE INDEX idx_messages_sender_id ON messages(sender_id);
+CREATE INDEX idx_messages_receiver_id ON messages(receiver_id);
+CREATE INDEX idx_messages_created_at ON messages(created_at);
 
 DROP TABLE IF EXISTS views;
 CREATE TABLE views ();
