@@ -44,8 +44,30 @@ CREATE TABLE comments (
 			REFERENCES posts (post_id)
 			ON DELETE CASCADE);
 
-DROP TABLE IF EXISTS notifications;
-CREATE TABLE notifications ();
+-- Drop first so you can recreate it cleanly
+DROP TABLE IF EXISTS notifications CASCADE;
+
+-- Recreate table
+CREATE TABLE notifications (
+  notification_id   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  notification_type TEXT NOT NULL,
+  user_id           UUID NOT NULL REFERENCES ssu_users(user_id) ON DELETE CASCADE,
+  content           VARCHAR(256),
+  action_user_id    UUID REFERENCES ssu_users(user_id) ON DELETE SET NULL,
+  is_read           BOOLEAN NOT NULL DEFAULT FALSE,
+  post_id           UUID REFERENCES posts(post_id) ON DELETE CASCADE,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT chk_notifications_type
+    CHECK (notification_type IN ('like', 'comment', 'follow', 'mention', 'system'))
+);
+
+-- Helpful indexes
+CREATE INDEX idx_notifications_user_id    ON notifications(user_id);
+CREATE INDEX idx_notifications_action_user ON notifications(action_user_id);
+CREATE INDEX idx_notifications_post_id    ON notifications(post_id);
+CREATE INDEX idx_notifications_is_read    ON notifications(is_read);
+CREATE INDEX idx_notifications_created_at ON notifications(created_at);
+
 
 DROP TABLE IF EXISTS likes CASCADE;
 
@@ -156,14 +178,57 @@ CREATE TABLE views (
   CONSTRAINT fk_views_post FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS bookmarks;
-CREATE TABLE bookmarks ();
+-- Drop table first so we can recreate it cleanly
+DROP TABLE IF EXISTS bookmarks CASCADE;
 
-DROP TABLE IF EXISTS contributors;
-CREATE TABLE contributors ();
+-- Recreate table
+CREATE TABLE bookmarks (
+  bookmark_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID NOT NULL REFERENCES ssu_users(user_id) ON DELETE CASCADE,
+  post_id     UUID NOT NULL REFERENCES posts(post_id)     ON DELETE CASCADE,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  is_public   BOOLEAN NOT NULL DEFAULT TRUE,
+  CONSTRAINT ux_bookmarks_user_post UNIQUE (user_id, post_id)
+);
 
-DROP TABLE IF EXISTS hashtags;
-CREATE TABLE hashtags ();
+-- Optional: index to speed up queries that list bookmarks for a given post
+CREATE INDEX idx_bookmarks_post_id ON bookmarks(post_id);
 
-DROP TABLE IF EXISTS post_hashtags;
-CREATE TABLE post_hashtags ();
+DROP TABLE IF EXISTS contributors CASCADE;
+
+-- Recreate table
+CREATE TABLE IF NOT EXISTS contributors (
+  contributor_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name           VARCHAR(120) NOT NULL,
+  position       VARCHAR(120) NOT NULL,
+  level_name     VARCHAR(120) NOT NULL,
+  created_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  CONSTRAINT contributors_level_check
+    CHECK (level_name IN ('Junior', 'Mid', 'Senior', 'Lead'))
+);
+
+DROP INDEX IF EXISTS idx_post_hashtags_hashtag_id;
+DROP TABLE IF EXISTS post_hashtags CASCADE;
+DROP TABLE IF EXISTS hashtags CASCADE;
+
+-- Recreate hashtags
+CREATE TABLE hashtags (
+  hashtag_id  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  hashtag     VARCHAR(255) UNIQUE NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CHECK (length(trim(hashtag)) > 0)
+);
+
+-- Recreate post_hashtags
+CREATE TABLE post_hashtags (
+  post_hashtag_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id         UUID NOT NULL,
+  hashtag_id      UUID NOT NULL,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT ux_post_hashtags UNIQUE (post_id, hashtag_id),
+  FOREIGN KEY (post_id)    REFERENCES posts(post_id)       ON DELETE CASCADE,
+  FOREIGN KEY (hashtag_id) REFERENCES hashtags(hashtag_id) ON DELETE CASCADE
+);
+
+-- Helpful index for finding posts by hashtag quickly
+CREATE INDEX idx_post_hashtags_hashtag_id ON post_hashtags(hashtag_id);
