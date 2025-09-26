@@ -106,15 +106,15 @@ CREATE TABLE chatrooms (
 
   CONSTRAINT fk_chatrooms_created_by
     FOREIGN KEY (created_by) REFERENCES ssu_users(user_id)
-    ON UPDATE CASCADE ON DELETE SET NULL,
+    ON UPDATE CASCADE ON DELETE CASCADE,
 
   CONSTRAINT fk_chatrooms_user_1
     FOREIGN KEY (user_1) REFERENCES ssu_users(user_id)
-    ON UPDATE CASCADE ON DELETE SET NULL,
+    ON UPDATE CASCADE ON DELETE CASCADE,
 
   CONSTRAINT fk_chatrooms_user_2
     FOREIGN KEY (user_2) REFERENCES ssu_users(user_id)
-    ON UPDATE CASCADE ON DELETE SET NULL,
+    ON UPDATE CASCADE ON DELETE CASCADE,
 
   -- integrity rules
   CONSTRAINT chk_distinct_users CHECK (user_1 <> user_2),
