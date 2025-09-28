@@ -1,0 +1,4 @@
+### Make sure you have the extension "REST Client" by Huachao Mao installed in your VSCode to run these tests.
+###Test GET all users
+GET http://localhost:3000/api/users/getAll
+Accept: application/json]
