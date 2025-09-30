@@ -10,3 +10,7 @@
 ### Test GET all users
 GET http://localhost:3000/api/users/getAll
 Accept: application/json
+
+### Automated testing
+GET http://localhost:3000/api/users/getAll/test
+Accept: application/json
