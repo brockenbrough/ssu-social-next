@@ -5,10 +5,10 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 type ApiComment = {
   _id: string;
-  username: string;        // will be empty string
   userId: string;
+  username: string;
   commentContent: string;
-  replies: string[];       // empty array
+  replies: string[];
   date: string | Date;
   postId: string;
 };
@@ -17,18 +17,19 @@ export async function GET() {
   try {
     const rows = await sql<ApiComment[]>`
       SELECT
-        comment_id::text         AS "_id",
-        ''                       AS "username",
-        user_id::text            AS "userId",
-        comment_content          AS "commentContent",
-        created_at               AS "date",
-        post_id::text            AS "postId"
-      FROM comments
-      ORDER BY created_at DESC
+        c.comment_id::text        AS "_id",
+        c.user_id::text           AS "userId",
+        u.username              AS "username",
+        c.comment_content         AS "commentContent",
+        c.created_at              AS "date",
+        c.post_id::text           AS "postId"
+      FROM comments c
+      JOIN ssu_users u ON c.user_id = u.user_id
+      ORDER BY c.created_at DESC
     `;
 
-    const data = rows.map(comment => ({
-      ...comment,
+    const data = rows.map(c => ({
+      ...c,
       replies: [],
     }));
 
