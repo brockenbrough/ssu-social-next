@@ -1,33 +1,42 @@
-// app/api/tests/users/getAll/route.ts  (App Router version)
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // Call the route being tested
-    const res = await fetch("http://localhost:3000/api/users/getAll");
+    const res = await fetch("http://localhost:3000/api/comment");
     const data = await res.json();
 
-    // Check status code and expected structure
     if (res.status === 200 && Array.isArray(data)) {
-      // Optionally verify sample fields
-      const hasTestUser = data.some(
-        (u: any) =>
-          u.username === "test_user" &&
-          u.email === "test_user@example.com" &&
-          u.biography?.includes("test user for automated integration tests")
+      // Define expected postIds and usernames
+      const expectedPostIds = [
+        "33333333-3333-3333-3333-333333333333",
+      ];
+
+      const expectedUsernames = [
+        "test_user1",
+        "test_user2",
+      ];
+
+      // Check if all expected postIds exist in at least one comment
+      const hasAllPostIds = expectedPostIds.every((postId) =>
+        data.some((comment: any) => comment.postId === postId)
       );
 
-      if (hasTestUser) {
+      // Check if all expected usernames exist in at least one comment
+      const hasAllUsernames = expectedUsernames.every((username) =>
+        data.some((comment: any) => comment.username === username)
+      );
+
+      if (hasAllPostIds && hasAllUsernames) {
         return NextResponse.json({
           success: true,
-          message: "Route returned expected 200 OK with test users.",
+          message: "Route returned expected 200 OK with matching postIds and usernames.",
           data,
         });
       } else {
         return NextResponse.json(
           {
             success: false,
-            message: "Route responded but did not contain expected test users.",
+            message: "Route responded but did not contain all expected postIds and usernames.",
             data,
           },
           { status: 500 }
