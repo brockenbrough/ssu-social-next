@@ -93,7 +93,7 @@ export default function RegisterPage() {
                   id="name"
                   type="text"
                   name="name"
-                  placeholder="Enter any display name"
+                  placeholder="Enter ANY display name"
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
                   required
