@@ -11,7 +11,7 @@ import {
 import { formatCurrency } from './utils';
 
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 // Notice that this file contains utility functions that are called internally by the server components.
 // Example: the user requests a page that contains a server component <RevenueChart> that calls fetchRevenue().
