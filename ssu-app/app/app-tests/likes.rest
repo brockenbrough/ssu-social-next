@@ -1,0 +1,8 @@
+### Test GET all users
+GET http://localhost:3000/api/statistics/likes
+Accept: application/json
+
+### Automated testing
+GET http://localhost:3000/api/statistics/likes/test
+Accept: application/json
+
