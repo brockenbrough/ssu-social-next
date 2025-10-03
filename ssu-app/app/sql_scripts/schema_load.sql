@@ -119,64 +119,22 @@ BEGIN
         );
     END IF;
 
-    -- Creation of a default notification (only if it does not already exist)
+        -- Creation of a default follow relationship (only if it does not already exist)
     IF NOT EXISTS (
-        SELECT 1 FROM notifications WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
+        SELECT 1 FROM followers 
+        WHERE user_id = fixed_user_id1 AND follower_id = fixed_user_id2
     ) THEN
-        INSERT INTO notifications (
-            notification_id,
-            notification_type,
+        INSERT INTO followers (
             user_id,
-            action_user_id,
-            content,
-            post_id,
-            is_read,
+            follower_id,
             created_at
         )
         VALUES (
-            gen_random_uuid(),
-            'comment',
-            fixed_user_id1,
-            fixed_user_id2,
-            'test_user2 commented on your test post',
-            fixed_post_id,
-            FALSE,
+            fixed_user_id1,   
+            fixed_user_id2,   
             NOW()
         );
     END IF;
 
 
-    -- Creation of comments
-
-    -- Remove any existing comments for this fixed post and users to avoid duplicates
-    DELETE FROM comments
-    WHERE post_id = fixed_post_id
-      AND user_id IN (fixed_user_id1, fixed_user_id2);
-
-    -- Insert test comments for fixed post
-
-    INSERT INTO comments (
-        comment_id,
-        user_id,
-        comment_content,
-        created_at,
-        post_id
-    )
-    VALUES
-    (
-        gen_random_uuid(),
-        fixed_user_id1,
-        'This is a test comment from test_user1.',
-        NOW(),
-        fixed_post_id
-    ),
-    (
-        gen_random_uuid(),
-        fixed_user_id2,
-        'This is another test comment from test_user2.',
-        NOW(),
-        fixed_post_id
-    );
-
 END $$;
-
