@@ -7,23 +7,7 @@ DECLARE
     fixed_chat_room_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed chat room ID for test
     fixed_bookmark_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed bookmark ID
 BEGIN
-    --Creation of like
-    IF NOT EXISTS (
-        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
-    ) THEN
-        INSERT INTO likes (
-            post_id,
-            user_id,
-            created_at
-        )
-        VALUES (
-            fixed_post_id,
-            fixed_user_id2,
-            NOW()
-        );
-    END IF;
-
-
+    
     -- Creation of users
     IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = fixed_user_id1) THEN
         INSERT INTO ssu_users (
@@ -116,6 +100,22 @@ BEGIN
         FALSE,
         NOW()
     );
+
+    --Creation of like
+    IF NOT EXISTS (
+        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
+    ) THEN
+        INSERT INTO likes (
+            post_id,
+            user_id,
+            created_at
+        )
+        VALUES (
+            fixed_post_id,
+            fixed_user_id2,
+            NOW()
+        );
+    END IF;
 
     -- Remove existing chat room with same fixed_chat_room_id or user pair
     DELETE FROM chatrooms
