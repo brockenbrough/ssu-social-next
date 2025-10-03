@@ -90,3 +90,13 @@ export type InvoiceForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+
+export type Message = {
+  message_id: string;
+  chat_room_id: string;
+  sender_id: string;
+  receiver_id: string;
+  message_text: string;
+  is_read: boolean;
+  created_at: string | Date;
+};
