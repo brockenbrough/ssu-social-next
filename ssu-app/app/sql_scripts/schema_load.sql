@@ -3,6 +3,7 @@ DECLARE
     fixed_user_id1 UUID := '11111111-1111-1111-1111-111111111111'; -- must exist in ssu_users
     fixed_user_id2 UUID := '22222222-2222-2222-2222-222222222222'; -- must exist in ssu_users
     fixed_post_id UUID  := '33333333-3333-3333-3333-333333333333'; -- fixed post ID for test
+    fixed_chat_room_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed chat room ID for test
 BEGIN
 
     -- Creation of users
@@ -77,6 +78,28 @@ BEGIN
         NULL,
         FALSE,
         FALSE,
+        NOW()
+    );
+
+    -- Remove existing chat room with same fixed_chat_room_id or user pair
+    DELETE FROM chatrooms
+    WHERE chat_room_id = fixed_chat_room_id
+    OR (LEAST(user_1, user_2), GREATEST(user_1, user_2))
+        = (LEAST(fixed_user_id1, fixed_user_id2), GREATEST(fixed_user_id1, fixed_user_id2));
+
+    -- Insert fixed chat room
+    INSERT INTO chatrooms (
+        chat_room_id,
+        user_1,
+        user_2,
+        created_by,
+        created_at
+    )
+    VALUES (
+        fixed_chat_room_id,
+        fixed_user_id1,
+        fixed_user_id2,
+        fixed_user_id1,
         NOW()
     );
 END $$;
