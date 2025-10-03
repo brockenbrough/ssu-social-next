@@ -3,36 +3,28 @@ import postgres from "postgres";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-// GET /api/following/:id gets all the user IDs that this user is following
-export async function GET(
-  _req: Request,
-  { params }: { params: { id: string } }
-) {
+// GET /api/following
+// Retrieves a list of all users and who they are following
+export async function GET() {
   try {
-    // params.id is available immediately here
-    const id = params.id;
-
-    const [row] = await sql<{ followers: string[] }[]>`
+    const rows = await sql<{ userId: string; following: string[] }[]>`
       SELECT
+        user_id::text AS "userId",
         COALESCE(
           ARRAY_AGG(follower_id::text ORDER BY follower_id)
           FILTER (WHERE follower_id IS NOT NULL),
           '{}'
-        ) AS followers
+        ) AS following
       FROM followers
-      WHERE user_id = ${id}::uuid
+      GROUP BY user_id
+      ORDER BY user_id
     `;
 
-    const doc = {
-      userId: id,
-      following: row?.followers || [],
-    };
-
-    return NextResponse.json(doc, { status: 200 });
+    return NextResponse.json(rows, { status: 200 });
   } catch (err) {
-    console.error("Error fetching following:", err);
+    console.error("Error fetching all following:", err);
     return NextResponse.json(
-      { error: "Failed to fetch following" },
+      { error: "Failed to fetch following list" },
       { status: 500 }
     );
   }

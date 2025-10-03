@@ -3,9 +3,8 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // Test data using fixed IDs from your schema_load.sql
-    const testUserId = "11111111-1111-1111-1111-111111111111"; // fixed_user_id1
-    const expectedFollowing = ["22222222-2222-2222-2222-222222222222"]; // IDs that user1 is following
+    const testUserId = "11111111-1111-1111-1111-111111111111";
+    const expectedFollowing = ["22222222-2222-2222-2222-222222222222"];
 
     // --- Test /api/following (all users) ---
     const allRes = await fetch("http://localhost:3000/api/following");
@@ -18,7 +17,6 @@ export async function GET() {
       );
     }
 
-    // Check that testUserId exists in allData
     const userRow = allData.find((u: any) => u.userId === testUserId);
     if (!userRow) {
       return NextResponse.json(
@@ -27,7 +25,6 @@ export async function GET() {
       );
     }
 
-    // Check that following array matches expected
     const followingMatches =
       Array.isArray(userRow.following) &&
       expectedFollowing.every((id) => userRow.following.includes(id));
@@ -43,10 +40,13 @@ export async function GET() {
     const idRes = await fetch(`http://localhost:3000/api/following/${testUserId}`);
     const idData = await idRes.json();
 
+    // Adjust to handle array
     if (
       idRes.status !== 200 ||
-      idData.userId !== testUserId ||
-      !Array.isArray(idData.following)
+      !Array.isArray(idData) ||
+      idData.length !== 1 ||
+      idData[0].userId !== testUserId ||
+      !Array.isArray(idData[0].following)
     ) {
       return NextResponse.json(
         { success: false, message: `/[id] route returned unexpected structure`, idData },
@@ -55,7 +55,7 @@ export async function GET() {
     }
 
     const followingMatchesIdRoute =
-      expectedFollowing.every((id) => idData.following.includes(id));
+      expectedFollowing.every((id) => idData[0].following.includes(id));
 
     if (!followingMatchesIdRoute) {
       return NextResponse.json(
@@ -64,7 +64,6 @@ export async function GET() {
       );
     }
 
-    // If all tests pass
     return NextResponse.json({
       success: true,
       message: "All /following routes returned expected data",

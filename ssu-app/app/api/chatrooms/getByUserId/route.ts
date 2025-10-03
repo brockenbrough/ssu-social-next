@@ -1,0 +1,47 @@
+import { NextResponse } from "next/server";
+import postgres from "postgres";
+
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
+export async function GET(request: Request) {
+    try {
+        const url = new URL(request.url);
+        const userId = url.searchParams.get("userId");
+
+        if (!userId) {
+            return NextResponse.json({ message: "UserId is required." }, { status: 400 });
+        }
+
+        // Verify user exists
+        const userExists = await sql`
+            SELECT 1 FROM ssu_users WHERE user_id = ${userId}
+        `;
+        if (userExists.length === 0) {
+            return NextResponse.json({ message: `User with ID ${userId} not found.` }, { status: 404 });
+        }
+
+        // Find chatrooms where user participates
+        const rooms = await sql`
+            SELECT chat_room_id, user_1, user_2, created_at
+            FROM chatrooms
+            WHERE user_1 = ${userId} OR user_2 = ${userId}
+        `;
+
+        // Return in a shape roughly compatible with legacy API
+        const chatRooms = rooms.map((r) => ({
+            _id: r.chat_room_id,
+            participants: [
+                { userId: r.user_1, firstMessageId: null },
+                { userId: r.user_2, firstMessageId: null },
+            ],
+            date: r.created_at,
+        }));
+
+        return NextResponse.json({ chatRooms });
+    } catch (err) {
+        console.error("Error fetching chat rooms:", err);
+        return NextResponse.json({ error: "Could not fetch chat rooms" }, { status: 500 });
+    }
+}
+
+
