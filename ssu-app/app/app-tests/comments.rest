@@ -5,3 +5,4 @@ Accept: application/json
 ### Automated testing
 GET http://localhost:3000/api/comment/test
 Accept: application/json
+
