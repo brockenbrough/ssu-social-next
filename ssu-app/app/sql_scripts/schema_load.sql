@@ -54,6 +54,15 @@ BEGIN
         );
     END IF;
 
+    -- Create test following relationships
+    IF NOT EXISTS (
+        SELECT 1 FROM followers
+        WHERE user_id = fixed_user_id1 AND follower_id = fixed_user_id2
+    ) THEN
+        INSERT INTO followers (user_id, follower_id, created_at)
+        VALUES (fixed_user_id1, fixed_user_id2, NOW());
+    END IF;
+
     -- Creation of posts
     DELETE FROM posts
     WHERE post_id = fixed_post_id;
@@ -118,7 +127,6 @@ BEGIN
             TRUE
         );
     END IF;
-END $$;
 
     -- Creation of a default notification (only if it does not already exist)
     IF NOT EXISTS (
@@ -126,10 +134,10 @@ END $$;
     ) THEN
         INSERT INTO notifications (
             notification_id,
-            type,
+            notification_type,
             user_id,
-            action_username,
-            text,
+            action_user_id,
+            content,
             post_id,
             is_read,
             created_at
@@ -138,11 +146,13 @@ END $$;
             gen_random_uuid(),
             'comment',
             fixed_user_id1,
-            'test_user2',
+            fixed_user_id2,
             'test_user2 commented on your test post',
             fixed_post_id,
             FALSE,
             NOW()
         );
     END IF;
-
+    
+    
+END $$;
