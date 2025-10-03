@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     // Call the route being tested
-    const res = await fetch("http://localhost:3000/api/users/getAll");
+    const res = await fetch("http://localhost:3000/api/user/getAll");
     const data = await res.json();
 
     // Check status code and expected structure
