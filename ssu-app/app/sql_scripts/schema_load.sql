@@ -119,3 +119,30 @@ BEGIN
         );
     END IF;
 END $$;
+
+    -- Creation of a default notification (only if it does not already exist)
+    IF NOT EXISTS (
+        SELECT 1 FROM notifications WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
+    ) THEN
+        INSERT INTO notifications (
+            notification_id,
+            type,
+            user_id,
+            action_username,
+            text,
+            post_id,
+            is_read,
+            created_at
+        )
+        VALUES (
+            gen_random_uuid(),
+            'comment',
+            fixed_user_id1,
+            'test_user2',
+            'test_user2 commented on your test post',
+            fixed_post_id,
+            FALSE,
+            NOW()
+        );
+    END IF;
+
