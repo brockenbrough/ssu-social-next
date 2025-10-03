@@ -1,35 +1,28 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import postgres from "postgres";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-export async function GET(
-  _req: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const { id } = params;
+export async function GET(_req: NextRequest, ctx: RouteContext<"/api/followers/[id]">) {
+  const { id } = await ctx.params; // 👈 params is a Promise in Next 15
 
-    const rows = await sql`
-      SELECT
-        ${id}::text AS "userId",
-        COALESCE(
-          ARRAY_AGG(follower_id::text ORDER BY follower_id)
-          FILTER (WHERE follower_id IS NOT NULL),
-          '{}'
-        ) AS "followers"
-      FROM followers  
-      WHERE user_id = ${id}::uuid   
-    `;
+  const rows = await sql`
+    SELECT
+      ${id}::text AS "userId",
+      COALESCE(
+        ARRAY_AGG(follower_id::text ORDER BY follower_id)
+        FILTER (WHERE follower_id IS NOT NULL),
+        '{}'
+      ) AS "followers"
+    FROM followers
+    WHERE user_id = ${id}::uuid
+  `;
 
-    const doc = {
-      userId: String(id),
-      followers: rows.length ? rows[0].followers : [],
-    };
+  const doc = {
+    userId: id,
+    followers: rows[0]?.followers ?? [],
+  };
 
-    return NextResponse.json([doc], { status: 200 });
-  } catch (err) {
-    console.error("GET followers by id error:", err);
-    return NextResponse.json({ error: "Failed to fetch user followers" }, { status: 500 });
-  }
+  return NextResponse.json([doc], { status: 200 });
 }
+
