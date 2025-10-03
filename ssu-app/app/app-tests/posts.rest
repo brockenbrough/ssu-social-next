@@ -1,0 +1,16 @@
+### To run these tests:
+###    Make sure you have the extension "REST Client" by Huachao Mao installed in your VSCode to run these tests.
+###    You made need to add test data to sql_scripts/schema_load.sql
+###
+### To check if the tests passed:
+###    Look at the response code and body in the REST Client
+###    output window. Make sure the field names and types 
+###    match what is in user model in the original backend.
+
+### Test GET all posts
+GET http://localhost:3000/api/posts/getAllPosts/test
+Accept: application/json
+
+### Test GET all posts by id
+GET http://localhost:3000/api/posts/getPostById/33333333-3333-3333-3333-333333333333
+Accept: application/json
