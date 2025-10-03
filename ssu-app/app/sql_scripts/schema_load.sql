@@ -145,5 +145,38 @@ BEGIN
         );
     END IF;
     
+
+    -- Creation of comments
+
+    -- Remove any existing comments for this fixed post and users to avoid duplicates
+    DELETE FROM comments
+    WHERE post_id = fixed_post_id
+      AND user_id IN (fixed_user_id1, fixed_user_id2);
+
+    -- Insert test comments for fixed post
+
+    INSERT INTO comments (
+        comment_id,
+        user_id,
+        comment_content,
+        created_at,
+        post_id
+    )
+    VALUES
+    (
+        gen_random_uuid(),
+        fixed_user_id1,
+        'This is a test comment from test_user1.',
+        NOW(),
+        fixed_post_id
+    ),
+    (
+        gen_random_uuid(),
+        fixed_user_id2,
+        'This is another test comment from test_user2.',
+        NOW(),
+        fixed_post_id
+    );
+
 END $$;
 
