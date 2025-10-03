@@ -31,6 +31,16 @@ BEGIN
         );
     END IF;
 
+     IF NOT EXISTS (SELECT 1 FROM hashtags WHERE hashtag = '#TestTag') THEN
+        INSERT INTO hashtags (
+            hashtag
+        )
+        VALUES (
+            '#TestTag'
+        );
+    END IF;
+
+
     IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = fixed_user_id2) THEN
         INSERT INTO ssu_users (
             user_id,
