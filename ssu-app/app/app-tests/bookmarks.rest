@@ -10,3 +10,7 @@
 ### Test GET all bookmarks
 GET http://localhost:3000/api/bookmarks
 Accept: application/json
+
+### Unit Test
+GET http://localhost:3000/api/bookmarks/test
+Accept: application/json
