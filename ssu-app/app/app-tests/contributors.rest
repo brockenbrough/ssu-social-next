@@ -1,0 +1,15 @@
+### Test create contributor
+POST http://localhost:3000/api/contributors
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Integration Test User",
+  "position": "Software Engineer",
+  "level_name": "Junior"
+}
+
+### Verify create contributor route via test endpoint
+GET http://localhost:3000/api/contributors/test
+Accept: application/json
+

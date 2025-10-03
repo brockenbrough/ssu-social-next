@@ -7,6 +7,7 @@ DECLARE
     fixed_chat_room_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed chat room ID for test
     fixed_bookmark_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed bookmark ID
 BEGIN
+    
 
 
 
