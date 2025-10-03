@@ -96,4 +96,22 @@ BEGIN
         );
     END IF;
 
+        -- Creation of a default follow relationship (only if it does not already exist)
+    IF NOT EXISTS (
+        SELECT 1 FROM followers 
+        WHERE user_id = fixed_user_id1 AND follower_id = fixed_user_id2
+    ) THEN
+        INSERT INTO followers (
+            user_id,
+            follower_id,
+            created_at
+        )
+        VALUES (
+            fixed_user_id1,   
+            fixed_user_id2,   
+            NOW()
+        );
+    END IF;
+
+
 END $$;
