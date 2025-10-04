@@ -1,6 +1,8 @@
-### Get all followers
+### Get all followers (main route)
 GET http://localhost:3000/api/followers
 
+### Run test for followers (unit test route)
+GET http://localhost:3000/api/followers/test
 ### Get all following
 GET http://localhost:3000/api/following
 
