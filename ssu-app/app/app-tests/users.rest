@@ -8,9 +8,9 @@
 ###    match what is in user model in the original backend.
 
 ### Test GET all users
-GET http://localhost:3000/api/users/getAll
+GET http://localhost:3000/api/user/getAll
 Accept: application/json
 
 ### Automated testing
-GET http://localhost:3000/api/users/getAll/test
+GET http://localhost:3000/api/user/getAll/test
 Accept: application/json

@@ -1,0 +1,11 @@
+### Test DB connection
+GET http://localhost:3000/api/test
+Accept: application/json
+
+### Test hashtags retrieval (from hashmaps route)
+GET http://localhost:3000/api/hashmaps/getAll
+Accept: application/json
+
+### Test hashtags retrieval (from hashmaps route)
+GET http://localhost:3000/api/hashmaps/getAll/test
+Accept: application/json

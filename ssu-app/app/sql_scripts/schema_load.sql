@@ -172,23 +172,6 @@ BEGIN
         );
     END IF;
 
-   
-    IF NOT EXISTS (
-        SELECT 1 FROM followers 
-        WHERE user_id = fixed_user_id1 AND follower_id = fixed_user_id2
-    ) THEN
-        INSERT INTO followers (
-            user_id,
-            follower_id,
-            created_at
-        )
-        VALUES (
-            fixed_user_id1,   -- the user being followed
-            fixed_user_id2,   -- the follower
-            NOW()
-        );
-    END IF;
-    
     -- Creation of a default notification (only if it does not already exist)
     IF NOT EXISTS (
         SELECT 1 FROM notifications WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
