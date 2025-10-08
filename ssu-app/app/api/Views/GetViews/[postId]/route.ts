@@ -9,13 +9,13 @@ export async function GET(
   { params }: { params: { postId: string } }
 ) {
   try {
-    const { postId } = params;
+    const { postId } = await params;
 
     const [row] = await sql<{ viewcount: number }[]>`
-      SELECT COUNT(*)::int AS viewCount
-      FROM views
-      WHERE post_id = ${postId}
-    `;
+  SELECT COUNT(DISTINCT user_id)::int AS viewCount
+  FROM views
+  WHERE post_id = ${postId};
+`;
 
     return NextResponse.json({ viewCount: row?.viewcount ?? 0 }, { status: 200 });
   } catch (error) {
