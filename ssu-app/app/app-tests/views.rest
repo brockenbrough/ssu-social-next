@@ -1,0 +1,15 @@
+### 🧠 Get view count for a specific post
+GET http://localhost:3000/api/Views/GetViews/33333333-3333-3333-3333-333333333333
+Accept: application/json
+
+###
+
+### 🧪 Run the test route for GetViews
+GET http://localhost:3000/api/Views/GetViews/test
+Accept: application/json
+
+###
+
+### ⚠️ Example: Missing or invalid postId
+GET http://localhost:3000/api/Views/GetViews/33333333-3333-3333-3333-333333333332
+Accept: application/json
