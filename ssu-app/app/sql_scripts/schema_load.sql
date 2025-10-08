@@ -217,9 +217,9 @@ BEGIN
         fixed_post_id
     );
 
- -- ========================================
+ -- ====================================
 -- Creation of views (for testing GetViews)
--- ========================================
+-- =====================================
 IF NOT EXISTS (
     SELECT 1 FROM views WHERE user_id = fixed_user_id2 AND post_id = fixed_post_id
 ) THEN
