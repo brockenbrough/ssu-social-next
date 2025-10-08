@@ -9,6 +9,7 @@ DECLARE
     follower_uuid UUID := '11111111-1111-1111-1111-111111111111'; -- test user
     followee_uuid1 UUID := '22222222-2222-2222-2222-222222222222'; -- user2
     followee_uuid2 UUID := '33333333-3333-3333-3333-333333333333'; -- user3
+    fixed_message_id UUID := '55555555-5555-5555-5555-555555555555'; -- fixed message ID for test
 BEGIN
 
     -- Creation of users
@@ -216,5 +217,29 @@ BEGIN
         NOW(),
         fixed_post_id
     );
+
+        -- Creation of a default message (only if it does not already exist)
+    IF NOT EXISTS (
+        SELECT 1 FROM messages WHERE message_id = fixed_message_id
+    ) THEN
+        INSERT INTO messages (
+            message_id,
+            chat_room_id,
+            sender_id,
+            receiver_id,
+            message_text,
+            is_read,
+            created_at
+        )
+        VALUES (
+            fixed_message_id,
+            fixed_chat_room_id,
+            fixed_user_id1,
+            fixed_user_id2,
+            'This is a seeded test message.',
+            FALSE,
+            NOW()
+        );
+    END IF;
 
 END $$;
