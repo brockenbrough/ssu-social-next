@@ -18,3 +18,78 @@ Accept: application/json
 ### Automated testing
 GET http://localhost:3000/api/user/getAll/test
 Accept: application/json
+
+#Lindsey's tests
+### Test POST /login - successful login
+POST http://localhost:3000/api/user/login
+Content-Type: application/json
+
+{
+  "username": "test_user1",
+  "password": "dummy_password_hash1"
+}
+
+### Test POST /login - wrong password
+POST http://localhost:3000/api/user/login
+Content-Type: application/json
+
+{
+  "username": "test_user1",
+  "password": "wrongpassword"
+}
+
+### Test POST /login - non-existent user
+POST http://localhost:3000/api/user/login
+Content-Type: application/json
+
+{
+  "username": "nonexistent_user",
+  "password": "anypassword"
+}
+
+### Test POST /signup - successful signup
+POST http://localhost:3000/api/user/signup
+Content-Type: application/json
+
+{
+  "username": "new_signup_user",
+  "email": "new_signup_user@example.com",
+  "password": "newuserpassword"
+}
+
+### Expected behavior:
+###   - 201 Created
+###   - returns new user object (password null, imageId null)
+
+### ---------------------------
+### Test POST /signup - username/email conflict
+POST http://localhost:3000/api/user/signup
+Content-Type: application/json
+
+{
+  "username": "signup_existing_user",
+  "email": "signup_existing_user@example.com",
+  "password": "anypassword"
+}
+
+### Expected behavior:
+###   - 409 Conflict
+###   - message: "Username is taken, make another one" or "Email already exists, make another one"
+
+### ---------------------------
+### Test DELETE /deleteById/[id] - successful delete
+#DELETE http://localhost:3000/api/user/deleteById/55555555-5555-5555-5555-555555555555
+#Authorization: Bearer {{accessToken_from_login_test_user}}
+
+### Expected behavior:
+###   - 200 OK
+###   - message: "User deleted successfully"
+###   - returns deletedUser object (password null)
+
+### ---------------------------
+### Test DELETE /deleteById/[id] - unauthorized delete
+#DELETE http://localhost:3000/api/user/deleteById/66666666-6666-6666-6666-666666666666
+#Authorization: Bearer {{accessToken_from_login_test_user}}
+
+### Expected behavior:
+###   - 403 Not authorized

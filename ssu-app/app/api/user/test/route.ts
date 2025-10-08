@@ -1,4 +1,4 @@
-// app/api/tests/users/getAll/route.ts  (App Router version)
+// app/api/user/test/route.ts  (App Router version)
 import { NextResponse } from "next/server";
 
 export async function GET() {
