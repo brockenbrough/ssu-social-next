@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
 
+export const runtime = "nodejs";
+
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 type LegacyComment = {
@@ -16,7 +18,6 @@ type LegacyComment = {
 export async function GET(_request: Request, { params }: { params: { postId: string } }) {
   try {
     const { postId } = params;
-
     if (!postId) {
       return NextResponse.json({ commentnotfound: "No comment found" }, { status: 404 });
     }
