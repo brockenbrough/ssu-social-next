@@ -82,6 +82,31 @@ BEGIN
         );
     END IF;
 
+    IF NOT EXISTS (SELECT 1 FROM hashtags WHERE hashtag = '#TestTag') THEN
+        INSERT INTO hashtags (
+            hashtag
+        )
+        VALUES (
+            '#TestTag'
+        );
+    END IF;
+
+    --Creation of like
+    IF NOT EXISTS (
+        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
+    ) THEN
+        INSERT INTO likes (
+            post_id,
+            user_id,
+            created_at
+        )
+        VALUES (
+            fixed_post_id,
+            fixed_user_id2,
+            NOW()
+        );
+    END IF;
+
     -- Creation of posts
     DELETE FROM posts
     WHERE post_id = fixed_post_id;
@@ -218,7 +243,7 @@ BEGIN
         fixed_post_id
     );
 
-        -- Creation of a default message (only if it does not already exist)
+    -- Creation of a default message (only if it does not already exist)
     IF NOT EXISTS (
         SELECT 1 FROM messages WHERE message_id = fixed_message_id
     ) THEN
@@ -241,5 +266,38 @@ BEGIN
             NOW()
         );
     END IF;
+
+ -- ====================================
+-- Creation of views (for testing GetViews)
+-- =====================================
+IF NOT EXISTS (
+    SELECT 1 FROM views WHERE user_id = fixed_user_id2 AND post_id = fixed_post_id
+) THEN
+    INSERT INTO views (
+        user_id,
+        post_id,
+        created_at
+    )
+    VALUES (
+        fixed_user_id2, -- user2 viewed user1's fixed post
+        fixed_post_id,
+        NOW()
+    );
+END IF;
+
+IF NOT EXISTS (
+    SELECT 1 FROM views WHERE user_id = fixed_user_id3 AND post_id = fixed_post_id
+) THEN
+    INSERT INTO views (
+        user_id,
+        post_id,
+        created_at
+    )
+    VALUES (
+        fixed_user_id3, -- user3 viewed the same post
+        fixed_post_id,
+        NOW()
+    );
+END IF;
 
 END $$;
