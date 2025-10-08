@@ -6,10 +6,10 @@ DECLARE
     fixed_post_id UUID  := '33333333-3333-3333-3333-333333333333'; -- fixed post ID for test
     fixed_chat_room_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed chat room ID for test
     fixed_bookmark_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed bookmark ID
+    follower_uuid UUID := '11111111-1111-1111-1111-111111111111'; -- test user
+    followee_uuid1 UUID := '22222222-2222-2222-2222-222222222222'; -- user2
+    followee_uuid2 UUID := '33333333-3333-3333-3333-333333333333'; -- user3
 BEGIN
-    
-
-
 
     -- Creation of users
     IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = fixed_user_id1) THEN
@@ -34,16 +34,6 @@ BEGIN
             'Auto-created test user.'
         );
     END IF;
-
-     IF NOT EXISTS (SELECT 1 FROM hashtags WHERE hashtag = '#TestTag') THEN
-        INSERT INTO hashtags (
-            hashtag
-        )
-        VALUES (
-            '#TestTag'
-        );
-    END IF;
-
 
     IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = fixed_user_id2) THEN
         INSERT INTO ssu_users (
@@ -114,22 +104,6 @@ BEGIN
         NOW()
     );
 
-    --Creation of like
-    IF NOT EXISTS (
-        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
-    ) THEN
-        INSERT INTO likes (
-            post_id,
-            user_id,
-            created_at
-        )
-        VALUES (
-            fixed_post_id,
-            fixed_user_id2,
-            NOW()
-        );
-    END IF;
-    
     -- Remove existing chat room with same fixed_chat_room_id or user pair
     DELETE FROM chatrooms
     WHERE chat_room_id = fixed_chat_room_id
@@ -151,6 +125,18 @@ BEGIN
         fixed_user_id1,
         NOW()
     );
+    
+    -- Remove any existing test follower relationships for this follower
+    DELETE FROM followers
+    WHERE follower_id = follower_uuid
+      AND user_id IN (followee_uuid1, followee_uuid2);
+
+    -- Insert new test follower relationships
+    INSERT INTO followers (user_id, follower_id)
+    VALUES 
+        (followee_uuid1, follower_uuid),
+        (followee_uuid2, follower_uuid)
+    ON CONFLICT DO NOTHING;
     
         -- Creation of a default bookmark (only if it does not already exist)
     IF NOT EXISTS (
