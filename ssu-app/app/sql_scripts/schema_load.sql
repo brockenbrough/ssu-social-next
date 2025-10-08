@@ -35,6 +35,30 @@ BEGIN
         );
     END IF;
 
+     IF NOT EXISTS (SELECT 1 FROM hashtags WHERE hashtag = '#TestTag') THEN
+        INSERT INTO hashtags (
+            hashtag
+        )
+        VALUES (
+            '#TestTag'
+        );
+    END IF;
+
+ IF NOT EXISTS (
+        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
+    ) THEN
+        INSERT INTO likes (
+            post_id,
+            user_id,
+            created_at
+        )
+        VALUES (
+            fixed_post_id,
+            fixed_user_id2,
+            NOW()
+        );
+    END IF;
+    
     IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = fixed_user_id2) THEN
         INSERT INTO ssu_users (
             user_id,
