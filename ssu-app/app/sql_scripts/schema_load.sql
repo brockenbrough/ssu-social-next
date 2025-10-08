@@ -217,42 +217,38 @@ BEGIN
         fixed_post_id
     );
 
-        -- ========================================
-    -- Creation of views (for testing GetViews)
-    -- ========================================
-    IF NOT EXISTS (
-        SELECT 1 FROM views WHERE user_id = fixed_user_id2 AND post_id = fixed_post_id
-    ) THEN
-        INSERT INTO views (
-            view_id,
-            user_id,
-            post_id,
-            created_at
-        )
-        VALUES (
-            gen_random_uuid(),
-            fixed_user_id2, -- user2 viewed user1's fixed post
-            fixed_post_id,
-            NOW()
-        );
-    END IF;
+ -- ====================================
+-- Creation of views (for testing GetViews)
+-- =====================================
+IF NOT EXISTS (
+    SELECT 1 FROM views WHERE user_id = fixed_user_id2 AND post_id = fixed_post_id
+) THEN
+    INSERT INTO views (
+        user_id,
+        post_id,
+        created_at
+    )
+    VALUES (
+        fixed_user_id2, -- user2 viewed user1's fixed post
+        fixed_post_id,
+        NOW()
+    );
+END IF;
 
-    IF NOT EXISTS (
-        SELECT 1 FROM views WHERE user_id = fixed_user_id3 AND post_id = fixed_post_id
-    ) THEN
-        INSERT INTO views (
-            view_id,
-            user_id,
-            post_id,
-            created_at
-        )
-        VALUES (
-            gen_random_uuid(),
-            fixed_user_id3, -- user3 viewed same post
-            fixed_post_id,
-            NOW()
-        );
-    END IF;
+IF NOT EXISTS (
+    SELECT 1 FROM views WHERE user_id = fixed_user_id3 AND post_id = fixed_post_id
+) THEN
+    INSERT INTO views (
+        user_id,
+        post_id,
+        created_at
+    )
+    VALUES (
+        fixed_user_id3, -- user3 viewed the same post
+        fixed_post_id,
+        NOW()
+    );
+END IF;
 
 
 END $$;
