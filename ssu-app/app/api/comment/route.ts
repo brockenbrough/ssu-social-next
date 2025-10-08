@@ -12,7 +12,7 @@ type ApiComment = {
   date: string | Date;
   postId: string;
 };
-
+// Get all comments
 export async function GET() {
   try {
     const rows = await sql<ApiComment[]>`

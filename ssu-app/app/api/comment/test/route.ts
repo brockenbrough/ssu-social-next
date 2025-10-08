@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-
+// Get all comments test
 export async function GET() {
   try {
     const res = await fetch("http://localhost:3000/api/comment");
