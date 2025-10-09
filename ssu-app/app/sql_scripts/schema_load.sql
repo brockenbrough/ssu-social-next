@@ -4,6 +4,7 @@ DECLARE
     fixed_user_id2 UUID := '22222222-2222-2222-2222-222222222222'; -- must exist in ssu_users
     fixed_user_id3 UUID := '33333333-3333-3333-3333-333333333333'; -- must exist in ssu_users
     fixed_post_id UUID  := '33333333-3333-3333-3333-333333333333'; -- fixed post ID for test
+    fixed_post_id1 UUID := '11111111-1111-1111-1111-111111111111'; -- fixed post ID for test Yannie
     fixed_chat_room_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed chat room ID for test
     fixed_bookmark_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed bookmark ID
     follower_uuid UUID := '11111111-1111-1111-1111-111111111111'; -- test user
@@ -135,6 +136,10 @@ BEGIN
     DELETE FROM posts
     WHERE post_id = fixed_post_id;
 
+    --Yannie
+    DELETE FROM posts
+    WHERE post_id = fixed_post_id1;
+
     INSERT INTO posts (
         post_id,
         user_id,
@@ -152,7 +157,18 @@ BEGIN
         FALSE,
         FALSE,
         NOW()
+    ), 
+    (
+        fixed_post_id1,
+        fixed_user_id3,
+        'This is a fixed test post for testing getting comment by PostId.',
+        NULL,
+        FALSE,
+        FALSE,
+        NOW()
     );
+    -- Yannie
+    
 
     -- Remove existing chat room with same fixed_chat_room_id or user pair
     DELETE FROM chatrooms
@@ -242,6 +258,10 @@ BEGIN
     WHERE post_id = fixed_post_id
       AND user_id IN (fixed_user_id1, fixed_user_id2);
 
+    --Yannie
+    DELETE FROM comments
+    WHERE post_id = fixed_post_id1;
+
     -- Insert test comments for fixed post
 
     INSERT INTO comments (
@@ -265,6 +285,13 @@ BEGIN
         'This is another test comment from test_user2.',
         NOW(),
         fixed_post_id
+    ),
+    (
+        gen_random_uuid(),
+        fixed_user_id3,
+        'This comment is for testing getting comment by PostId.',
+        NOW(),
+        fixed_post_id1
     );
 
     -- Creation of a default message (only if it does not already exist)
