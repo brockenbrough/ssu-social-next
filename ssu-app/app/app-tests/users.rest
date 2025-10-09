@@ -52,16 +52,11 @@ POST http://localhost:3000/api/user/signup
 Content-Type: application/json
 
 {
-  "username": "new_signup_user",
-  "email": "new_signup_user@example.com",
+  "username": "new_signup_user1",
+  "email": "new_signup_user1@example.com",
   "password": "newuserpassword"
 }
 
-### Expected behavior:
-###   - 201 Created
-###   - returns new user object (password null, imageId null)
-
-### ---------------------------
 ### Test POST /signup - username/email conflict
 POST http://localhost:3000/api/user/signup
 Content-Type: application/json
@@ -72,24 +67,7 @@ Content-Type: application/json
   "password": "anypassword"
 }
 
-### Expected behavior:
-###   - 409 Conflict
-###   - message: "Username is taken, make another one" or "Email already exists, make another one"
-
-### ---------------------------
 ### Test DELETE /deleteById/[id] - successful delete
-#DELETE http://localhost:3000/api/user/deleteById/55555555-5555-5555-5555-555555555555
-#Authorization: Bearer {{accessToken_from_login_test_user}}
-
-### Expected behavior:
-###   - 200 OK
-###   - message: "User deleted successfully"
-###   - returns deletedUser object (password null)
-
-### ---------------------------
-### Test DELETE /deleteById/[id] - unauthorized delete
-#DELETE http://localhost:3000/api/user/deleteById/66666666-6666-6666-6666-666666666666
-#Authorization: Bearer {{accessToken_from_login_test_user}}
-
-### Expected behavior:
-###   - 403 Not authorized
+DELETE http://localhost:3000/api/user/deleteById/11111111-1111-1111-1111-111111111111
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYwMDQzNDg5LCJleHAiOjE3NjAwNDQzODl9.uAWWAd3Dj5CiJDlA_lC6wWE2__oXaIq4EN6dxDIYvZ0
+# Authorization is the accessToken from login
