@@ -4,7 +4,7 @@ GET http://localhost:3000/api/followers
 ### Run test for followers (unit test route)
 GET http://localhost:3000/api/followers/test
 
-### Get followers for a specific user
+### followers for a specific user
 # Replace with a real UUID from your database if needed
 GET http://localhost:3000/api/followers/11111111-1111-1111-1111-111111111111
 Accept: application/json
