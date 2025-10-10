@@ -3,36 +3,36 @@ import postgres from "postgres";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
+// DELETE /api/posts/deletePost/[id]
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await ctx.params;
 
-    if (!id || !/^[0-9a-fA-F-]{36}$/.test(id)) {
-      return NextResponse.json({ success: false, message: "Invalid post ID" }, { status: 400 });
+    // Validate UUID
+    if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
+      return NextResponse.json({ error: "Invalid post id" }, { status: 400 });
     }
 
-    // Attempt deletion
-    const result = await sql<{ post_id: string }[]>`
+    // Attempt to delete the post
+    const result = await sql<{ deleted: boolean }[]>`
       DELETE FROM posts
       WHERE post_id = ${id}::uuid
-      RETURNING post_id
+      RETURNING TRUE AS deleted;
     `;
 
     if (result.length === 0) {
-      return NextResponse.json({ success: false, message: "Post not found" }, { status: 404 });
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "Post deleted successfully",
-      data: { deletedId: result[0].post_id },
-    });
-
-  } catch (err: any) {
-    console.error("Delete post error:", err);
-    return NextResponse.json({ success: false, message: err.message }, { status: 500 });
+    return NextResponse.json(
+      { success: true, message: "Post deleted successfully", data: { postId: id } },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    return NextResponse.json({ error: "Failed to delete post" }, { status: 500 });
   }
 }

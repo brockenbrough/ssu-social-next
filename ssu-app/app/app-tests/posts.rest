@@ -34,3 +34,19 @@ Accept: application/json
 ### Test DELETE a specific post test
 GET http://localhost:3000/api/posts/deletePost/33333333-3333-3333-3333-333333333333/test
 Accept: application/json
+
+######################################
+
+### Create POST
+
+POST http://localhost:3000/api/posts/createPost
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userId": "11111111-1111-1111-1111-111111111111",
+  "content": "Hello, this is a new post!",
+  "imageUri": null,
+  "isSensitive": false,
+  "hasOffensiveText": false
+}
