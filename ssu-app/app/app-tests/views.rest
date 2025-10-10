@@ -13,3 +13,24 @@ Accept: application/json
 ### ⚠️ Example: Missing or invalid postId
 GET http://localhost:3000/api/Views/GetViews/33333333-3333-3333-3333-333333333332
 Accept: application/json
+
+
+
+### 🧍‍♂️ Create new view (POST /api/Views/CreateView)
+POST http://localhost:3000/api/Views/CreateView
+Content-Type: application/json
+
+{
+  "userId": "22222222-2222-2222-2222-222222222222",
+  "postId": "33333333-3333-3333-3333-333333333333"
+}
+
+
+### Create a *new* view (different post)
+POST http://localhost:3000/api/Views/CreateView
+Content-Type: application/json
+
+{
+  "userId": "22222222-2222-2222-2222-222222222222",
+  "postId": "11111111-1111-1111-1111-111111111111"
+}
