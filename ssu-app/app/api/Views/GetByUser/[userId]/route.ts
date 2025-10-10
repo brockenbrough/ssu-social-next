@@ -15,7 +15,7 @@ export async function GET(
       return NextResponse.json({ error: "Invalid userId format" }, { status: 400 });
     }
 
-    // Fetch all posts viewed by this user
+    // Fetch all post viewed by this user
     const results = await sql`
       SELECT 
         v.post_id::text,

@@ -8,7 +8,7 @@ export async function GET() {
     const res = await fetch(`http://localhost:3000/api/Views/GetByUser/${TEST_USER_ID}`);
     const data = await res.json();
 
-    // Check for successful response and expected structure
+    // Check for successful responses and expected structure
     if (res.status === 200 && Array.isArray(data.views)) {
       const hasViews = data.views.length > 0;
 
