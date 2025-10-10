@@ -6,3 +6,20 @@ Accept: application/json
 GET http://localhost:3000/api/comment/test
 Accept: application/json
 
+### Test GET comment by id (get new comment id from database for each test)
+GET http://localhost:3000/api/comment/6f810359-5790-4fc5-be36-d096a8e53f30
+Accept: application/json
+
+
+### Test DELETE comment by id (get new comment id from database for each test)
+DELETE http://localhost:3000/api/comment/6f810359-5790-4fc5-be36-d096a8e53f30
+Accept: application/json
+
+# Yannien's tests
+### Get comments by postId = 33333333-3333-3333-3333-333333333333
+GET http://localhost:3000/api/comment/getCommentsByPostId/33333333-3333-3333-3333-333333333333
+Accept: application/json
+
+### Get comments by postId = 11111111-1111-1111-1111-111111111111
+GET http://localhost:3000/api/comment/getCommentsByPostId/11111111-1111-1111-1111-111111111111
+Accept: application/json
