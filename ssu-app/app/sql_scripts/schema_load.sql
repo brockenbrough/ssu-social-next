@@ -358,5 +358,13 @@ END IF;
       ('aaaaaaaa-bbbb-bbbb-bbbb-aaaaaaaaaaaa', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Post from extra_user6 for testing CreateView route.', NULL, FALSE, FALSE, NOW())
     ON CONFLICT (post_id) DO NOTHING;
 
-
+    INSERT INTO comments (comment_id, user_id, comment_content, created_at, post_id)
+    VALUES (
+      '88888888-8888-8888-8888-888888888888',        -- fixed comment id
+      '22222222-2222-2222-2222-222222222222',        -- fixed_user_id2 (exists)
+      'This is an updatable test comment (initial).',
+      NOW(),
+      '33333333-3333-3333-3333-333333333333'         -- fixed_post_id (exists)
+    )
+    ON CONFLICT (comment_id) DO NOTHING;
 END $$;
