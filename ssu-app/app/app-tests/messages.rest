@@ -34,3 +34,16 @@ Accept: application/json
 ### Test mark as read route via test endpoint
 GET http://localhost:3000/api/message/markAsRead/test
 Accept: application/json
+
+### Test generate message
+POST http://localhost:3000/message/generate
+Content-Type: application/json
+Accept: application/json
+
+{
+  "chatHistoryStr": "Bob: hey\nMe: hey! how are you?\nBob: I'm good — any plans for tonight?"
+}
+
+### Test generate message route via test endpoint
+GET http://localhost:3000/message/generate/test
+Accept: application/json
