@@ -10,64 +10,54 @@ DECLARE
     follower_uuid UUID := '11111111-1111-1111-1111-111111111111'; -- test user
     followee_uuid1 UUID := '22222222-2222-2222-2222-222222222222'; -- user2
     followee_uuid2 UUID := '33333333-3333-3333-3333-333333333333'; -- user3
+    signup_existing_user_id UUID := '66666666-6666-6666-6666-666666666666';
     fixed_message_id UUID := '55555555-5555-5555-5555-555555555555'; -- fixed message ID for test
 BEGIN
-
-
-
-    -- Creation of users
-    IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = fixed_user_id1) THEN
-        INSERT INTO ssu_users (
-            user_id,
-            username,
-            email,
-            password,
-            created_at,
-            role,
-            profile_image,
-            biography
-        )
-        VALUES (
-            fixed_user_id1,
-            'test_user1',
-            'test_user1@example.com',
-            'dummy_password_hash',
-            NOW(),
-            'user',
-            NULL,
-            'Auto-created test user.'
-        );
-    END IF;
-
-     IF NOT EXISTS (SELECT 1 FROM hashtags WHERE hashtag = '#TestTag') THEN
-        INSERT INTO hashtags (
-            hashtag
-        )
-        VALUES (
-            '#TestTag'
-        );
-    END IF;
-
- IF NOT EXISTS (
-        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
-    ) THEN
-        INSERT INTO likes (
-            post_id,
-            user_id,
-            created_at
-        )
-        VALUES (
-            fixed_post_id,
-            fixed_user_id2,
-            NOW()
-        );
-    END IF;
     
-    IF NOT EXISTS (SELECT 1 FROM hashtags WHERE hashtag = '#TestTag') THEN
-        INSERT INTO hashtags (hashtag) VALUES ('#TestTag');
-    END IF;
+    -- Upsert test_user1
+    INSERT INTO ssu_users(user_id, username, email, password, created_at, role, profile_image, biography)
+    VALUES (
+        fixed_user_id1,
+        'test_user1',
+        'test_user1@example.com',
+        '$2b$10$jbi3d6Q82flNiZaReOO9j.JjDjjKxQTVSwBJhBqyB9ZkdmDoVu.TW', -- bcrypt hash for 'dummy_password_hash1'
+        NOW(),
+        'user',
+        NULL,
+        'Auto-created test user.'
+    )
+    ON CONFLICT (user_id) DO UPDATE SET password = EXCLUDED.password;
 
-    IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = fixed_user_id2) THEN
+    -- Upsert test_user2
+    INSERT INTO ssu_users(user_id, username, email, password, created_at, role, profile_image, biography)
+    VALUES (
+        fixed_user_id2,
+        'test_user2',
+        'test_user2@example.com',
+        '$2b$10$6xM6kyrYp7Iqmxz0x6ELpuK3X/wb2qv2L4xfTxk9eyedJbCv5X2ci',
+        NOW(),
+        'user',
+        NULL,
+        'Auto-created test user.'
+    )
+    ON CONFLICT (user_id) DO UPDATE SET password = EXCLUDED.password;
+
+    -- Upsert test_user3
+    INSERT INTO ssu_users(user_id, username, email, password, created_at, role, profile_image, biography)
+    VALUES (
+        fixed_user_id3,
+        'test_user3',
+        'test_user3@example.com',
+        '$2b$10$0y3lHxfBnUOt5c1iSzJ2ku7iFgkTcZtj6cznL2oZMzIhE6W8XGqY6',
+        NOW(),
+        'user',
+        NULL,
+        'Auto-created test user.'
+    )
+    ON CONFLICT (user_id) DO UPDATE SET password = EXCLUDED.password;
+
+    -- Signup conflict test user (already exists)
+    IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = signup_existing_user_id) THEN
         INSERT INTO ssu_users (
             user_id,
             username,
@@ -79,37 +69,14 @@ BEGIN
             biography
         )
         VALUES (
-            fixed_user_id2,
-            'test_user2',
-            'test_user2@example.com',
-            'dummy_password_hash',
+            signup_existing_user_id,
+            'signup_existing_user',
+            'signup_existing_user@example.com',
+            '$2b$10$CwTycUXWue0Thq9StjUM0uJ8XQWZ7GfjOw9Tp8k1P9Jzqf2ZQh7e.',  -- bcrypt hash for 'signuppassword'
             NOW(),
             'user',
             NULL,
-            'Auto-created test user.'
-        );
-    END IF;
-
-    IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = fixed_user_id3) THEN
-        INSERT INTO ssu_users (
-            user_id,
-            username,
-            email,
-            password,
-            created_at,
-            role,
-            profile_image,
-            biography
-        )
-        VALUES (
-            fixed_user_id3,
-            'test_user3',
-            'test_user3@example.com',
-            'dummy_password_hash',
-            NOW(),
-            'user',
-            NULL,
-            'Auto-created test user.'
+            'Pre-existing user for signup conflict test.'
         );
     END IF;
 
