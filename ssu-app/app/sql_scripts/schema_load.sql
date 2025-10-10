@@ -6,7 +6,7 @@ DECLARE
     fixed_post_id UUID  := '33333333-3333-3333-3333-333333333333'; -- fixed post ID for test
     fixed_post_id1 UUID := '11111111-1111-1111-1111-111111111111'; -- fixed post ID for test Yannie
     fixed_chat_room_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed chat room ID for test
-    fixed_bookmark_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed bookmark ID
+    fixed_bookmark_id UUID := 'cccccccc-cccc-cccc-cccc-cccccccccccc'; -- fixed bookmark ID (unique; distinct from chat room)
     follower_uuid UUID := '11111111-1111-1111-1111-111111111111'; -- test user
     followee_uuid1 UUID := '22222222-2222-2222-2222-222222222222'; -- user2
     followee_uuid2 UUID := '33333333-3333-3333-3333-333333333333'; -- user3
