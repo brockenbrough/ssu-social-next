@@ -21,7 +21,7 @@ export async function GET(
   ctx: { params: Promise<{ id: string }> }   // NOTE: params is a Promise now
 ) {
   try {
-    const { id } = await ctx.params;          // ✅ await params
+    const { id } = await ctx.params;
 
     // Optional: basic UUID shape check to 400 early (keeps logs cleaner)
     if (!/^[0-9a-fA-F-]{36}$/.test(id)) {

@@ -11,10 +11,63 @@
 GET http://localhost:3000/api/user/getAll
 Accept: application/json
 
-### Test GET specific user by id
-GET http://localhost:3000/api/user/11111111-1111-1111-1111-111111111111
+### Test GET specific user by its user id
+GET http://localhost:3000/api/user/getUserById/11111111-1111-1111-1111-111111111111
 Accept: application/json
 
 ### Automated testing
-GET http://localhost:3000/api/user/getAll/test
+GET http://localhost:3000/api/user/test
 Accept: application/json
+
+#Lindsey's tests
+### Test POST /login - successful login
+POST http://localhost:3000/api/user/login
+Content-Type: application/json
+
+{
+  "username": "test_user1",
+  "password": "dummy_password_hash1"
+}
+
+### Test POST /login - wrong password
+POST http://localhost:3000/api/user/login
+Content-Type: application/json
+
+{
+  "username": "test_user1",
+  "password": "wrongpassword"
+}
+
+### Test POST /login - non-existent user
+POST http://localhost:3000/api/user/login
+Content-Type: application/json
+
+{
+  "username": "nonexistent_user",
+  "password": "anypassword"
+}
+
+### Test POST /signup - successful signup
+POST http://localhost:3000/api/user/signup
+Content-Type: application/json
+
+{
+  "username": "new_signup_user1",
+  "email": "new_signup_user1@example.com",
+  "password": "newuserpassword"
+}
+
+### Test POST /signup - username/email conflict
+POST http://localhost:3000/api/user/signup
+Content-Type: application/json
+
+{
+  "username": "signup_existing_user",
+  "email": "signup_existing_user@example.com",
+  "password": "anypassword"
+}
+
+### Test DELETE /deleteById/[id] - successful delete
+DELETE http://localhost:3000/api/user/deleteById/11111111-1111-1111-1111-111111111111
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYwMDQzNDg5LCJleHAiOjE3NjAwNDQzODl9.uAWWAd3Dj5CiJDlA_lC6wWE2__oXaIq4EN6dxDIYvZ0
+# Authorization is the accessToken from login
