@@ -13,6 +13,8 @@ DECLARE
     fixed_message_id UUID := '55555555-5555-5555-5555-555555555555'; -- fixed message ID for test
 BEGIN
 
+
+
     -- Creation of users
     IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = fixed_user_id1) THEN
         INSERT INTO ssu_users (
@@ -35,6 +37,10 @@ BEGIN
             NULL,
             'Auto-created test user.'
         );
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM hashtags WHERE hashtag = '#TestTag') THEN
+        INSERT INTO hashtags (hashtag) VALUES ('#TestTag');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = fixed_user_id2) THEN
@@ -109,8 +115,7 @@ BEGIN
     END IF;
 
     -- Creation of posts
-    DELETE FROM posts
-    WHERE post_id = fixed_post_id;
+    DELETE FROM posts WHERE post_id = fixed_post_id;
 
     --Yannie
     DELETE FROM posts
@@ -143,16 +148,51 @@ BEGIN
         FALSE,
         NOW()
     );
+
+    -- Creation of like  (fixed condition: user2 likes user1's post)
+    IF NOT EXISTS (
+        SELECT 1 FROM likes WHERE user_id = fixed_user_id2 AND post_id = fixed_post_id
+    ) THEN
+        INSERT INTO likes (post_id, user_id, created_at)
+        VALUES (fixed_post_id, fixed_user_id2, NOW());
+    END IF;
     -- Yannie
     
 
     -- Remove existing chat room with same fixed_chat_room_id or user pair
     DELETE FROM chatrooms
     WHERE chat_room_id = fixed_chat_room_id
-    OR (LEAST(user_1, user_2), GREATEST(user_1, user_2))
-        = (LEAST(fixed_user_id1, fixed_user_id2), GREATEST(fixed_user_id1, fixed_user_id2));
+       OR (LEAST(user_1, user_2), GREATEST(user_1, user_2))
+          = (LEAST(fixed_user_id1, fixed_user_id2), GREATEST(fixed_user_id1, fixed_user_id2));
 
     -- Insert fixed chat room
+    INSERT INTO chatrooms (chat_room_id, user_1, user_2, created_by, created_at)
+    VALUES (fixed_chat_room_id, fixed_user_id1, fixed_user_id2, fixed_user_id1, NOW());
+
+    -- Followers seeding 
+    DELETE FROM followers
+     WHERE (user_id, follower_id) IN (
+           (fixed_user_id1, fixed_user_id2),
+           (fixed_user_id2, fixed_user_id1),
+           (fixed_user_id3, fixed_user_id1)
+     );
+
+    IF NOT EXISTS (SELECT 1 FROM followers WHERE user_id = fixed_user_id1 AND follower_id = fixed_user_id2) THEN
+        INSERT INTO followers (user_id, follower_id, created_at)
+        VALUES (fixed_user_id1, fixed_user_id2, NOW());
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM followers WHERE user_id = fixed_user_id2 AND follower_id = fixed_user_id1) THEN
+        INSERT INTO followers (user_id, follower_id, created_at)
+        VALUES (fixed_user_id2, fixed_user_id1, NOW());
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM followers WHERE user_id = fixed_user_id3 AND follower_id = fixed_user_id1) THEN
+        INSERT INTO followers (user_id, follower_id, created_at)
+        VALUES (fixed_user_id3, fixed_user_id1, NOW());
+    END IF;
+
+    -- Creation of a default bookmark (only if it does not already exist)
     INSERT INTO chatrooms (
         chat_room_id,
         user_1,
@@ -184,20 +224,8 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM bookmarks WHERE user_id = fixed_user_id2 AND post_id = fixed_post_id
     ) THEN
-        INSERT INTO bookmarks (
-            bookmark_id,
-            user_id,
-            post_id,
-            created_at,
-            is_public
-        )
-        VALUES (
-            fixed_bookmark_id,
-            fixed_user_id2,         -- user2 bookmarks user1's test post
-            fixed_post_id,
-            NOW(),
-            TRUE
-        );
+        INSERT INTO bookmarks (bookmark_id, user_id, post_id, created_at, is_public)
+        VALUES (fixed_bookmark_id, fixed_user_id2, fixed_post_id, NOW(), TRUE);
     END IF;
 
     -- Creation of a default notification (only if it does not already exist)
@@ -226,10 +254,7 @@ BEGIN
         );
     END IF;
 
-
     -- Creation of comments
-
-    -- Remove any existing comments for this fixed post and users to avoid duplicates
     DELETE FROM comments
     WHERE post_id = fixed_post_id
       AND user_id IN (fixed_user_id1, fixed_user_id2);
