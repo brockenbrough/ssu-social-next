@@ -98,22 +98,6 @@ BEGIN
         );
     END IF;
 
-    --Creation of like
-    IF NOT EXISTS (
-        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
-    ) THEN
-        INSERT INTO likes (
-            post_id,
-            user_id,
-            created_at
-        )
-        VALUES (
-            fixed_post_id,
-            fixed_user_id2,
-            NOW()
-        );
-    END IF;
-
     -- Creation of posts
     DELETE FROM posts WHERE post_id = fixed_post_id;
 
@@ -148,6 +132,22 @@ BEGIN
         FALSE,
         NOW()
     );
+
+    --Creation of like
+    IF NOT EXISTS (
+        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
+    ) THEN
+        INSERT INTO likes (
+            post_id,
+            user_id,
+            created_at
+        )
+        VALUES (
+            fixed_post_id,
+            fixed_user_id2,
+            NOW()
+        );
+    END IF;
 
     -- Creation of like  (fixed condition: user2 likes user1's post)
     IF NOT EXISTS (
@@ -191,22 +191,6 @@ BEGIN
         INSERT INTO followers (user_id, follower_id, created_at)
         VALUES (fixed_user_id3, fixed_user_id1, NOW());
     END IF;
-
-    -- Creation of a default bookmark (only if it does not already exist)
-    INSERT INTO chatrooms (
-        chat_room_id,
-        user_1,
-        user_2,
-        created_by,
-        created_at
-    )
-    VALUES (
-        fixed_chat_room_id,
-        fixed_user_id1,
-        fixed_user_id2,
-        fixed_user_id1,
-        NOW()
-    );
     
     -- Remove any existing test follower relationships for this follower
     DELETE FROM followers
