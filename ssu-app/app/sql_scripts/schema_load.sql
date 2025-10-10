@@ -327,4 +327,31 @@ IF NOT EXISTS (
     );
 END IF;
 
+    -- ====================================
+    -- EXTRA TEST USERS
+    -- ====================================
+    INSERT INTO ssu_users (user_id, username, email, password, created_at, role, profile_image, biography)
+    VALUES
+      ('55555555-5555-5555-5555-555555555555', 'extra_user1', 'extra1@example.com', 'dummy_password_hash', NOW(), 'user', NULL, 'Extra test user 1.'),
+      ('66666666-6666-6666-6666-666666666666', 'extra_user2', 'extra2@example.com', 'dummy_password_hash', NOW(), 'user', NULL, 'Extra test user 2.'),
+      ('77777777-7777-7777-7777-777777777777', 'extra_user3', 'extra3@example.com', 'dummy_password_hash', NOW(), 'user', NULL, 'Extra test user 3.'),
+      ('88888888-8888-8888-8888-888888888888', 'extra_user4', 'extra4@example.com', 'dummy_password_hash', NOW(), 'user', NULL, 'Extra test user 4.'),
+      ('99999999-9999-9999-9999-999999999999', 'extra_user5', 'extra5@example.com', 'dummy_password_hash', NOW(), 'user', NULL, 'Extra test user 5.'),
+      ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'extra_user6', 'extra6@example.com', 'dummy_password_hash', NOW(), 'user', NULL, 'Extra test user 6.')
+    ON CONFLICT (user_id) DO NOTHING;
+
+    -- ====================================
+    -- EXTRA TEST POSTS
+    -- ====================================
+    INSERT INTO posts (post_id, user_id, content, image_uri, is_sensitive, has_offensive_text, created_at)
+    VALUES
+      ('55555555-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '55555555-5555-5555-5555-555555555555', 'Post from extra_user1 for testing view counts.', NULL, FALSE, FALSE, NOW()),
+      ('66666666-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '66666666-6666-6666-6666-666666666666', 'Post from extra_user2 for testing followers.', NULL, FALSE, FALSE, NOW()),
+      ('77777777-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '77777777-7777-7777-7777-777777777777', 'Post from extra_user3 for testing comments.', NULL, FALSE, FALSE, NOW()),
+      ('88888888-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '88888888-8888-8888-8888-888888888888', 'Post from extra_user4 for API validation.', NULL, FALSE, FALSE, NOW()),
+      ('99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '99999999-9999-9999-9999-999999999999', 'Post from extra_user5 for GetViews route.', NULL, FALSE, FALSE, NOW()),
+      ('aaaaaaaa-bbbb-bbbb-bbbb-aaaaaaaaaaaa', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Post from extra_user6 for testing CreateView route.', NULL, FALSE, FALSE, NOW())
+    ON CONFLICT (post_id) DO NOTHING;
+
+
 END $$;
