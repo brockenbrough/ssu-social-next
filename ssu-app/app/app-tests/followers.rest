@@ -14,6 +14,74 @@ GET http://localhost:3000/api/followers/not-a-valid-uuid-0000-000000000000
 Accept: application/json
 
 
+### FOLLOW: 1111 follows 2222
+POST http://localhost:3000/api/followers/follow
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userId": "11111111-1111-1111-1111-111111111111",
+  "targetUserId": "22222222-2222-2222-2222-222222222222"
+}
+
+### VERIFY after FOLLOW: followers of 2222 should include 1111
+GET http://localhost:3000/api/followers/22222222-2222-2222-2222-222222222222
+Accept: application/json
+
+### UNFOLLOW: 1111 unfollows 2222
+POST http://localhost:3000/api/followers/unfollow
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userId": "11111111-1111-1111-1111-111111111111",
+  "targetUserId": "22222222-2222-2222-2222-222222222222"
+}
+
+### VERIFY after UNFOLLOW: followers of 2222 should NOT include 1111
+GET http://localhost:3000/api/followers/22222222-2222-2222-2222-222222222222
+Accept: application/json
+
+### NEGATIVE: follow with invalid UUID
+POST http://localhost:3000/api/followers/follow
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userId": "not-a-uuid",
+  "targetUserId": "22222222-2222-2222-2222-222222222222"
+}
+
+### NEGATIVE: cannot follow yourself
+POST http://localhost:3000/api/followers/follow
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userId": "11111111-1111-1111-1111-111111111111",
+  "targetUserId": "11111111-1111-1111-1111-111111111111"
+}
+
+### NEGATIVE: unfollow with invalid UUID
+POST http://localhost:3000/api/followers/unfollow
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userId": "11111111-1111-1111-1111-111111111111",
+  "targetUserId": "bad-uuid"
+}
+
+### OPTIONAL: restore baseline — ensure 1111 follows 2222
+POST http://localhost:3000/api/followers/follow
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userId": "11111111-1111-1111-1111-111111111111",
+  "targetUserId": "22222222-2222-2222-2222-222222222222"
+}
+
 
 
 ##Lindsey Test Routes:: 
