@@ -2,24 +2,23 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // ---- Configure these to match your seed data ----
-    const testUserId = "33333333-3333-3333-3333-333333333333"; // user being followed by others
+    // Must match your seed data
+    const testUserId = "33333333-3333-3333-3333-333333333333";
     const expectedFollowers = [
       "11111111-1111-1111-1111-111111111111",
       "22222222-2222-2222-2222-222222222222",
     ];
-    // -------------------------------------------------
 
-    // Hit your /followers/[id] route
+    // Call your existing /followers/[id] route
     const res = await fetch(`http://localhost:3000/api/followers/${testUserId}`);
     const json = await res.json();
 
-    // Validate response structure (expects: { success, data: { followers: [...] } })
+    // Your [id]/route.ts returns: { success, message, data: { followers: string[] } }
     if (!json?.success || !Array.isArray(json?.data?.followers)) {
       return NextResponse.json(
         {
           success: false,
-          message: "Unexpected response structure from /followers/[id] route",
+          message: "Unexpected response shape from /followers/[id]",
           data: json,
         },
         { status: 500 }
@@ -34,18 +33,29 @@ export async function GET() {
       return NextResponse.json(
         {
           success: false,
-          message:
-            "Target user exists but does not have all expected follower(s).",
+          message: "Missing expected follower(s).",
           data: { userId: testUserId, followers, missing },
         },
         { status: 500 }
       );
     }
 
-    // All good
+    // Optional quick negative: invalid UUID should 400
+    const bad = await fetch(`http://localhost:3000/api/followers/not-a-uuid`);
+    if (bad.status !== 400) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid-UUID request did not return 400.",
+          data: { status: bad.status },
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
-      message: "Followers list retrieved successfully",
+      message: "Followers [id] endpoint verified",
       data: { userId: testUserId, followers },
     });
   } catch (err: any) {
