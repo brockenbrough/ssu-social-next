@@ -15,10 +15,22 @@ Accept: application/json
 GET http://localhost:3000/api/posts/getAllPosts/test
 Accept: application/json
 
+######################################
+
 ### Test GET all posts by id
 GET http://localhost:3000/api/posts/getPostById/33333333-3333-3333-3333-333333333333
 Accept: application/json
 
 ### Test GET all posts by id test
 GET http://localhost:3000/api/posts/getPostById/33333333-3333-3333-3333-333333333333/test
+Accept: application/json
+
+######################################
+
+### Test DELETE a specific post
+DELETE http://localhost:3000/api/posts/deletePost/33333333-3333-3333-3333-333333333333
+Accept: application/json
+
+### Test DELETE a specific post test
+GET http://localhost:3000/api/posts/deletePost/33333333-3333-3333-3333-333333333333/test
 Accept: application/json
