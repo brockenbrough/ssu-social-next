@@ -4,8 +4,13 @@ DECLARE
     fixed_user_id2 UUID := '22222222-2222-2222-2222-222222222222'; -- must exist in ssu_users
     fixed_user_id3 UUID := '33333333-3333-3333-3333-333333333333'; -- must exist in ssu_users
     fixed_post_id UUID  := '33333333-3333-3333-3333-333333333333'; -- fixed post ID for test
+    fixed_post_id1 UUID := '11111111-1111-1111-1111-111111111111'; -- fixed post ID for test Yannie
     fixed_chat_room_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed chat room ID for test
     fixed_bookmark_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed bookmark ID
+    follower_uuid UUID := '11111111-1111-1111-1111-111111111111'; -- test user
+    followee_uuid1 UUID := '22222222-2222-2222-2222-222222222222'; -- user2
+    followee_uuid2 UUID := '33333333-3333-3333-3333-333333333333'; -- user3
+    fixed_message_id UUID := '55555555-5555-5555-5555-555555555555'; -- fixed message ID for test
 BEGIN
 
 
@@ -84,8 +89,37 @@ BEGIN
         );
     END IF;
 
+    IF NOT EXISTS (SELECT 1 FROM hashtags WHERE hashtag = '#TestTag') THEN
+        INSERT INTO hashtags (
+            hashtag
+        )
+        VALUES (
+            '#TestTag'
+        );
+    END IF;
+
+    --Creation of like
+    IF NOT EXISTS (
+        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
+    ) THEN
+        INSERT INTO likes (
+            post_id,
+            user_id,
+            created_at
+        )
+        VALUES (
+            fixed_post_id,
+            fixed_user_id2,
+            NOW()
+        );
+    END IF;
+
     -- Creation of posts
     DELETE FROM posts WHERE post_id = fixed_post_id;
+
+    --Yannie
+    DELETE FROM posts
+    WHERE post_id = fixed_post_id1;
 
     INSERT INTO posts (
         post_id,
@@ -104,6 +138,15 @@ BEGIN
         FALSE,
         FALSE,
         NOW()
+    ), 
+    (
+        fixed_post_id1,
+        fixed_user_id3,
+        'This is a fixed test post for testing getting comment by PostId.',
+        NULL,
+        FALSE,
+        FALSE,
+        NOW()
     );
 
     -- Creation of like  (fixed condition: user2 likes user1's post)
@@ -113,7 +156,9 @@ BEGIN
         INSERT INTO likes (post_id, user_id, created_at)
         VALUES (fixed_post_id, fixed_user_id2, NOW());
     END IF;
+    -- Yannie
     
+
     -- Remove existing chat room with same fixed_chat_room_id or user pair
     DELETE FROM chatrooms
     WHERE chat_room_id = fixed_chat_room_id
@@ -148,6 +193,34 @@ BEGIN
     END IF;
 
     -- Creation of a default bookmark (only if it does not already exist)
+    INSERT INTO chatrooms (
+        chat_room_id,
+        user_1,
+        user_2,
+        created_by,
+        created_at
+    )
+    VALUES (
+        fixed_chat_room_id,
+        fixed_user_id1,
+        fixed_user_id2,
+        fixed_user_id1,
+        NOW()
+    );
+    
+    -- Remove any existing test follower relationships for this follower
+    DELETE FROM followers
+    WHERE follower_id = follower_uuid
+      AND user_id IN (followee_uuid1, followee_uuid2);
+
+    -- Insert new test follower relationships
+    INSERT INTO followers (user_id, follower_id)
+    VALUES 
+        (followee_uuid1, follower_uuid),
+        (followee_uuid2, follower_uuid)
+    ON CONFLICT DO NOTHING;
+    
+        -- Creation of a default bookmark (only if it does not already exist)
     IF NOT EXISTS (
         SELECT 1 FROM bookmarks WHERE user_id = fixed_user_id2 AND post_id = fixed_post_id
     ) THEN
@@ -186,7 +259,124 @@ BEGIN
     WHERE post_id = fixed_post_id
       AND user_id IN (fixed_user_id1, fixed_user_id2);
 
-    INSERT INTO comments (comment_id, user_id, comment_content, created_at, post_id) VALUES
-        (gen_random_uuid(), fixed_user_id1, 'This is a test comment from test_user1.', NOW(), fixed_post_id),
-        (gen_random_uuid(), fixed_user_id2, 'This is another test comment from test_user2.', NOW(), fixed_post_id);
+    --Yannie
+    DELETE FROM comments
+    WHERE post_id = fixed_post_id1;
+
+    -- Insert test comments for fixed post
+
+    INSERT INTO comments (
+        comment_id,
+        user_id,
+        comment_content,
+        created_at,
+        post_id
+    )
+    VALUES
+    (
+        gen_random_uuid(),
+        fixed_user_id1,
+        'This is a test comment from test_user1.',
+        NOW(),
+        fixed_post_id
+    ),
+    (
+        gen_random_uuid(),
+        fixed_user_id2,
+        'This is another test comment from test_user2.',
+        NOW(),
+        fixed_post_id
+    ),
+    (
+        gen_random_uuid(),
+        fixed_user_id3,
+        'This comment is for testing getting comment by PostId.',
+        NOW(),
+        fixed_post_id1
+    );
+
+    -- Creation of a default message (only if it does not already exist)
+    IF NOT EXISTS (
+        SELECT 1 FROM messages WHERE message_id = fixed_message_id
+    ) THEN
+        INSERT INTO messages (
+            message_id,
+            chat_room_id,
+            sender_id,
+            receiver_id,
+            message_text,
+            is_read,
+            created_at
+        )
+        VALUES (
+            fixed_message_id,
+            fixed_chat_room_id,
+            fixed_user_id1,
+            fixed_user_id2,
+            'This is a seeded test message.',
+            FALSE,
+            NOW()
+        );
+    END IF;
+
+ -- ====================================
+-- Creation of views (for testing GetViews)
+-- =====================================
+IF NOT EXISTS (
+    SELECT 1 FROM views WHERE user_id = fixed_user_id2 AND post_id = fixed_post_id
+) THEN
+    INSERT INTO views (
+        user_id,
+        post_id,
+        created_at
+    )
+    VALUES (
+        fixed_user_id2, -- user2 viewed user1's fixed post
+        fixed_post_id,
+        NOW()
+    );
+END IF;
+
+IF NOT EXISTS (
+    SELECT 1 FROM views WHERE user_id = fixed_user_id3 AND post_id = fixed_post_id
+) THEN
+    INSERT INTO views (
+        user_id,
+        post_id,
+        created_at
+    )
+    VALUES (
+        fixed_user_id3, -- user3 viewed the same post
+        fixed_post_id,
+        NOW()
+    );
+END IF;
+
+    -- ====================================
+    -- EXTRA TEST USERS
+    -- ====================================
+    INSERT INTO ssu_users (user_id, username, email, password, created_at, role, profile_image, biography)
+    VALUES
+      ('55555555-5555-5555-5555-555555555555', 'extra_user1', 'extra1@example.com', 'dummy_password_hash', NOW(), 'user', NULL, 'Extra test user 1.'),
+      ('66666666-6666-6666-6666-666666666666', 'extra_user2', 'extra2@example.com', 'dummy_password_hash', NOW(), 'user', NULL, 'Extra test user 2.'),
+      ('77777777-7777-7777-7777-777777777777', 'extra_user3', 'extra3@example.com', 'dummy_password_hash', NOW(), 'user', NULL, 'Extra test user 3.'),
+      ('88888888-8888-8888-8888-888888888888', 'extra_user4', 'extra4@example.com', 'dummy_password_hash', NOW(), 'user', NULL, 'Extra test user 4.'),
+      ('99999999-9999-9999-9999-999999999999', 'extra_user5', 'extra5@example.com', 'dummy_password_hash', NOW(), 'user', NULL, 'Extra test user 5.'),
+      ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'extra_user6', 'extra6@example.com', 'dummy_password_hash', NOW(), 'user', NULL, 'Extra test user 6.')
+    ON CONFLICT (user_id) DO NOTHING;
+
+    -- ====================================
+    -- EXTRA TEST POSTS
+    -- ====================================
+    INSERT INTO posts (post_id, user_id, content, image_uri, is_sensitive, has_offensive_text, created_at)
+    VALUES
+      ('55555555-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '55555555-5555-5555-5555-555555555555', 'Post from extra_user1 for testing view counts.', NULL, FALSE, FALSE, NOW()),
+      ('66666666-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '66666666-6666-6666-6666-666666666666', 'Post from extra_user2 for testing followers.', NULL, FALSE, FALSE, NOW()),
+      ('77777777-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '77777777-7777-7777-7777-777777777777', 'Post from extra_user3 for testing comments.', NULL, FALSE, FALSE, NOW()),
+      ('88888888-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '88888888-8888-8888-8888-888888888888', 'Post from extra_user4 for API validation.', NULL, FALSE, FALSE, NOW()),
+      ('99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '99999999-9999-9999-9999-999999999999', 'Post from extra_user5 for GetViews route.', NULL, FALSE, FALSE, NOW()),
+      ('aaaaaaaa-bbbb-bbbb-bbbb-aaaaaaaaaaaa', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Post from extra_user6 for testing CreateView route.', NULL, FALSE, FALSE, NOW())
+    ON CONFLICT (post_id) DO NOTHING;
+
+
 END $$;
