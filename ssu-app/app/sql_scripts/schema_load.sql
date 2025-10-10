@@ -7,7 +7,6 @@ DECLARE
     fixed_chat_room_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed chat room ID for test
     fixed_bookmark_id UUID := '44444444-4444-4444-4444-444444444444'; -- fixed bookmark ID
 BEGIN
-    
 
 
 
@@ -35,15 +34,9 @@ BEGIN
         );
     END IF;
 
-     IF NOT EXISTS (SELECT 1 FROM hashtags WHERE hashtag = '#TestTag') THEN
-        INSERT INTO hashtags (
-            hashtag
-        )
-        VALUES (
-            '#TestTag'
-        );
+    IF NOT EXISTS (SELECT 1 FROM hashtags WHERE hashtag = '#TestTag') THEN
+        INSERT INTO hashtags (hashtag) VALUES ('#TestTag');
     END IF;
-
 
     IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = fixed_user_id2) THEN
         INSERT INTO ssu_users (
@@ -92,8 +85,7 @@ BEGIN
     END IF;
 
     -- Creation of posts
-    DELETE FROM posts
-    WHERE post_id = fixed_post_id;
+    DELETE FROM posts WHERE post_id = fixed_post_id;
 
     INSERT INTO posts (
         post_id,
@@ -114,62 +106,53 @@ BEGIN
         NOW()
     );
 
-    --Creation of like
+    -- Creation of like  (fixed condition: user2 likes user1's post)
     IF NOT EXISTS (
-        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
+        SELECT 1 FROM likes WHERE user_id = fixed_user_id2 AND post_id = fixed_post_id
     ) THEN
-        INSERT INTO likes (
-            post_id,
-            user_id,
-            created_at
-        )
-        VALUES (
-            fixed_post_id,
-            fixed_user_id2,
-            NOW()
-        );
+        INSERT INTO likes (post_id, user_id, created_at)
+        VALUES (fixed_post_id, fixed_user_id2, NOW());
     END IF;
     
     -- Remove existing chat room with same fixed_chat_room_id or user pair
     DELETE FROM chatrooms
     WHERE chat_room_id = fixed_chat_room_id
-    OR (LEAST(user_1, user_2), GREATEST(user_1, user_2))
-        = (LEAST(fixed_user_id1, fixed_user_id2), GREATEST(fixed_user_id1, fixed_user_id2));
+       OR (LEAST(user_1, user_2), GREATEST(user_1, user_2))
+          = (LEAST(fixed_user_id1, fixed_user_id2), GREATEST(fixed_user_id1, fixed_user_id2));
 
     -- Insert fixed chat room
-    INSERT INTO chatrooms (
-        chat_room_id,
-        user_1,
-        user_2,
-        created_by,
-        created_at
-    )
-    VALUES (
-        fixed_chat_room_id,
-        fixed_user_id1,
-        fixed_user_id2,
-        fixed_user_id1,
-        NOW()
-    );
-    
-        -- Creation of a default bookmark (only if it does not already exist)
+    INSERT INTO chatrooms (chat_room_id, user_1, user_2, created_by, created_at)
+    VALUES (fixed_chat_room_id, fixed_user_id1, fixed_user_id2, fixed_user_id1, NOW());
+
+    -- Followers seeding 
+    DELETE FROM followers
+     WHERE (user_id, follower_id) IN (
+           (fixed_user_id1, fixed_user_id2),
+           (fixed_user_id2, fixed_user_id1),
+           (fixed_user_id3, fixed_user_id1)
+     );
+
+    IF NOT EXISTS (SELECT 1 FROM followers WHERE user_id = fixed_user_id1 AND follower_id = fixed_user_id2) THEN
+        INSERT INTO followers (user_id, follower_id, created_at)
+        VALUES (fixed_user_id1, fixed_user_id2, NOW());
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM followers WHERE user_id = fixed_user_id2 AND follower_id = fixed_user_id1) THEN
+        INSERT INTO followers (user_id, follower_id, created_at)
+        VALUES (fixed_user_id2, fixed_user_id1, NOW());
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM followers WHERE user_id = fixed_user_id3 AND follower_id = fixed_user_id1) THEN
+        INSERT INTO followers (user_id, follower_id, created_at)
+        VALUES (fixed_user_id3, fixed_user_id1, NOW());
+    END IF;
+
+    -- Creation of a default bookmark (only if it does not already exist)
     IF NOT EXISTS (
         SELECT 1 FROM bookmarks WHERE user_id = fixed_user_id2 AND post_id = fixed_post_id
     ) THEN
-        INSERT INTO bookmarks (
-            bookmark_id,
-            user_id,
-            post_id,
-            created_at,
-            is_public
-        )
-        VALUES (
-            fixed_bookmark_id,
-            fixed_user_id2,         -- user2 bookmarks user1's test post
-            fixed_post_id,
-            NOW(),
-            TRUE
-        );
+        INSERT INTO bookmarks (bookmark_id, user_id, post_id, created_at, is_public)
+        VALUES (fixed_bookmark_id, fixed_user_id2, fixed_post_id, NOW(), TRUE);
     END IF;
 
     -- Creation of a default notification (only if it does not already exist)
@@ -198,37 +181,12 @@ BEGIN
         );
     END IF;
 
-
     -- Creation of comments
-
-    -- Remove any existing comments for this fixed post and users to avoid duplicates
     DELETE FROM comments
     WHERE post_id = fixed_post_id
       AND user_id IN (fixed_user_id1, fixed_user_id2);
 
-    -- Insert test comments for fixed post
-
-    INSERT INTO comments (
-        comment_id,
-        user_id,
-        comment_content,
-        created_at,
-        post_id
-    )
-    VALUES
-    (
-        gen_random_uuid(),
-        fixed_user_id1,
-        'This is a test comment from test_user1.',
-        NOW(),
-        fixed_post_id
-    ),
-    (
-        gen_random_uuid(),
-        fixed_user_id2,
-        'This is another test comment from test_user2.',
-        NOW(),
-        fixed_post_id
-    );
-
+    INSERT INTO comments (comment_id, user_id, comment_content, created_at, post_id) VALUES
+        (gen_random_uuid(), fixed_user_id1, 'This is a test comment from test_user1.', NOW(), fixed_post_id),
+        (gen_random_uuid(), fixed_user_id2, 'This is another test comment from test_user2.', NOW(), fixed_post_id);
 END $$;
