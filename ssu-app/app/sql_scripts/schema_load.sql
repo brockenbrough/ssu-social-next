@@ -23,7 +23,7 @@ BEGIN
         '$2b$10$jbi3d6Q82flNiZaReOO9j.JjDjjKxQTVSwBJhBqyB9ZkdmDoVu.TW', -- bcrypt hash for 'dummy_password_hash1'
         NOW(),
         'user',
-        NULL,
+        'https://classroomclipart.com/image/content7/72519/thumb.gif',
         'Auto-created test user.'
     )
     ON CONFLICT (user_id) DO UPDATE SET password = EXCLUDED.password;
@@ -37,7 +37,7 @@ BEGIN
         '$2b$10$6xM6kyrYp7Iqmxz0x6ELpuK3X/wb2qv2L4xfTxk9eyedJbCv5X2ci',
         NOW(),
         'user',
-        NULL,
+        'https://media.tenor.com/xEq2kohc69QAAAAM/dance-emoji.gif',
         'Auto-created test user.'
     )
     ON CONFLICT (user_id) DO UPDATE SET password = EXCLUDED.password;
@@ -51,7 +51,7 @@ BEGIN
         '$2b$10$0y3lHxfBnUOt5c1iSzJ2ku7iFgkTcZtj6cznL2oZMzIhE6W8XGqY6',
         NOW(),
         'user',
-        NULL,
+        'https://thumbs.dreamstime.com/b/emoticon-missing-teeth-smiling-tooth-62484085.jpg?w=576',
         'Auto-created test user.'
     )
     ON CONFLICT (user_id) DO UPDATE SET password = EXCLUDED.password;
