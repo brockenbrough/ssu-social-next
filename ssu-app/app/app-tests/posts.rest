@@ -8,6 +8,10 @@
 ###    match what is in user model in the original backend.
 
 ### Test GET all posts
+GET http://localhost:3000/api/posts/getAllPosts
+Accept: application/json
+
+### Test GET all posts test
 GET http://localhost:3000/api/posts/getAllPosts/test
 Accept: application/json
 
