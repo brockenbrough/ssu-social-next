@@ -1,23 +1,19 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
 
+type LikeRow = {
+  user_Id: string;
+  post_Id: string;
+  created_At: string;
+}
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
-
-type ApiLike = {
-  userId: string;
-  postId: string;
-  date: string | Date;
-};
 
 export async function GET() {
   try {
-    const rows = await sql<ApiLike[]>`
-      SELECT
-        l.user_id::text           AS "userId",
-        l.post_id::text           AS "postId",
-        l.created_at              AS "date"
+    const rows = await sql<LikeRow[]>`
+      SELECT 
+        *
       FROM likes l
-      ORDER BY l.created_at DESC
     `;
 
     return NextResponse.json(rows, { status: 200 });
