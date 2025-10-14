@@ -50,3 +50,9 @@ Accept: application/json
   "isSensitive": false,
   "hasOffensiveText": false
 }
+
+### Create POST test
+
+GET http://localhost:3000/api/posts/createPost/test
+Accept: application/json
+
