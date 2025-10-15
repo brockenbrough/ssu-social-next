@@ -1,10 +1,11 @@
-### Test GET all users
-GET http://localhost:3000/api/statistics/likes
-Accept: application/json
-
 ### Automated testing
-GET http://localhost:3000/api/statistics/likes/test
-Accept: application/json
+POST http://localhost:3000/api/statistics/likes/
+Content-Type: application/json
+
+{
+    "userId": "33333333-3333-3333-3333-333333333333",
+    "postId": "11111111-1111-1111-1111-111111111111"
+}
 
 ### LikeList Test
 GET http://localhost:3000/api/statistics/likeList/
