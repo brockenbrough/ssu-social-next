@@ -21,7 +21,7 @@ Accept: application/json
 
 #Lindsey's tests
 ### Test POST /login - successful login
-POST http://localhost:3000/api/user/login
+POST https://ssu-social-newwave.vercel.app/api/user/login
 Content-Type: application/json
 
 {
@@ -30,7 +30,7 @@ Content-Type: application/json
 }
 
 ### Test POST /login - wrong password
-POST http://localhost:3000/api/user/login
+POST https://ssu-social-newwave.vercel.app/api/user/login
 Content-Type: application/json
 
 {
@@ -39,7 +39,7 @@ Content-Type: application/json
 }
 
 ### Test POST /login - non-existent user
-POST http://localhost:3000/api/user/login
+POST https://ssu-social-newwave.vercel.app/api/user/login
 Content-Type: application/json
 
 {
