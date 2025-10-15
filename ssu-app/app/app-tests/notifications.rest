@@ -20,12 +20,6 @@ Content-Type: application/json
   "user_id": "11111111-1111-1111-1111-111111111111"
 }
 
-###
 
 ### Get notifications by username
-POST http://localhost:3000/api/notifications/get/username
-Content-Type: application/json
-
-{
-  "username": "merry567"
-}
+GET http://localhost:3000/api/notifications/get/username?username=test_user1

@@ -1,26 +1,25 @@
-// app/api/notifications/get/usernameRoute.ts
 // app/api/notifications/get/username/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Secure server-only Supabase client
 const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const { username } = await req.json();
+    const { searchParams } = new URL(req.url);
+    const username = searchParams.get("username");
 
     if (!username) {
       return NextResponse.json(
-        { success: false, error: "Username is required." },
+        { success: false, error: "Username query parameter is required." },
         { status: 400 }
       );
     }
 
-    // Step 1: Lookup the user's UUID
+    // Find user_id
     const { data: user, error: userError } = await supabase
       .from("ssu_users")
       .select("user_id")
@@ -34,22 +33,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Step 2: Fetch notifications for this user
+    // Fetch notifications for that user
     const { data: notifications, error: notifError } = await supabase
       .from("notifications")
-      .select(
-        "notification_id, notification_type, content, is_read, post_id, created_at, action_user_id"
-      )
+      .select("*")
       .eq("user_id", user.user_id)
       .order("created_at", { ascending: false });
 
-    if (notifError) throw notifError;
+    if (notifError) {
+      return NextResponse.json(
+        { success: false, error: notifError.message },
+        { status: 500 }
+      );
+    }
 
-    return NextResponse.json({ success: true, notifications });
+    return NextResponse.json({
+      success: true,
+      data: notifications ?? [],
+    });
   } catch (err: any) {
-    console.error("Error fetching notifications by username:", err);
     return NextResponse.json(
-      { success: false, error: err.message },
+      { success: false, error: err.message || "Unexpected error" },
       { status: 500 }
     );
   }
