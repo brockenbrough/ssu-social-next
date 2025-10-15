@@ -140,6 +140,36 @@ BEGIN
         );
     END IF;
 
+    IF NOT EXISTS (
+        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
+    ) THEN
+        INSERT INTO likes (
+            post_id,
+            user_id,
+            created_at
+        )
+        VALUES (
+            fixed_post_id1,
+            fixed_user_id3,
+            NOW()
+        );
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
+    ) THEN
+        INSERT INTO likes (
+            post_id,
+            user_id,
+            created_at
+        )
+        VALUES (
+            fixed_post_id,
+            fixed_user_id3,
+            NOW()
+        );
+    END IF;
+
     -- Creation of like  (fixed condition: user2 likes user1's post)
     IF NOT EXISTS (
         SELECT 1 FROM likes WHERE user_id = fixed_user_id2 AND post_id = fixed_post_id
