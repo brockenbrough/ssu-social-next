@@ -9,3 +9,41 @@ Accept: application/json
 ### Test hashtags retrieval (from hashmaps route)
 GET http://localhost:3000/api/hashmaps/getAll/test
 Accept: application/json
+
+### ✅ Create valid hashtag
+POST http://localhost:3000/api/hashmaps/createHashtag
+Content-Type: application/json
+
+{
+  "hashtag": "#UnitTestTag"
+}
+
+### Test create hashtag route
+GET http://localhost:3000/api/hashmaps/createHashtag/test
+Accept: application/json
+
+
+
+### ✅ Attach existing and new hashtags to a post
+POST http://localhost:3000/api/posts/attachHashtags
+Content-Type: application/json
+
+{
+  "post_id": "33333333-3333-3333-3333-333333333333",
+  "hashtags": ["#TestTag", "#Integration", "NextJS"]
+}
+
+
+### Get posts by hashtag
+GET http://localhost:3000/api/posts/getByHashtag?tag=NextJS
+Accept: application/json
+
+
+### Get posts by hashtag
+GET http://localhost:3000/api/posts/getByHashtag?tag=TestTag
+Accept: application/json
+
+### Get posts by hashtag
+GET http://localhost:3000/api/posts/getByHashtag?tag=UnitTestTag
+Accept: application/json 
+

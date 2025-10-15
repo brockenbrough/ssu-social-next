@@ -3,26 +3,42 @@ import postgres from "postgres";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-type ApiLike = {
-  userId: string;
-  postId: string;
-  date: string | Date;
-};
-
-export async function GET() {
+export async function POST(req: Request) {
   try {
-    const rows = await sql<ApiLike[]>`
-      SELECT
-        l.user_id::text           AS "userId",
-        l.post_id::text           AS "postId",
-        l.created_at              AS "date"
-      FROM likes l
-      ORDER BY l.created_at DESC
+    const body = await req.json();
+    const { userId, postId } = body;
+
+    if (!userId || !postId) {
+      return NextResponse.json(
+        { success: false, message: "Missing required fields: userId or postId" },
+        { status: 400 }
+      );
+    }
+
+    const inserted = await sql<[]>`
+      INSERT INTO likes (
+        user_id,
+        post_id,
+        created_at
+      )
+      VALUES (
+        ${userId}::uuid,
+        ${postId}::uuid,
+        NOW()
+      )
+      RETURNING  user_id, post_id, created_at
     `;
 
-    return NextResponse.json(rows, { status: 200 });
-  } catch (error) {
-    console.error("Error fetching comments:", error);
-    return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 });
+    return NextResponse.json({
+      success: true,
+      message: "Post Liked.",
+      data: inserted[0],
+    });
+  } catch (err: any) {
+    console.error("Couldn't like post, error:", err);
+    return NextResponse.json(
+      { success: false, message: err.message },
+      { status: 500 }
+    );
   }
 }
