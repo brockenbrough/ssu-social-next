@@ -1,3 +1,5 @@
+//first mistake found, this should be a post/insert not a get/select...
+//code monkey go brrr
 import { NextResponse } from "next/server";
 import postgres from "postgres";
 
