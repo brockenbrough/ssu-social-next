@@ -13,6 +13,31 @@ DECLARE
     signup_existing_user_id UUID := '66666666-6666-6666-6666-666666666666';
     fixed_message_id UUID := '55555555-5555-5555-5555-555555555555'; -- fixed message ID for test
 BEGIN
+-- ====================================
+-- Create default 'Deleted User'
+-- ====================================
+IF NOT EXISTS (SELECT 1 FROM ssu_users WHERE user_id = '00000000-0000-0000-0000-000000000000') THEN
+    INSERT INTO ssu_users (
+        user_id,
+        username,
+        email,
+        password,
+        created_at,
+        role,
+        profile_image,
+        biography
+    )
+    VALUES (
+        '00000000-0000-0000-0000-000000000000',
+        '[deleted]',
+        'deleted@system.local',
+        '$2b$10$CwTycUXWue0Thq9StjUM0uJ8XQWZ7GfjOw9Tp8k1P9Jzqf2ZQh7e.', -- dummy hash
+        NOW(),
+        'user',
+        'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+        'This account has been deleted.'
+    );
+END IF;
     
     -- Upsert test_user1
     INSERT INTO ssu_users(user_id, username, email, password, created_at, role, profile_image, biography)
@@ -136,6 +161,36 @@ BEGIN
         VALUES (
             fixed_post_id,
             fixed_user_id2,
+            NOW()
+        );
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
+    ) THEN
+        INSERT INTO likes (
+            post_id,
+            user_id,
+            created_at
+        )
+        VALUES (
+            fixed_post_id1,
+            fixed_user_id3,
+            NOW()
+        );
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM likes WHERE user_id = fixed_user_id1 AND post_id = fixed_post_id
+    ) THEN
+        INSERT INTO likes (
+            post_id,
+            user_id,
+            created_at
+        )
+        VALUES (
+            fixed_post_id,
+            fixed_user_id3,
             NOW()
         );
     END IF;
@@ -355,7 +410,10 @@ END IF;
       ('88888888-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '88888888-8888-8888-8888-888888888888', 'Post from extra_user4 for API validation.', NULL, FALSE, FALSE, NOW()),
       ('99999999-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '99999999-9999-9999-9999-999999999999', 'Post from extra_user5 for GetViews route.', NULL, FALSE, FALSE, NOW()),
       ('aaaaaaaa-bbbb-bbbb-bbbb-aaaaaaaaaaaa', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Post from extra_user6 for testing CreateView route.', NULL, FALSE, FALSE, NOW())
-    ON CONFLICT (post_id) DO NOTHING;
+    ON CONFLICT (post_id) DO UPDATE
+    SET user_id = EXCLUDED.user_id,
+        content = EXCLUDED.content,
+        created_at = NOW();
 
     INSERT INTO comments (comment_id, user_id, comment_content, created_at, post_id)
     VALUES (
@@ -365,5 +423,9 @@ END IF;
       NOW(),
       '33333333-3333-3333-3333-333333333333'         -- fixed_post_id (exists)
     )
-    ON CONFLICT (comment_id) DO NOTHING;
+    ON CONFLICT (comment_id) DO UPDATE
+    SET user_id = EXCLUDED.user_id,
+        comment_content = EXCLUDED.comment_content,
+        created_at = NOW();
+
 END $$;
