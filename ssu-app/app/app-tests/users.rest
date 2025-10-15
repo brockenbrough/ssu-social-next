@@ -79,3 +79,13 @@ Content-Type: application/json
 {
   "user_id": "11111111-1111-1111-1111-111111111111"
 }
+
+### Test GET /user/getUserByUserName/[username] - existing user
+GET http://localhost:3000/api/user/getUserByUsername/test_user1
+Accept: application/json
+
+###
+
+### Test GET /user/getUserByUserName/[username] - non existent user
+GET http://localhost:3000/api/user/getUserByUsername/nonexistent_user
+Accept: application/json
