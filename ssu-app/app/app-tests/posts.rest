@@ -20,7 +20,6 @@ Accept: application/json
 ### Test GET all posts by id
 GET http://localhost:3000/api/posts/getPostById/33333333-3333-3333-3333-333333333333
 Accept: application/json
-
 ### Test GET all posts by id test
 GET http://localhost:3000/api/posts/getPostById/33333333-3333-3333-3333-333333333333/test
 Accept: application/json
@@ -56,3 +55,20 @@ Accept: application/json
 GET http://localhost:3000/api/posts/createPost/test
 Accept: application/json
 
+
+###  Get paginated posts (manual)---- YACINE
+GET http://localhost:3000/api/posts/GetPostPage?page=1&postPerPage=2
+Accept: application/json
+
+###  Test paginated posts route (automated)----YACINE
+GET http://localhost:3000/api/posts/GetPostPage/test
+Accept: application/json
+
+
+###  Get posts by username (manual)---- YACINE
+GET http://localhost:3000/api/posts/getpostpagebyusername?username=test_user1&page=1&postPerPage=3
+Accept: application/json
+
+### Test getpostpagebyusername route (automated) ---- YACINE
+GET http://localhost:3000/api/posts/getpostpagebyusername/test
+Accept: application/json
