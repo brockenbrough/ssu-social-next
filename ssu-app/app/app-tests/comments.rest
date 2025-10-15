@@ -1,4 +1,4 @@
-### Test GET all users
+### Test GET all comments
 GET http://localhost:3000/api/comment
 Accept: application/json
 
@@ -7,12 +7,12 @@ GET http://localhost:3000/api/comment/test
 Accept: application/json
 
 ### Test GET comment by id (get new comment id from database for each test)
-GET http://localhost:3000/api/comment/6f810359-5790-4fc5-be36-d096a8e53f30
+GET http://localhost:3000/api/comment/21b70957-34b5-4c32-a128-97c7663a531b
 Accept: application/json
 
 
 ### Test DELETE comment by id (get new comment id from database for each test)
-DELETE http://localhost:3000/api/comment/6f810359-5790-4fc5-be36-d096a8e53f30
+DELETE http://localhost:3000/api/comment/21b70957-34b5-4c32-a128-97c7663a531b
 Accept: application/json
 
 # Yannien's tests
@@ -24,9 +24,31 @@ Accept: application/json
 GET http://localhost:3000/api/comment/getCommentsByPostId/11111111-1111-1111-1111-111111111111
 Accept: application/json
 
-###update comment by id = 88888888-8888-8888-8888-888888888888
-PATCH http://localhost:3000/api/comment/updateCommentById/88888888-8888-8888-8888-888888888888
+###update comment by id = (get new comment id from supabase each test)
+PATCH http://localhost:3000/api/comment/updateCommentById/38753e27-0a1c-4f8b-bfa0-4a1943be8ddd
 Accept: application/json
 Content-Type: application/json
 
 { "commentContent": "Updated via Comments." }
+
+
+### Test CREATE comment
+POST http://localhost:3000/api/comment/createComment
+Content-Type: application/json
+Accept: application/json
+
+{
+  "commentContent": "This is a unit test comment",
+  "postId": "33333333-3333-3333-3333-333333333333",
+  "userId": "11111111-1111-1111-1111-111111111111"
+}
+
+### Test REPLY to comment
+POST http://localhost:3000/api/comment/reply/38753e27-0a1c-4f8b-bfa0-4a1943be8ddd
+Accept: application/json
+
+{
+  "commentId": "44444444-4444-4444-4444-444444444444",
+  "userId": "11111111-1111-1111-1111-111111111111",
+  "replyContent": "This is a unit test reply"
+}
