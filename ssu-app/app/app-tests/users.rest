@@ -89,3 +89,10 @@ Accept: application/json
 ### Test GET /user/getUserByUserName/[username] - non existent user
 GET http://localhost:3000/api/user/getUserByUsername/nonexistent_user
 Accept: application/json
+
+### Test Delete All Users
+POST http://localhost:3000/api/user/deleteAll
+Content-Type: application/json
+
+###
+
