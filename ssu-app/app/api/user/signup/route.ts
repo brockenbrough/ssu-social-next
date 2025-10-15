@@ -15,7 +15,18 @@ type ApiUser = {
   biography: string;
 };
 
-// POST /api/user/signup
+// Handle OPTIONS preflight requests for CORS
+export async function OPTIONS(req: Request) {
+  return NextResponse.json(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -24,11 +35,11 @@ export async function POST(req: Request) {
     if (!username || !email || !password) {
       return NextResponse.json(
         { message: "Username, email, and password are required" },
-        { status: 400 }
+        { status: 400, headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } }
       );
     }
 
-    // Check if username already exists
+    // Check username
     const usernameRows = await sql<ApiUser[]>`
       SELECT user_id::text AS "_id" 
       FROM ssu_users 
@@ -38,11 +49,11 @@ export async function POST(req: Request) {
     if (usernameRows.length > 0) {
       return NextResponse.json(
         { message: "Username is taken, make another one" },
-        { status: 409 }
+        { status: 409, headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } }
       );
     }
 
-    // Check if email already exists
+    // Check email
     const emailRows = await sql<ApiUser[]>`
       SELECT user_id::text AS "_id" 
       FROM ssu_users 
@@ -52,15 +63,15 @@ export async function POST(req: Request) {
     if (emailRows.length > 0) {
       return NextResponse.json(
         { message: "Email already exists, make another one" },
-        { status: 409 }
+        { status: 409, headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } }
       );
     }
 
-    // Hash the password
+    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Insert new user
+    // Insert user
     const rows = await sql<ApiUser[]>`
       INSERT INTO ssu_users (username, email, password)
       VALUES (${username}, ${email}, ${hashedPassword})
@@ -74,17 +85,21 @@ export async function POST(req: Request) {
         NULL::text AS "profileImage",
         '' AS "biography"
     `;
-
     const newUser = rows[0];
-    // Redact password before returning
     const safeUser = { ...newUser, password: null };
 
-    return NextResponse.json(safeUser, { status: 201 });
+    return NextResponse.json(safeUser, {
+      status: 201,
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" },
+    });
   } catch (error) {
     console.error("Signup error:", error);
     return NextResponse.json(
       { message: "Server error during signup" },
-      { status: 500 }
+      {
+        status: 500,
+        headers: { "Access-Control-Allow-Origin": "http://localhost:3000" },
+      }
     );
   }
 }

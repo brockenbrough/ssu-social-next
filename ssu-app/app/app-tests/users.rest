@@ -48,17 +48,18 @@ Content-Type: application/json
 }
 
 ### Test POST /signup - successful signup
-POST http://localhost:3000/api/user/signup
+### Test against Vercel
+POST https://ssu-social-newwave.vercel.app/api/user/signup
 Content-Type: application/json
 
 {
-  "username": "new_signup_user1",
-  "email": "new_signup_user1@example.com",
+  "username": "new_signup_user2",
+  "email": "new_signup_user2@example.com",
   "password": "newuserpassword"
 }
 
 ### Test POST /signup - username/email conflict
-POST http://localhost:3000/api/user/signup
+POST https://ssu-social-newwave.vercel.app/api/user/signup
 Content-Type: application/json
 
 {
