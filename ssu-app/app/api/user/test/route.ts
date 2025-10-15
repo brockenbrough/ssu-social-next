@@ -46,6 +46,23 @@ export async function GET() {
         { status: 500 }
       );
     }
+    // --- TEST GET USER BY USERNAME ---
+    const getUserByUsernameRes = await fetch(
+      `${BASE_URL}/api/user/getUserByUsername/${testUser.username}`
+    );
+    const getUsernameData = await getUserByUsernameRes.json();
+
+    if (getUserByUsernameRes.status !== 200 || getUsernameData.username !== testUser.username) {
+      return NextResponse.json(
+        {
+          step: "getUserByUsername",
+          success: false,
+          status: getUserByUsernameRes.status,
+          data: getUsernameData,
+        },
+        { status: 500 }
+      );
+    }
 
     const accessToken = loginData.accessToken;
     const loggedInUser = loginData.user;
@@ -97,10 +114,11 @@ export async function GET() {
     return NextResponse.json(
       {
         success: true,
-        message: "Signup, login, deleteById, and getAll tests all passed!",
+        message: "Signup, login, getByUsername[username] deleteById, and getAll tests all passed!",
         details: {
           signupStatus: signupRes.status,
           loginStatus: loginRes.status,
+          getUserByUsernameStatus: getUserByUsernameRes.status,
           deleteStatus: deleteRes.status,
           getAllStatus: getAllRes.status,
         },
