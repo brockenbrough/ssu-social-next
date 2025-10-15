@@ -1,14 +1,11 @@
 // app/api/user/getUserByUsername/[username]/route.ts
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import postgres from "postgres";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-export async function GET(
-  req: Request,
-  { params }: { params: { username: string } }
-) {
-const { username } = await params;
+export async function GET(req: Request, context: any) {
+  const { username } = context.params; 
   const defaultProfileImageUrl =
     "https://ssusocial.s3.amazonaws.com/profilepictures/ProfileIcon.png";
 
