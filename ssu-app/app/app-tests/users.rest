@@ -8,15 +8,15 @@
 ###    match what is in user model in the original backend.
 
 ### Test GET all users
-GET http://localhost:3000/api/user/getAll
+GET https://ssu-social-newwave.vercel.app/api/user/getAll
 Accept: application/json
 
 ### Test GET specific user by its user id
-GET http://localhost:3000/api/user/getUserById/11111111-1111-1111-1111-111111111111
+GET https://ssu-social-newwave.vercel.app/api/user/getUserById/11111111-1111-1111-1111-111111111111
 Accept: application/json
 
 ### Automated testing
-GET http://localhost:3000/api/user/test
+GET https://ssu-social-newwave.vercel.app/api/user/test
 Accept: application/json
 
 #Lindsey's tests
@@ -69,6 +69,6 @@ Content-Type: application/json
 }
 
 ### Test DELETE /deleteById/[id] - successful delete
-DELETE http://localhost:3000/api/user/deleteById/11111111-1111-1111-1111-111111111111
+DELETE https://ssu-social-newwave.vercel.app/api/user/deleteById/11111111-1111-1111-1111-111111111111
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYwMDQzNDg5LCJleHAiOjE3NjAwNDQzODl9.uAWWAd3Dj5CiJDlA_lC6wWE2__oXaIq4EN6dxDIYvZ0
 # Authorization is the accessToken from login
