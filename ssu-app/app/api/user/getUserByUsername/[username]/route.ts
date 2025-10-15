@@ -5,7 +5,8 @@ import postgres from "postgres";
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 export async function GET(req: Request, context: any) {
-  const { username } = context.params; 
+  const params = await context.params;
+  const { username } = params;
   const defaultProfileImageUrl =
     "https://ssusocial.s3.amazonaws.com/profilepictures/ProfileIcon.png";
 
