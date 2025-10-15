@@ -16,6 +16,18 @@ type ApiUser = {
   biography: string;
 };
 
+// Handle preflight OPTIONS requests
+export async function OPTIONS(req: Request) {
+  return NextResponse.json(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
+}
+
 // POST /api/user/login
 export async function POST(req: Request) {
   try {
@@ -30,7 +42,10 @@ export async function POST(req: Request) {
       console.log("Missing username or password");
       return NextResponse.json(
         { message: "Username and password are required" },
-        { status: 400 }
+        {
+          status: 400,
+          headers: { "Access-Control-Allow-Origin": "http://localhost:3000" },
+        }
       );
     }
 
@@ -43,7 +58,7 @@ export async function POST(req: Request) {
         password,
         role::text              AS "role",
         NULL::text              AS "imageId",
-        profile_image            AS "profileImage",
+        profile_image           AS "profileImage",
         COALESCE(biography, '') AS "biography"
       FROM ssu_users
       WHERE username = ${username}
@@ -55,27 +70,26 @@ export async function POST(req: Request) {
       console.log("No user found with username:", username);
       return NextResponse.json(
         { message: "Username or password does not exist, try again" },
-        { status: 401 }
+        {
+          status: 401,
+          headers: { "Access-Control-Allow-Origin": "http://localhost:3000" },
+        }
       );
     }
 
     const user = rows[0];
-    console.log("Fetched user from DB:", {
-      _id: user._id,
-      username: user.username,
-      passwordLength: user.password?.length,
-    });
 
     if (!user.password) {
       console.log("User has no password set");
       return NextResponse.json(
         { message: "Invalid password" },
-        { status: 401 }
+        {
+          status: 401,
+          headers: { "Access-Control-Allow-Origin": "http://localhost:3000" },
+        }
       );
     }
 
-    // Check password
-    console.log("Comparing password with bcrypt...");
     const isValidPassword = await bcrypt.compare(password, user.password);
     console.log("Password match result:", isValidPassword);
 
@@ -83,11 +97,13 @@ export async function POST(req: Request) {
       console.log("Password does not match for user:", username);
       return NextResponse.json(
         { message: "Username or password does not exist, try again" },
-        { status: 401 }
+        {
+          status: 401,
+          headers: { "Access-Control-Allow-Origin": "http://localhost:3000" },
+        }
       );
     }
 
-    // Redact password before returning user
     const safeUser = { ...user, password: null };
 
     console.log("Generating JWT tokens...");
@@ -117,13 +133,19 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       { user: safeUser, accessToken, refreshToken },
-      { status: 200 }
+      {
+        status: 200,
+        headers: { "Access-Control-Allow-Origin": "http://localhost:3000" },
+      }
     );
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
       { message: "Server error during login" },
-      { status: 500 }
+      {
+        status: 500,
+        headers: { "Access-Control-Allow-Origin": "http://localhost:3000" },
+      }
     );
   }
 }
