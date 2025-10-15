@@ -23,3 +23,11 @@ Content-Type: application/json
     "userId": "33333333-3333-3333-3333-333333333333",
     "postId": "11111111-1111-1111-1111-111111111111"
 }
+
+### Likes count for a post
+GET http://localhost:3000/api/count/likes-for-post/33333333-3333-3333-3333-333333333333
+Accept: application/json
+
+### Likes count test (seeded post should be exactly 1)
+GET http://localhost:3000/api/count/likes-for-post/test
+Accept: application/json
