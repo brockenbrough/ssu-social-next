@@ -8,12 +8,13 @@ export async function GET() {
     const res = await fetch(
       `http://localhost:3000/api/posts/getpostpagebyusername?username=${TEST_USERNAME}&page=1&postPerPage=3`
     );
+
     const data = await res.json();
 
     if (res.status === 200 && Array.isArray(data.data)) {
       return NextResponse.json({
         success: true,
-        message: "✅ /api/posts/getpostpagebyusername works correctly.",
+        message: `✅ /api/posts/getpostpagebyusername works correctly for ${TEST_USERNAME}.`,
         count: data.data.length,
         data,
       });
@@ -21,7 +22,7 @@ export async function GET() {
       return NextResponse.json(
         {
           success: false,
-          message: `❌ Unexpected response: status ${res.status}`,
+          message: `❌ Unexpected response from /getpostpagebyusername (status ${res.status})`,
           data,
         },
         { status: res.status }

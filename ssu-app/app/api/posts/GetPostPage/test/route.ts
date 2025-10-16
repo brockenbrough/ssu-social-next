@@ -1,4 +1,4 @@
-// app/api/Posts/GetPostPage/test/route.ts
+// app/api/posts/getpostpage/test/route.ts
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -9,7 +9,7 @@ export async function GET() {
     if (res.status === 200 && Array.isArray(data.data)) {
       return NextResponse.json({
         success: true,
-        message: "✅ /api/posts/GetPostPage returned posts successfully.",
+        message: "✅ /api/posts/getpostpage returned posts successfully.",
         count: data.data.length,
         data,
       });

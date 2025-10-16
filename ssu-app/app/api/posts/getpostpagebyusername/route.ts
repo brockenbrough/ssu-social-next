@@ -4,22 +4,11 @@ import postgres from "postgres";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-export async function GET(
-  _req: Request,
-  ctx: { params?: any; searchParams?: URLSearchParams }
-) {
+export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(_req.url);
-    const INITIAL_PAGE = 1;
-    const DEFAULT_POSTS_PER_PAGE = 10;
+    const { searchParams } = new URL(req.url);
+    const username = searchParams.get("username");
 
-    const page = parseInt(searchParams.get("page") || `${INITIAL_PAGE}`);
-    const postsPerPage = parseInt(
-      searchParams.get("postPerPage") || `${DEFAULT_POSTS_PER_PAGE}`
-    );
-
-    // Get the username from dynamic param
-    const username = searchParams.get("username") || null;
     if (!username) {
       return NextResponse.json(
         { success: false, message: "username is required" },
@@ -27,16 +16,21 @@ export async function GET(
       );
     }
 
+    const INITIAL_PAGE = 1;
+    const DEFAULT_POSTS_PER_PAGE = 10;
+    const page = parseInt(searchParams.get("page") || `${INITIAL_PAGE}`);
+    const postsPerPage = parseInt(
+      searchParams.get("postPerPage") || `${DEFAULT_POSTS_PER_PAGE}`
+    );
     const offset = (page - 1) * postsPerPage;
 
-    // Join users and posts tables to get user posts
     const posts = await sql`
-      SELECT p.post_id, p.user_id, p.content, p.created_at
+      SELECT p.post_id, p.user_id, p.content, p.created_at, u.username
       FROM posts p
-      INNER JOIN ssu_users u ON p.user_id = u.user_id
+      JOIN ssu_users u ON p.user_id = u.user_id
       WHERE u.username = ${username}
       ORDER BY p.created_at DESC
-      OFFSET ${offset} LIMIT ${postsPerPage}
+      OFFSET ${offset} LIMIT ${postsPerPage};
     `;
 
     return NextResponse.json(
