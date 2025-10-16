@@ -100,3 +100,28 @@ Content-Type: application/json
 ### Test GET /user/search/:searchInput 
 GET http://localhost:3000/api/user/search/unknown
 Accept: application/json
+
+
+### test LOCAL login
+POST http://localhost:3000/api/user/login
+Content-Type: application/json
+
+{
+  "username": "test_user1",
+  "password": "dummy_password_hash1"
+}
+
+### test generate-token, this method takes your access token and EXTENDS the life of it.
+### paramater: accesssToken
+GET http://localhost:3000/api/generate-token
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYwNTkzODcyLCJleHAiOjE3NjA1OTc0NzJ9.ADb0MkczsJvGMjJMibvbNCZO79SornT67NOHhdSuSWg
+Accept: application/json
+
+### test refresh-token , This takes your refresh token and gives you a new refresh and access token
+### paramater: refreshToken
+POST http://localhost:3000/api/user/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYwNTkzODcyLCJleHAiOjE3NjExOTg2NzJ9.Ee4pndlYCaN6zPClaBQ4v4JSwr9ZirbOuIPJuEv9Vyw"
+}
