@@ -56,6 +56,13 @@ Content-Type: application/json
 
 
 
+### Run CreateView API test (automated validation)
+GET http://localhost:3000/api/Views/CreateView/test
+
+
+
+
+
 
 ### 🧪 Test GetByUser (automated test route)
 GET http://localhost:3000/api/Views/GetByUser/test

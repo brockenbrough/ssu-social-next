@@ -1,8 +1,41 @@
-### Test GET all users
-GET http://localhost:3000/api/statistics/likes
-Accept: application/json
-
 ### Automated testing
-GET http://localhost:3000/api/statistics/likes/test
+POST http://localhost:3000/api/statistics/likes/
+Content-Type: application/json
+
+{
+    "userId": "33333333-3333-3333-3333-333333333333",
+    "postId": "11111111-1111-1111-1111-111111111111"
+}
+
+### LikeList Test
+GET http://localhost:3000/api/statistics/likeList/
 Accept: application/json
 
+### Get Likes by User
+GET http://localhost:3000/api/statistics/likesByUser/33333333-3333-3333-3333-333333333333
+Accept: application/json
+
+###Unlike a post by a user
+DELETE http://localhost:3000/api/statistics/unlike
+Content-Type: application/json
+
+{
+    "userId": "33333333-3333-3333-3333-333333333333",
+    "postId": "11111111-1111-1111-1111-111111111111"
+}
+
+### Likes count for a post
+GET http://localhost:3000/api/count/likes-for-post/33333333-3333-3333-3333-333333333333
+Accept: application/json
+
+### Likes count test (seeded post should be exactly 1)
+GET http://localhost:3000/api/count/likes-for-post/test
+Accept: application/json
+
+### Likes count for a user
+GET http://localhost:3000/api/user-totallikes/11111111-1111-1111-1111-111111111111
+Accept: application/json
+
+### Likes count for a user test
+GET http://localhost:3000/api/user-totallikes/test
+Accept: application/json

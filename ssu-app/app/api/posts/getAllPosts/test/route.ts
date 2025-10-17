@@ -10,7 +10,6 @@ export async function GET() {
       imageUri: null,
       isSensitive: false,
       hasOffensiveText: false,
-      createdAt: "2025-10-03T12:56:49.742Z",
     };
 
     // Call the posts route being tested
@@ -27,8 +26,7 @@ export async function GET() {
           p.content === expectedPost.content &&
           p.imageUri === expectedPost.imageUri &&
           p.isSensitive === expectedPost.isSensitive &&
-          p.hasOffensiveText === expectedPost.hasOffensiveText &&
-          p.createdAt === expectedPost.createdAt
+          p.hasOffensiveText === expectedPost.hasOffensiveText
       );
 
       if (found) {

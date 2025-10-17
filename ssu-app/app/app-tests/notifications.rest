@@ -17,3 +17,28 @@ DELETE http://localhost:3000/api/notifications/deleteById/aaaa1111-bbbb-2222-ccc
 ### Run unit test for deleteById [id] route
 GET http://localhost:3000/api/notifications/deleteById/test
 
+### Create a new notification
+POST http://localhost:3000/api/notifications/create
+Content-Type: application/json
+
+{
+  "notification_type": "like",
+  "user_id": "11111111-1111-1111-1111-111111111111",
+  "content": "User A liked your post.",
+  "action_user_id": "22222222-2222-2222-2222-222222222222",
+  "post_id": "33333333-3333-3333-3333-333333333333"
+}
+
+###
+
+### Get notifications by user_id
+POST http://localhost:3000/api/notifications/get
+Content-Type: application/json
+
+{
+  "user_id": "11111111-1111-1111-1111-111111111111"
+}
+
+
+### Get notifications by username
+GET http://localhost:3000/api/notifications/get/username?username=test_user1
