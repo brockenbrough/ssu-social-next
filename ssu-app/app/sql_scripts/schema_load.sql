@@ -428,4 +428,24 @@ END IF;
         comment_content = EXCLUDED.comment_content,
         created_at = NOW();
 
+    -- ======================================================
+    -- Seed likes MADE BY user1 so tests for "numberOfPostsLiked"
+    -- can assert a deterministic count (expected = 2)
+    -- ======================================================
+
+    -- Ensure no duplicates
+    DELETE FROM likes
+    WHERE user_id = fixed_user_id1
+      AND post_id IN (fixed_post_id, fixed_post_id1);
+
+    --user1 likes their own fixed post
+    INSERT INTO likes (post_id, user_id, created_at)
+    VALUES (fixed_post_id, fixed_user_id1, NOW())
+    ON CONFLICT DO NOTHING;
+
+    --user1 also likes user3's fixed post
+    INSERT INTO likes (post_id, user_id, created_at)
+    VALUES (fixed_post_id1, fixed_user_id1, NOW())
+    ON CONFLICT DO NOTHING;    
+
 END $$;
