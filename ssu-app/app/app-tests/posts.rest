@@ -60,13 +60,17 @@ Accept: application/json
 ######################################
 
 ### Update a post's content - Angel
-PATCH http://localhost:3000/api/posts/updatePost
+POST http://localhost:3000/api/posts/updatePost
 Content-Type: application/json
 
 {
-  "postId": "33333333-3333-3333-3333-333333333333",
+  "postId": "90750dec-0d84-402e-b073-b97f85d2f9fa",
   "content": "Updated content for this post!"
 }
+
+### Update a post's content test - Angel
+GET http://localhost:3000/api/posts/updatePost/test
+Content-Type: application/json
 
 ### 🧩 Get paginated posts (manual) — YACINE
 GET http://localhost:3000/api/posts/GetPostPage?page=1&postPerPage=2
