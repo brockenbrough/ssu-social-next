@@ -133,6 +133,7 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error("Login error:", error);
+    console.error("Full login error:", error);
     return NextResponse.json(
       { message: "Server error during login" },
       {
