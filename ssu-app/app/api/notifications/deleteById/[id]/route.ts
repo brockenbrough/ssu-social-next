@@ -2,53 +2,50 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
 
+export const runtime = "nodejs";
+
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-// (optional) UUID check to avoid cast errors
-const UUID_RE =
-  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+// Та же простая проверка UUID, как в followers
+const SIMPLE_UUID_RE = /^[0-9a-fA-F-]{36}$/;
 
 export async function DELETE(
   _req: Request,
-  ctx: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = ctx.params?.id;
+    // Тот же способ получения параметров, как в followers
+    const { id } = await ctx.params;
 
-    if (!id) {
+    if (!SIMPLE_UUID_RE.test(id)) {
       return NextResponse.json(
-        { error: "Notification ID is required." },
-        { status: 400 }
-      );
-    }
-    if (!UUID_RE.test(id)) {
-      return NextResponse.json(
-        { error: "Invalid notification ID format." },
+        { success: false, message: "Invalid notification id" },
         { status: 400 }
       );
     }
 
-    const [deleted] = await sql/* sql */`
+    // Явный ::uuid чтобы не было конфликтов типов
+    const rows = await sql/* sql */`
       DELETE FROM notifications
-      WHERE notification_id = ${id}
+      WHERE notification_id = ${id}::uuid
       RETURNING notification_id
     `;
 
-    if (!deleted) {
+    if (rows.length === 0) {
       return NextResponse.json(
-        { error: "Notification not found." },
+        { success: false, message: "Notification not found" },
         { status: 404 }
       );
     }
 
     return NextResponse.json(
-      { msg: "Notification deleted successfully." },
+      { success: true, message: "Notification deleted successfully" },
       { status: 200 }
     );
   } catch (err) {
     console.error("Error deleting notification:", err);
     return NextResponse.json(
-      { error: "Could not delete notification." },
+      { success: false, message: "Could not delete notification" },
       { status: 500 }
     );
   }
