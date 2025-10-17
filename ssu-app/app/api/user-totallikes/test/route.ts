@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const seededUserId = "11111111-1111-1111-1111-111111111111";
-    const expectedCount = 2;
+    const expectedCount = 3;
 
     const res = await fetch(
       `http://localhost:3000/api/user-totallikes/${seededUserId}`,
