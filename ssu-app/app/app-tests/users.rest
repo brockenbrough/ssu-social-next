@@ -140,3 +140,30 @@ Accept: application/json
 ### Test GET /user/uploadProfileImage/test - automated verification
 GET http://localhost:3000/api/user/uploadProfileImage/test
 Accept: application/json
+
+### 🔹 1. Test fetching multiple users by IDs
+POST http://localhost:3000/api/user/getUsersByIds
+Content-Type: application/json
+
+{
+  "userIds": [
+    "22222222-2222-2222-2222-222222222222",
+    "33333333-3333-3333-3333-333333333333"
+  ]
+}
+
+### 🔹 2. Test when userIds array is empty
+POST http://localhost:3000/api/user/getUsersByIds
+Content-Type: application/json
+
+{
+  "userIds": []
+}
+
+### 🔹 3. Test invalid request (not array)
+POST http://localhost:3000/api/user/getUsersByIds
+Content-Type: application/json
+
+{
+  "userIds": "invalid-string"
+}
