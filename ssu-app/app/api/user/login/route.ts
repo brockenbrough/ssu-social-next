@@ -1,8 +1,8 @@
-
 import { NextResponse } from "next/server";
 import postgres from "postgres";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { generateAccessToken, generateRefreshToken } from "@/utilities/generateToken";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -108,26 +108,18 @@ export async function POST(req: Request) {
     const safeUser = { ...user, password: null };
 
     console.log("Generating JWT tokens...");
-    const accessToken = jwt.sign(
-      {
-        id: safeUser._id,
-        email: safeUser.email,
-        username: safeUser.username,
-        role: safeUser.role,
-      },
-      process.env.SUPABASE_JWT_SECRET!,
-      { expiresIn: "15m" }
+    const accessToken = generateAccessToken(
+      safeUser._id,
+      safeUser.email,
+      safeUser.username,
+      safeUser.role
     );
 
-    const refreshToken = jwt.sign(
-      {
-        id: safeUser._id,
-        email: safeUser.email,
-        username: safeUser.username,
-        role: safeUser.role,
-      },
-      process.env.SUPABASE_JWT_SECRET!,
-      { expiresIn: "7d" }
+    const refreshToken = generateRefreshToken(
+      safeUser._id,
+      safeUser.email,
+      safeUser.username,
+      safeUser.role
     );
 
     console.log("Login successful for user:", username);
