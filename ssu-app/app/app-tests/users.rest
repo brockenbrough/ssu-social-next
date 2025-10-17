@@ -111,6 +111,34 @@ Content-Type: application/json
   "password": "dummy_password_hash1"
 }
 
+
+
+### Test PUT /user/edit - successful update
+### This route updates user information for the currently logged-in user.
+### Requires a valid Bearer accessToken in the Authorization header.
+### Make sure the token belongs to the same user you're editing.
+
+PUT http://localhost:3000/api/user/editUser
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYwNzA3NDAxLCJleHAiOjE3NjA3MTEwMDF9.-QMEzblnCOB1SeklwnKi81r_f_2RPPH3MjVbWuAs6HY
+Accept: application/json
+
+{
+  "username": "updated_test_user1",
+  "email": "updated_test_user1@example.com",
+  "biography": "This is the updated bio from REST test.",
+  "password": "new_secure_password123"
+}
+
+### Test PUT /user/edit - missing token (should fail)
+PUT http://localhost:3000/api/user/editUser
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "unauthorized_update"
+}
+
 ### test generate-token, this method takes your access token and EXTENDS the life of it.
 ### paramater: accesssToken
 GET http://localhost:3000/api/generate-token
