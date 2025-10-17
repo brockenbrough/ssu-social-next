@@ -1,3 +1,22 @@
+###  Update Notification (happy path)
+PUT http://localhost:3000/api/notifications/update
+Content-Type: application/json
+
+{
+  "id": "aaaa1111-bbbb-2222-cccc-3333dddd4444",
+  "text": "Updated via REST test",
+  "isRead": true
+}
+
+### Run the integrated unit test for the update route
+GET http://localhost:3000/api/notifications/update/test
+
+### Delete by ID 
+DELETE http://localhost:3000/api/notifications/deleteById/aaaa1111-bbbb-2222-cccc-3333dddd4444
+
+### Run unit test for deleteById [id] route
+GET http://localhost:3000/api/notifications/deleteById/test
+
 ### Create a new notification
 POST http://localhost:3000/api/notifications/create
 Content-Type: application/json
