@@ -2,6 +2,8 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
+
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
