@@ -1,6 +1,8 @@
 // app/api/notifications/deleteById/[id]/route.ts
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
+
 
 export const runtime = "nodejs";
 
