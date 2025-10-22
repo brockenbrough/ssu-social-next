@@ -22,7 +22,7 @@ export async function OPTIONS(req: Request) {
   return NextResponse.json(null, {
     status: 200,
     headers: {
-      "Access-Control-Allow-Origin": "http://localhost:3001",
+      "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
     },
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
         { message: "Username and password are required" },
         {
           status: 400,
-          headers: { "Access-Control-Allow-Origin": "http://localhost:3001" },
+          headers: { "Access-Control-Allow-Origin": "*" },
         }
       );
     }
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
         { message: "Username or password does not exist, try again" },
         {
           status: 401,
-          headers: { "Access-Control-Allow-Origin": "http://localhost:3001" },
+          headers: { "Access-Control-Allow-Origin": "*" },
         }
       );
     }
@@ -87,7 +87,7 @@ export async function POST(req: Request) {
         { message: "Invalid password" },
         {
           status: 401,
-          headers: { "Access-Control-Allow-Origin": "http://localhost:3001" },
+          headers: { "Access-Control-Allow-Origin": "*" },
         }
       );
     }
@@ -101,7 +101,7 @@ export async function POST(req: Request) {
         { message: "Username or password does not exist, try again" },
         {
           status: 401,
-          headers: { "Access-Control-Allow-Origin": "http://localhost:3001" },
+          headers: { "Access-Control-Allow-Origin": "*" },
         }
       );
     }
@@ -132,7 +132,7 @@ export async function POST(req: Request) {
       { user: safeUser, accessToken, refreshToken },
       {
         status: 200,
-        headers: { "Access-Control-Allow-Origin": "http://localhost:3001" },
+        headers: { "Access-Control-Allow-Origin": "*" },
       }
     );
   } catch (error) {
@@ -142,7 +142,7 @@ export async function POST(req: Request) {
       { message: "Server error during login" },
       {
         status: 500,
-        headers: { "Access-Control-Allow-Origin": "http://localhost:3001" },
+        headers: { "Access-Control-Allow-Origin": "*" },
       }
     );
   }
