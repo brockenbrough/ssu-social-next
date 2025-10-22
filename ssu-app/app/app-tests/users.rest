@@ -25,8 +25,8 @@ POST https://ssu-social-newwave.vercel.app/api/user/login
 Content-Type: application/json
 
 {
-  "username": "test_user1",
-  "password": "dummy_password_hash1"
+  "username": "testing101",
+  "password": "testing101"
 }
 
 ### Test POST /login - wrong password
@@ -53,9 +53,9 @@ POST https://ssu-social-newwave.vercel.app/api/user/signup
 Content-Type: application/json
 
 {
-  "username": "new_signup_user2",
-  "email": "new_signup_user2@example.com",
-  "password": "newuserpassword"
+  "username": "testing101",
+  "email": "testing101@gmail.com",
+  "password": "testing101"
 }
 
 ### Test POST /signup - username/email conflict
@@ -152,7 +152,7 @@ POST http://localhost:3000/api/user/refresh-token
 Content-Type: application/json
 
 {
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYwNTkzODcyLCJleHAiOjE3NjExOTg2NzJ9.Ee4pndlYCaN6zPClaBQ4v4JSwr9ZirbOuIPJuEv9Vyw"
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYxMTAzNjQ0LCJleHAiOjE3NjE3MDg0NDR9.bPdOsAlplP4gzkE5GQk749XDhanLSQ2Ga72aDGnNpGI"
 }
 
 ######################################

@@ -65,6 +65,7 @@ export async function POST(req: Request) {
       WHERE username = ${username}
       LIMIT 1
     `;
+    console.log("Query Result:", rows);
 
     console.log("Database rows fetched:", rows.length);
     if (rows.length === 0) {
@@ -108,6 +109,9 @@ export async function POST(req: Request) {
     const safeUser = { ...user, password: null };
 
     console.log("Generating JWT tokens...");
+    console.log("Access token secret exists:", !!process.env.ACCESS_TOKEN_SECRET);
+    console.log("Refresh token secret exists:", !!process.env.REFRESH_TOKEN_SECRET);
+
     const accessToken = generateAccessToken(
       safeUser._id,
       safeUser.email,
