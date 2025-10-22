@@ -196,3 +196,31 @@ Content-Type: application/json
 {
   "userIds": "invalid-string"
 }
+
+### Test GET /user/get-bio/[id] (LOCAL)
+GET http://localhost:3000/api/user/get-bio/11111111-1111-1111-1111-111111111111
+//Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
+Accept: application/json
+
+### Test GET /user/get-bio/[id] (Vercel)
+GET https://ssu-social-newwave.vercel.app/api/user/get-bio/11111111-1111-1111-1111-111111111111
+//Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
+Accept: application/json
+
+### Test PUT /user/update-bio/[id] (LOCAL)
+PUT http://localhost:3000/api/user/update-bio/11111111-1111-1111-1111-111111111111
+Content-Type: application/json
+//Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
+
+{
+  "biography": "I don't got internet"
+}
+
+### Test PUT /user/update-bio/[id] (Vercel)
+PUT https://localhost:3000/api/user/update-bio/11111111-1111-1111-1111-111111111111
+Content-Type: application/json
+//Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
+
+{
+  "biography": "Hello from Vercel test for bio."
+}
