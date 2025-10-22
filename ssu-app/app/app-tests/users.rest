@@ -107,8 +107,8 @@ POST http://localhost:3000/api/user/login
 Content-Type: application/json
 
 {
-  "username": "test_user1",
-  "password": "dummy_password_hash1"
+  "username": "testing12345",
+  "password": "testing12345"
 }
 
 
