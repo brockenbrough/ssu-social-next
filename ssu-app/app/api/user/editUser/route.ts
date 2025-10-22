@@ -10,7 +10,7 @@ function corsResponse(body: any, status: number) {
   return NextResponse.json(body, {
     status,
     headers: {
-      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "PUT, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
     },
