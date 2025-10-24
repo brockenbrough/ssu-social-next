@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 // In these routes, we must match the field definitions in
 // the original backend.  This means we have to rename some 

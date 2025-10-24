@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { corsHeaders } from "@/utilities/cors";
 
 export async function GET() {
   try {
