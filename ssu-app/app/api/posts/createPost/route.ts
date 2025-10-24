@@ -1,17 +1,6 @@
-export async function OPTIONS(req: Request) {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization"
-    }
-  });
-}
-
-
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -34,7 +23,7 @@ export async function POST(req: Request) {
     if (!userId || !content) {
       return NextResponse.json(
         { error: "Missing required fields: userId or content" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -72,8 +61,8 @@ export async function POST(req: Request) {
   } catch (err: any) {
     console.error("Error creating post:", err);
     return NextResponse.json(
-      { error: "Failed to create post", details: err.message },
-      { status: 500 }
+      { success: false, message: "Failed to fetch followers list" },
+      { status: 500, headers: corsHeaders }
     );
   }
 }

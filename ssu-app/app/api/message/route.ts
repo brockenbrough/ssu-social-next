@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
 import { auth } from "@/app/lib/auth";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -15,6 +16,10 @@ type ApiMessage = {
     date: string | Date;
 };
 
+export async function OPTIONS(_req: Request) {
+    return NextResponse.json(null, { status: 200, headers: corsHeaders });
+}
+
 export async function POST(request: Request) {
     try {
         // TODO: Re-enable auth after migration is complete
@@ -25,7 +30,7 @@ export async function POST(request: Request) {
         if (!session || !session.user) {
             return NextResponse.json(
                 { error: "Unauthorized. Please log in." },
-                { status: 401 }
+                { status: 401, headers: corsHeaders }
             );
         }
         */
@@ -39,7 +44,7 @@ export async function POST(request: Request) {
         if (session.user.id !== senderId) {
                  return NextResponse.json(
                      { error: "Forbidden. You can only send messages as yourself." },
-                     { status: 403 }
+                     { status: 403, headers: corsHeaders }
                  );
         }
         */
@@ -50,7 +55,7 @@ export async function POST(request: Request) {
                 {
                     message: "chatRoomId, senderId, receiverId and text are required.",
                 },
-                { status: 400 }
+                { status: 400, headers: corsHeaders }
             );
         }
 
@@ -58,7 +63,7 @@ export async function POST(request: Request) {
         if (text.trim() === "") {
             return NextResponse.json(
                 { message: "Text is required." },
-                { status: 400 }
+                { status: 400, headers: corsHeaders }
             );
         }
 
@@ -69,7 +74,7 @@ export async function POST(request: Request) {
         if (chatRoomExists.length === 0) {
             return NextResponse.json(
                 { message: `Chat room with ID ${chatRoomId} not found.` },
-                { status: 404 }
+                { status: 404, headers: corsHeaders }
             );
         }
 
@@ -80,7 +85,7 @@ export async function POST(request: Request) {
         if (senderExists.length === 0) {
             return NextResponse.json(
                 { message: `Sender with ID ${senderId} not found.` },
-                { status: 404 }
+                { status: 404, headers: corsHeaders }
             );
         }
 
@@ -91,7 +96,7 @@ export async function POST(request: Request) {
         if (receiverExists.length === 0) {
             return NextResponse.json(
                 { message: `Receiver with ID ${receiverId} not found.` },
-                { status: 404 }
+                { status: 404, headers: corsHeaders }
             );
         }
 
@@ -127,13 +132,13 @@ export async function POST(request: Request) {
                 message: "Message created successfully",
                 data: newMessage,
             },
-            { status: 201 }
+            { status: 201, headers: corsHeaders }
         );
     } catch (error) {
         console.error("Error creating message:", error);
         return NextResponse.json(
             { error: "Could not create message" },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
         );
     }
 }

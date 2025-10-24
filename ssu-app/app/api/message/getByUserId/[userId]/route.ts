@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
-
 
 type LegacyMessage = {
   _id: string;          // maps to message_id
@@ -14,18 +14,21 @@ type LegacyMessage = {
   date: string | Date;  // maps to created_at
 };
 
+export async function OPTIONS(_req: Request) {
+  return NextResponse.json(null, { status: 200, headers: corsHeaders });
+}
+
 export async function GET(
   req: Request,
   ctx: { params: Promise<{ userId: string }> }
 ) {
   try {
-
     const { userId } = await ctx.params;
 
     if (!userId) {
       return NextResponse.json(
         { message: "userId is required." },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -33,7 +36,7 @@ export async function GET(
     if (!/^[0-9a-fA-F-]{36}$/.test(userId)) {
       return NextResponse.json(
         { message: "Invalid user id" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -47,7 +50,7 @@ export async function GET(
     if (!userExists?.[0]?.exists) {
       return NextResponse.json(
         { message: `User with ID ${userId} not found.` },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
 
@@ -68,12 +71,12 @@ export async function GET(
     `;
 
     // Keep the exact old response shape: { data: messages }
-    return NextResponse.json({ data: messages }, { status: 200 });
+    return NextResponse.json({ data: messages }, { status: 200, headers: corsHeaders });
   } catch (err) {
     console.error("Error fetching messages:", err);
     return NextResponse.json(
       { error: "Could not fetch messages" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

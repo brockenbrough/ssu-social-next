@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -11,7 +12,7 @@ export async function POST(req: Request) {
     if (!postId || !content) {
       return NextResponse.json(
         { error: "Missing required fields: postId or content" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -43,8 +44,8 @@ export async function POST(req: Request) {
   } catch (err: any) {
     console.error("Update post error:", err);
     return NextResponse.json(
-      { error: "Failed to update post", details: err.message },
-      { status: 500 }
+      { success: false, message: "Failed to update post" },
+      { status: 500, headers: corsHeaders }
     );
   }
 }
