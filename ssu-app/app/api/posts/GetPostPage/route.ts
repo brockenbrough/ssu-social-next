@@ -1,8 +1,13 @@
-// app/api/posts/getpostpage/route.ts
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors"; // ✅ add shared CORS headers
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
+// ✅ Allow preflight CORS requests
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+}
 
 export async function GET(req: Request) {
   try {
@@ -27,13 +32,13 @@ export async function GET(req: Request) {
 
     return NextResponse.json(
       { success: true, page, postsPerPage, data: posts },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (err: any) {
     console.error("Error fetching posts:", err);
     return NextResponse.json(
       { success: false, message: "Error fetching posts", error: err.message },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

@@ -1,8 +1,13 @@
-// app/api/posts/getpostpagebyusername/route.ts
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors"; // ✅ add shared CORS headers
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
+// ✅ Allow preflight CORS requests
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+}
 
 export async function GET(req: Request) {
   try {
@@ -12,7 +17,7 @@ export async function GET(req: Request) {
     if (!username) {
       return NextResponse.json(
         { success: false, message: "username is required" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -35,7 +40,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json(
       { success: true, username, page, postsPerPage, data: posts },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (error: any) {
     console.error("Error fetching posts by username:", error);
@@ -45,7 +50,7 @@ export async function GET(req: Request) {
         message: "Error fetching posts by username",
         error: error.message,
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
