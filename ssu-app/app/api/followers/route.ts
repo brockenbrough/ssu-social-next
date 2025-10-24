@@ -4,33 +4,37 @@ import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-// Handle preflight requests (CORS)
+// Handle preflight requests
 export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: corsHeaders,
-  });
+  return new Response(null, { status: 204, headers: corsHeaders });
 }
 
 // GET /api/followers
 export async function GET() {
   try {
-    const rows = await sql`
+    // Retrieve all users and their followers (with usernames instead of IDs)
+    const rows = await sql<{
+      username: string;
+      followers: string[];
+    }[]>`
       SELECT
-        user_id::text AS "userId",
+        u.username AS "username",
         COALESCE(
-          ARRAY_AGG(follower_id::text ORDER BY follower_id)
-          FILTER (WHERE follower_id IS NOT NULL),
+          ARRAY_AGG(DISTINCT uf.username ORDER BY uf.username)
+          FILTER (WHERE f.follower_id IS NOT NULL),
           '{}'
         ) AS "followers"
-      FROM followers  
-      GROUP BY user_id
-      ORDER BY user_id
+      FROM ssu_users u
+      LEFT JOIN followers f ON f.user_id = u.user_id
+      LEFT JOIN ssu_users uf ON uf.user_id = f.follower_id
+      GROUP BY u.user_id, u.username
+      ORDER BY u.username;
     `;
+
     return NextResponse.json(rows, { status: 200, headers: corsHeaders });
-  } catch (err) {
+  } catch (err: any) {
     return NextResponse.json(
-      { error: String((err as any)?.message ?? err) },
+      { success: false, error: err?.message ?? String(err) },
       { status: 500, headers: corsHeaders }
     );
   }

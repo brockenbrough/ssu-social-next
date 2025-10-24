@@ -4,23 +4,21 @@ import { headers } from "next/headers";
 import postgres from "postgres";
 import { corsHeaders } from "@/utilities/cors";
 
+// Initialize PostgreSQL connection
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-// Reusable fixed test IDs
+// Fixed test IDs for predictable results
 const TEST_NOTIFICATION_ID = "bbbb1111-2222-3333-4444-555566667777";
-const RECEIVER_USER_ID     = "11111111-1111-1111-1111-111111111111"; // fixed_user_id1
-const ACTOR_USER_ID        = "22222222-2222-2222-2222-222222222222"; // fixed_user_id2
+const RECEIVER_USER_ID = "11111111-1111-1111-1111-111111111111"; // fixed_user_id1
+const ACTOR_USER_ID = "22222222-2222-2222-2222-222222222222";   // fixed_user_id2
 
-// Preflight support
-export async function OPTIONS() {
-  return NextResponse.json({}, { status: 200, headers: corsHeaders });
-}
-
+// GET endpoint to perform an automated end-to-end test
 export async function GET() {
+  // Structured report to summarize test stages
   const report: Record<string, any> = { seed: null, deleteCall: null, verify: null };
 
   try {
-    // 1) Seed a predictable notification
+    //  Seed a predictable notification for testing
     const [seeded] = await sql/* sql */`
       INSERT INTO notifications (
         notification_id, notification_type, user_id, action_user_id,
@@ -36,20 +34,20 @@ export async function GET() {
     `;
     report.seed = { ok: !!seeded, row: seeded };
 
-    // 2) Call the real DELETE endpoint via HTTP
+    //  Call the actual DELETE endpoint using fetch
     const h = await headers();
     const host = h.get("host") ?? "localhost:3000";
     const base = host.startsWith("http") ? host : `http://${host}`;
 
-    const resp = await fetch(`${base}/api/notification/deleteById/${TEST_NOTIFICATION_ID}`, {
+    const resp = await fetch(`${base}/api/notifications/deleteById/${TEST_NOTIFICATION_ID}`, {
       method: "DELETE",
-      // No need to send CORS headers here; this is a server-to-server call
-      cache: "no-store",
+      headers: corsHeaders, // include CORS headers for consistency
     });
 
     const json = await resp.json().catch(() => ({}));
     report.deleteCall = { status: resp.status, body: json };
 
+    // Stop test if deletion failed
     if (!resp.ok) {
       return NextResponse.json(
         { ok: false, step: "delete_call", report },
@@ -57,7 +55,7 @@ export async function GET() {
       );
     }
 
-    // 3) Verify that the row was removed
+    //  Verify that the row has been removed
     const remaining = await sql/* sql */`
       SELECT notification_id
       FROM notifications
@@ -71,10 +69,8 @@ export async function GET() {
       { status: deleted ? 200 : 500, headers: corsHeaders }
     );
   } catch (err: any) {
+    // Log and return any error encountered
     report.error = err?.message ?? String(err);
-    return NextResponse.json(
-      { ok: false, report },
-      { status: 500, headers: corsHeaders }
-    );
+    return NextResponse.json({ ok: false, report }, { status: 500, headers: corsHeaders });
   }
 }
