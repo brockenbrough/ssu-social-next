@@ -4,6 +4,14 @@ import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
+// Handle preflight requests (CORS)
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
 type ApiPost = {
   _id: string;
   userId: string;
@@ -14,12 +22,12 @@ type ApiPost = {
   createdAt: string | Date;
 };
 
+// POST /api/posts
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { userId, content, imageUri, isSensitive, hasOffensiveText } = body;
 
-    // ✅ Input validation
     if (!userId || !content) {
       return NextResponse.json(
         { error: "Missing required fields: userId or content" },
@@ -27,7 +35,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ Insert post
     const rows = await sql<ApiPost[]>`
       INSERT INTO posts (
         user_id,
@@ -55,13 +62,11 @@ export async function POST(req: Request) {
         created_at           AS "createdAt"
     `;
 
-    const newPost = rows[0];
-
-    return NextResponse.json(newPost, { status: 201 });
+    return NextResponse.json(rows[0], { status: 201, headers: corsHeaders });
   } catch (err: any) {
     console.error("Error creating post:", err);
     return NextResponse.json(
-      { success: false, message: "Failed to fetch followers list" },
+      { success: false, message: "Failed to create post", error: err.message },
       { status: 500, headers: corsHeaders }
     );
   }

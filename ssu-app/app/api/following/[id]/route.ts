@@ -1,8 +1,18 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
+// Handle preflight requests (CORS)
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
+// GET /api/user/following/[id]
 export async function GET(
   _req: Request,
   ctx: { params: Promise<{ id: string }> }
@@ -14,7 +24,7 @@ export async function GET(
     if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
       return NextResponse.json(
         { success: false, message: "Invalid user id" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -37,7 +47,7 @@ export async function GET(
         message: "Following list retrieved successfully",
         data: { following },
       },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (err) {
     console.error("Error fetching following for user:", err);
@@ -46,7 +56,7 @@ export async function GET(
         success: false,
         message: "Failed to fetch following list",
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

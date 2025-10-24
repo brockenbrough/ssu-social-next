@@ -6,6 +6,14 @@ import { corsHeaders } from "@/utilities/cors";
 // Connect to Postgres
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
+// Handle preflight requests (CORS)
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
 type ApiPost = {
   _id: string;                // matches frontend expectations
   userId: string;             // foreign key
@@ -16,6 +24,7 @@ type ApiPost = {
   createdAt: string | Date;
 };
 
+// GET /api/feed/[username]
 export async function GET(
   _req: Request,
   ctx: { params: Promise<{ username: string }> }
@@ -30,21 +39,26 @@ export async function GET(
       );
     }
 
-    const rows = await sql`
-  SELECT p.post_id::text
-  FROM posts p
-  ORDER BY p.created_at DESC
-`;
+    // Fetch posts for the user
+    const rows = await sql<ApiPost[]>`
+      SELECT
+        p.post_id::text AS "_id",
+        p.user_id::text AS "userId",
+        p.content,
+        p.image_uri AS "imageUri",
+        p.is_sensitive AS "isSensitive",
+        p.has_offensive_text AS "hasOffensiveText",
+        p.created_at AS "createdAt"
+      FROM posts p
+      JOIN ssu_users u ON p.user_id = u.user_id
+      WHERE u.username = ${username}
+      ORDER BY p.created_at DESC
+    `;
 
-const ids = rows.map((r) => r.post_id); // extract the plain values
-
-return NextResponse.json(
-  { feed: ids },
-  {
-    status: 200,
-    headers: corsHeaders,
-  }
-);
+    return NextResponse.json(
+      { feed: rows },
+      { status: 200, headers: corsHeaders }
+    );
   } catch (error) {
     console.error("Error fetching feed:", error);
     return NextResponse.json(
@@ -52,8 +66,4 @@ return NextResponse.json(
       { status: 500, headers: corsHeaders }
     );
   }
-}
-
-export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
 }
