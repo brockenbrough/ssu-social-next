@@ -1,6 +1,8 @@
 // app/api/notifications/update/test/route.ts
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
+
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 // Connect to Postgres
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
@@ -29,12 +30,22 @@ export async function GET() {
       ORDER BY created_at DESC
     `;
 
-    return NextResponse.json(rows, { status: 200 });
+    return NextResponse.json(rows, {
+      status: 200,
+      headers: corsHeaders,
+    });
   } catch (error) {
     console.error("Error fetching posts:", error);
     return NextResponse.json(
       { error: "Failed to fetch posts" },
-      { status: 500 }
+      {
+        status: 500,
+        headers: corsHeaders,
+      }
     );
+  }
 }
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
 }

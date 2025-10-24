@@ -20,7 +20,7 @@ export async function OPTIONS(req: Request) {
   return NextResponse.json(null, {
     status: 200,
     headers: {
-      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
     },
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     if (!username || !email || !password) {
       return NextResponse.json(
         { message: "Username, email, and password are required" },
-        { status: 400, headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } }
+        { status: 400, headers: { "Access-Control-Allow-Origin": "*" } }
       );
     }
 
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     if (usernameRows.length > 0) {
       return NextResponse.json(
         { message: "Username is taken, make another one" },
-        { status: 409, headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } }
+        { status: 409, headers: { "Access-Control-Allow-Origin": "*" } }
       );
     }
 
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
     if (emailRows.length > 0) {
       return NextResponse.json(
         { message: "Email already exists, make another one" },
-        { status: 409, headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } }
+        { status: 409, headers: { "Access-Control-Allow-Origin": "*" } }
       );
     }
 
@@ -90,7 +90,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(safeUser, {
       status: 201,
-      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" },
+      headers: { "Access-Control-Allow-Origin": "*" },
     });
   } catch (error) {
     console.error("Signup error:", error);
@@ -98,7 +98,7 @@ export async function POST(req: Request) {
       { message: "Server error during signup" },
       {
         status: 500,
-        headers: { "Access-Control-Allow-Origin": "http://localhost:3000" },
+        headers: { "Access-Control-Allow-Origin": "*" },
       }
     );
   }
