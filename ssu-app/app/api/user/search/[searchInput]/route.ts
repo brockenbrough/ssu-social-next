@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 // This route mirrors the legacy backend: GET /user/search/:searchInput
 // It returns an array of user objects with the same field names/types

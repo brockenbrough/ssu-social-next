@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -14,16 +15,19 @@ type ApiPost = {
 };
 
 // GET /api/post/[id]
-export async function GET(
-  _req: Request,
-  ctx: { params: Promise<{ id: string }> }
-) {
+export async function OPTIONS() {
+  return NextResponse.json(null, { status: 200, headers: corsHeaders });
+}
+export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await ctx.params;
 
     // Validate UUID
     if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
-      return NextResponse.json({ error: "Invalid post id" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid post id" }, 
+        { status: 400, headers: corsHeaders }
+      );
     }
 
     // Fetch only the post
@@ -45,9 +49,14 @@ export async function GET(
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    return NextResponse.json(rows[0], { status: 200 });
+    return NextResponse.json(rows[0], 
+      { status: 200, headers: corsHeaders }
+    );
   } catch (error) {
     console.error("Error fetching post:", error);
-    return NextResponse.json({ error: "Failed to fetch post" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Failed to fetch posts" },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }

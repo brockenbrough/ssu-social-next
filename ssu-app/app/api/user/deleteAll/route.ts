@@ -1,10 +1,16 @@
 // app/api/user/deleteAll/route.ts
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 const DELETED_USER_ID = "00000000-0000-0000-0000-000000000000";
+
+// Handle preflight CORS requests
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
 
 export async function POST() {
   try {
@@ -70,9 +76,9 @@ export async function POST() {
     `;
     console.log(`Deleted ${deletedUsers.length} users`);
 
-    return NextResponse.json({ success: true, deletedCount: deletedUsers.length }, { status: 200 });
+    return NextResponse.json({ success: true, deletedCount: deletedUsers.length }, { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error("Error deleting all users:", error);
-    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 });
+    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500, headers: corsHeaders });
   }
 }
