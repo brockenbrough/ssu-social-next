@@ -1,9 +1,21 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
-
+import { corsHeaders } from "@/utilities/cors";
 
 // Create Postgres client
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
+// Handle OPTIONS preflight requests for CORS
+export async function OPTIONS(req: Request) {
+  return NextResponse.json(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
+}
 
 export async function GET(req: Request) {
   try {
@@ -17,9 +29,15 @@ export async function GET(req: Request) {
       ORDER BY b.created_at DESC
     `;
 
-    return NextResponse.json(rows, { status: 200 });
+    return NextResponse.json(rows, { 
+      status: 200, 
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+    });
   } catch (err) {
     console.error("GET all bookmarks error:", err);
-    return NextResponse.json({ error: "Failed to fetch bookmarks" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch bookmarks" }, { 
+      status: 500, 
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+    });
   }
 }

@@ -1,8 +1,21 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 // Create Postgres client
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
+// Handle OPTIONS preflight requests for CORS
+export async function OPTIONS(req: Request) {
+  return NextResponse.json(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
+}
 
 export async function GET(req: Request) {
   try {
@@ -24,10 +37,16 @@ export async function GET(req: Request) {
       ORDER BY b.created_at DESC
     `;
 
-    return NextResponse.json(rows, { status: 200 });
+    return NextResponse.json(rows, { 
+      status: 200, 
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+    });
   } catch (err) {
     console.error("GET bookmarks (manage) error:", err);
-    return NextResponse.json({ error: "Failed to fetch bookmarks" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch bookmarks" }, { 
+      status: 500, 
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+    });
   }
 }
 
@@ -39,7 +58,10 @@ export async function POST(req: Request) {
     if (!userId || !postId) {
       return NextResponse.json(
         { error: "Missing required fields: user_id, post_id" },
-        { status: 400 }
+        { 
+          status: 400, 
+          headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+        }
       );
     }
 
@@ -53,7 +75,10 @@ export async function POST(req: Request) {
     if (rows.length === 0) {
       return NextResponse.json(
         { error: "Bookmark already exists for this user and post" },
-        { status: 409 }
+        { 
+          status: 409, 
+          headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+        }
       );
     }
 
@@ -68,10 +93,16 @@ export async function POST(req: Request) {
       WHERE b.bookmark_id = ${created.bookmark_id}
     `;
 
-    return NextResponse.json(details[0], { status: 201 });
+    return NextResponse.json(details[0], { 
+      status: 201, 
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+    });
   } catch (err) {
     console.error("POST bookmark (manage) error:", err);
-    return NextResponse.json({ error: "Failed to create bookmark" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to create bookmark" }, { 
+      status: 500, 
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+    });
   }
 }
 
@@ -83,7 +114,10 @@ export async function DELETE(req: Request) {
     if (!bookmarkId && !(userId && postId)) {
       return NextResponse.json(
         { error: "Provide bookmark_id or both user_id and post_id" },
-        { status: 400 }
+        { 
+          status: 400, 
+          headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+        }
       );
     }
 
@@ -94,13 +128,22 @@ export async function DELETE(req: Request) {
     `;
 
     if (result.length === 0) {
-      return NextResponse.json({ error: "Bookmark not found" }, { status: 404 });
+      return NextResponse.json({ error: "Bookmark not found" }, { 
+        status: 404, 
+        headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+      });
     }
 
-    return NextResponse.json({ deleted: result.length }, { status: 200 });
+    return NextResponse.json({ deleted: result.length }, { 
+      status: 200, 
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+    });
   } catch (err) {
     console.error("DELETE bookmark (manage) error:", err);
-    return NextResponse.json({ error: "Failed to delete bookmark" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to delete bookmark" }, { 
+      status: 500, 
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+    });
   }
 }
 

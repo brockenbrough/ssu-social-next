@@ -1,7 +1,20 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
+// Handle OPTIONS preflight requests for CORS
+export async function OPTIONS(req: Request) {
+  return NextResponse.json(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Methods": "PUT, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
+}
 
 // NOTE: Auth/moderation intentionally commented so route works unauthenticated for now.
 // import jwt from "jsonwebtoken";
@@ -30,14 +43,20 @@ export async function PUT(
     const { id } = await ctx.params;
 
     if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
-      return NextResponse.json({ error: "Invalid user id" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid user id" }, { 
+        status: 400, 
+        headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+      });
     }
 
     const body = await req.json();
     const { biography } = body ?? {};
 
     if (typeof biography !== "string") {
-      return NextResponse.json({ message: "Invalid biography" }, { status: 400 });
+      return NextResponse.json({ message: "Invalid biography" }, { 
+        status: 400, 
+        headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+      });
     }
 
     // Intended auth+moderation (disabled for now):
@@ -58,13 +77,22 @@ export async function PUT(
   `;
 
     if (rows.length === 0) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json({ message: "User not found" }, { 
+        status: 404, 
+        headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+      });
     }
 
-    return NextResponse.json({ biography: rows[0].biography }, { status: 200 });
+    return NextResponse.json({ biography: rows[0].biography }, { 
+      status: 200, 
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+    });
   } catch (error) {
     console.error("Error updating biography:", error);
-    return NextResponse.json({ message: "Error updating biography" }, { status: 500 });
+    return NextResponse.json({ message: "Error updating biography" }, { 
+      status: 500, 
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+    });
   }
 }
 

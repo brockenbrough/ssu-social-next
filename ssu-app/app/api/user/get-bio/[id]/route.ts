@@ -1,7 +1,20 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
+// Handle OPTIONS preflight requests for CORS
+export async function OPTIONS(req: Request) {
+  return NextResponse.json(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
+}
 
 // NOTE: Auth is intentionally commented out so route works unauthenticated for now.
 // import jwt from "jsonwebtoken";
@@ -27,7 +40,10 @@ export async function GET(
 
     // UUID shape check
     if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
-      return NextResponse.json({ error: "Invalid user id" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid user id" }, { 
+        status: 400, 
+        headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+      });
     }
 
     // Intended auth (disabled for now):
@@ -44,13 +60,22 @@ export async function GET(
     `;
 
     if (rows.length === 0) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json({ message: "User not found" }, { 
+        status: 404, 
+        headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+      });
     }
 
-    return NextResponse.json({ biography: rows[0].biography || "" }, { status: 200 });
+    return NextResponse.json({ biography: rows[0].biography || "" }, { 
+      status: 200, 
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+    });
   } catch (error) {
     console.error("Error fetching biography:", error);
-    return NextResponse.json({ message: "Error fetching biography" }, { status: 500 });
+    return NextResponse.json({ message: "Error fetching biography" }, { 
+      status: 500, 
+      headers: { "Access-Control-Allow-Origin": "http://localhost:3000" } 
+    });
   }
 }
 
