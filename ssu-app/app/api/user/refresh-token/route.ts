@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { generateAccessToken, generateRefreshToken } from "@/utilities/generateToken";
+import { corsHeaders } from "@/utilities/cors";
 
 //this method checks if you have a refresh token and then gives you a new acces and refresh token
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
 import jwt from "jsonwebtoken";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -29,6 +30,11 @@ function verifyToken(req: Request) {
   }
 }
 
+// Handle CORS preflight
+export async function OPTIONS() {
+  return new NextResponse(null, { headers: corsHeaders });
+}
+
 // DELETE /api/user/deleteById/[id]
 export async function DELETE(
   _req: Request,
@@ -42,7 +48,7 @@ export async function DELETE(
     if (!userFromToken) {
       return NextResponse.json(
         { message: "Unauthorized" },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -50,7 +56,7 @@ export async function DELETE(
     if (userFromToken.id !== id) {
       return NextResponse.json(
         { message: "Not authorized to delete this user" },
-        { status: 403 }
+        { status: 403, headers: corsHeaders }
       );
     }
 
@@ -72,7 +78,7 @@ export async function DELETE(
     if (rows.length === 0) {
       return NextResponse.json(
         { message: "User not found" },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
 
@@ -81,13 +87,13 @@ export async function DELETE(
 
     return NextResponse.json(
       { message: "User deleted successfully", deletedUser },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (error) {
     console.error("Delete user error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
