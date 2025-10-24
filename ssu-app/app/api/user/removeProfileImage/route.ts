@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const { user_id } = body as { user_id?: string };
 
     if (!user_id) {
-      return NextResponse.json({ message: "user_id is required" }, { status: 400 });
+      return NextResponse.json({ message: "user_id is required" }, { status: 400, headers: corsHeaders  });
     }
 
     const userRows = await sql<{ user_id: string; profile_image: string | null }[]>`
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     `;
 
     if (userRows.length === 0) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json({ message: "User not found" }, { status: 404, headers: corsHeaders   });
     }
 
     const DEFAULT_PROFILE_IMAGE = "https://ssusocial.s3.amazonaws.com/profilepictures/ProfileIcon.png";
@@ -39,13 +39,13 @@ export async function POST(req: Request) {
         message: "Profile image removed successfully",
         profileImage: DEFAULT_PROFILE_IMAGE,
       },
-      { status: 200 }
+      { status: 200, headers: corsHeaders   }
     );
   } catch (error: any) {
     console.error("Error removing profile image:", error);
     return NextResponse.json(
       { message: "Failed to remove profile image", error: String(error?.message ?? error) },
-      { status: 500 }
+      { status: 500, headers: corsHeaders   }
     );
   }
 }

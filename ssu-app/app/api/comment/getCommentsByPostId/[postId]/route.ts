@@ -27,7 +27,7 @@ export async function GET(
 
     // Optional UUID validation (mirrors user/[id] style)
     if (!/^[0-9a-fA-F-]{36}$/.test(postId)) {
-      return NextResponse.json({ error: "Invalid post id" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid post id" }, { status: 400, headers: corsHeaders   });
     }
 
     const rows = await sql<LegacyComment[]>`
@@ -44,10 +44,10 @@ export async function GET(
       ORDER BY c.created_at ASC
     `;
 
-    return NextResponse.json(rows, { status: 200 });
+    return NextResponse.json(rows, { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error("Error fetching comments by postId:", error);
-    return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500, headers: corsHeaders   });
   }
 }
 

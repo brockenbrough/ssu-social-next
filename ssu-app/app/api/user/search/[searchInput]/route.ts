@@ -30,7 +30,7 @@ export async function GET(
 
     // Match legacy behavior: if no search input, return {}
     if (!searchInput) {
-      return NextResponse.json({}, { status: 200 });
+      return NextResponse.json({}, { status: 200, headers: corsHeaders   });
     }
 
     const likeTerm = `%${searchInput}%`;
@@ -53,10 +53,10 @@ export async function GET(
     // Redact password to avoid leaking stored hashes, while preserving field shape
     const data = rows.map((u) => ({ ...u, password: null }));
 
-    return NextResponse.json(data, { status: 200 });
+    return NextResponse.json(data, { status: 200, headers: corsHeaders   });
   } catch (error) {
     console.error("Error searching users:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500, headers: corsHeaders   });
   }
 }
 

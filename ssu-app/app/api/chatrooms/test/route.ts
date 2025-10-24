@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { corsHeaders } from "@/utilities/cors";
 
 export async function GET() {
   try {
@@ -20,9 +21,9 @@ export async function GET() {
       return NextResponse.json({ success: true, message: "Chatrooms route OK", data });
     }
 
-    return NextResponse.json({ success: false, message: `Unexpected status: ${res.status}`, data }, { status: res.status });
+    return NextResponse.json({ success: false, message: `Unexpected status: ${res.status}`, data }, { status: res.status, headers: corsHeaders  });
   } catch (err: any) {
-    return NextResponse.json({ success: false, error: err?.message || "Unknown error" }, { status: 500 });
+    return NextResponse.json({ success: false, error: err?.message || "Unknown error" }, { status: 500, headers: corsHeaders });
   }
 }
 
