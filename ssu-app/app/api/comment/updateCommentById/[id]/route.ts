@@ -1,6 +1,7 @@
 // app/api/comment/updateCommentById/[id]/route.ts
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";  //Just add this line 
 
 export const runtime = "nodejs";
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
@@ -13,17 +14,6 @@ type LegacyComment = {
   date: string | Date;
   postId: string;
 };
-
-export async function OPTIONS(req: Request) {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization"
-    }
-  });
-}
 
 export async function PATCH(
   req: Request,

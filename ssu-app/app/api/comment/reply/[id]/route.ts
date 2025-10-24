@@ -2,19 +2,9 @@
 
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";  //Just add this line 
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
-
-export async function OPTIONS(req: Request) {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization"
-    }
-  });
-}
 
 export async function POST(
   request: Request,
