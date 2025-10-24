@@ -21,6 +21,14 @@ type ApiUser = {
   biography: string;
 };
 
+// Handle preflight requests (CORS)
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
 export async function GET(
   _req: Request,
   ctx: { params: Promise<{ searchInput: string }> }
@@ -30,7 +38,7 @@ export async function GET(
 
     // Match legacy behavior: if no search input, return {}
     if (!searchInput) {
-      return NextResponse.json({}, { status: 200, headers: corsHeaders   });
+      return NextResponse.json({}, { status: 200, headers: corsHeaders });
     }
 
     const likeTerm = `%${searchInput}%`;
@@ -50,14 +58,15 @@ export async function GET(
       WHERE username ILIKE ${likeTerm}
     `;
 
-    // Redact password to avoid leaking stored hashes, while preserving field shape
+    // Redact password to avoid leaking stored hashes
     const data = rows.map((u) => ({ ...u, password: null }));
 
-    return NextResponse.json(data, { status: 200, headers: corsHeaders   });
+    return NextResponse.json(data, { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error("Error searching users:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500, headers: corsHeaders   });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
-
-

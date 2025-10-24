@@ -16,18 +16,15 @@ type ApiUser = {
   biography: string;
 };
 
-// Handle OPTIONS preflight requests for CORS
-export async function OPTIONS(req: Request) {
-  return NextResponse.json(null, {
+// Handle preflight requests (CORS)
+export async function OPTIONS() {
+  return new NextResponse(null, {
     status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    },
+    headers: corsHeaders,
   });
 }
 
+// POST /api/user/signup
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -36,7 +33,7 @@ export async function POST(req: Request) {
     if (!username || !email || !password) {
       return NextResponse.json(
         { message: "Username, email, and password are required" },
-        { status: 400, headers: { "Access-Control-Allow-Origin": "*" } }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -50,7 +47,7 @@ export async function POST(req: Request) {
     if (usernameRows.length > 0) {
       return NextResponse.json(
         { message: "Username is taken, make another one" },
-        { status: 409, headers: { "Access-Control-Allow-Origin": "*" } }
+        { status: 409, headers: corsHeaders }
       );
     }
 
@@ -64,7 +61,7 @@ export async function POST(req: Request) {
     if (emailRows.length > 0) {
       return NextResponse.json(
         { message: "Email already exists, make another one" },
-        { status: 409, headers: { "Access-Control-Allow-Origin": "*" } }
+        { status: 409, headers: corsHeaders }
       );
     }
 
@@ -91,16 +88,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json(safeUser, {
       status: 201,
-      headers: { "Access-Control-Allow-Origin": "*" },
+      headers: corsHeaders,
     });
   } catch (error) {
     console.error("Signup error:", error);
     return NextResponse.json(
       { message: "Server error during signup" },
-      {
-        status: 500,
-        headers: { "Access-Control-Allow-Origin": "*" },
-      }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
