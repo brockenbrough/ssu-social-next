@@ -12,7 +12,6 @@ export async function OPTIONS() {
   });
 }
 
-// POST /api/user/removeProfileImage
 // Expects JSON body { user_id: string }
 export async function POST(req: Request) {
   try {

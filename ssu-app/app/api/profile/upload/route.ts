@@ -12,7 +12,6 @@ export async function OPTIONS() {
   });
 }
 
-// POST /api/user/uploadProfileImage
 // Expects JSON body: { user_id: string, image_url: string }
 export async function POST(req: Request) {
   try {
