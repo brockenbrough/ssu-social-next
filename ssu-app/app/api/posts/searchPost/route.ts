@@ -12,7 +12,7 @@ export async function GET(req: Request) {
     if (!postId) {
       return NextResponse.json(
         { error: "Missing postId query parameter" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -37,8 +37,8 @@ export async function GET(req: Request) {
   } catch (err: any) {
     console.error("Error fetching post:", err);
     return NextResponse.json(
-      { error: "Failed to fetch post", details: err.message },
-      { status: 500 }
+      { success: false, message: "Error fetching post" },
+      { status: 500, headers: corsHeaders }
     );
   }
 }

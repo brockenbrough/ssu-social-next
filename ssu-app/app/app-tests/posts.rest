@@ -64,7 +64,7 @@ POST http://localhost:3000/api/posts/updatePost
 Content-Type: application/json
 
 {
-  "postId": "90750dec-0d84-402e-b073-b97f85d2f9fa",
+  "postId": "33333333-3333-3333-3333-333333333333",
   "content": "Updated content for this post!"
 }
 
@@ -75,13 +75,13 @@ Content-Type: application/json
 ######################################
 
 ### Search POST by id
-GET http://localhost:3000/api/posts/searchPost?postId=ce9c2c05-eb7d-43c6-864f-07b78c91ce89
+GET http://localhost:3000/api/posts/searchPost?postId=33333333-3333-3333-3333-333333333333
 Content-Type: application/json
 
 ######################################
 
 ### Search POST by id test
-GET http://localhost:3000/api/posts/searchPost?postId=ce9c2c05-eb7d-43c6-864f-07b78c91ce89
+GET http://localhost:3000/api/posts/searchPost?postId=33333333-3333-3333-3333-333333333333
 Content-Type: application/json
 
 ######################################

@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     if (!userId || !content) {
       return NextResponse.json(
         { error: "Missing required fields: userId or content" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -61,8 +61,8 @@ export async function POST(req: Request) {
   } catch (err: any) {
     console.error("Error creating post:", err);
     return NextResponse.json(
-      { error: "Failed to create post", details: err.message },
-      { status: 500 }
+      { success: false, message: "Failed to fetch followers list" },
+      { status: 500, headers: corsHeaders }
     );
   }
 }

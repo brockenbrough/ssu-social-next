@@ -28,13 +28,13 @@ export async function GET(req: Request) {
 
     return NextResponse.json(
       { success: true, page, postsPerPage, data: posts },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (err: any) {
     console.error("Error fetching posts:", err);
     return NextResponse.json(
-      { success: false, message: "Error fetching posts", error: err.message },
-      { status: 500 }
+      { success: false, message: "Error fetching posts" },
+      { status: 500, headers: corsHeaders }
     );
   }
 }
