@@ -3,52 +3,58 @@ import { NextResponse } from "next/server";
 import postgres from "postgres";
 import { corsHeaders } from "@/utilities/cors";
 
-
+// Explicitly specify the runtime
 export const runtime = "nodejs";
 
+// Initialize PostgreSQL connection
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-// Та же простая проверка UUID, как в followers
+// Simple UUID validation pattern
 const SIMPLE_UUID_RE = /^[0-9a-fA-F-]{36}$/;
 
+// DELETE route handler
 export async function DELETE(
   _req: Request,
   ctx: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Тот же способ получения параметров, как в followers
+    // Extract the "id" parameter from the request context
     const { id } = await ctx.params;
 
+    // Validate UUID format
     if (!SIMPLE_UUID_RE.test(id)) {
       return NextResponse.json(
         { success: false, message: "Invalid notification id" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
-    // Явный ::uuid чтобы не было конфликтов типов
+    // Execute SQL DELETE query with explicit UUID casting
     const rows = await sql/* sql */`
       DELETE FROM notifications
       WHERE notification_id = ${id}::uuid
       RETURNING notification_id
     `;
 
+    // Handle case when no rows are affected (notification not found)
     if (rows.length === 0) {
       return NextResponse.json(
         { success: false, message: "Notification not found" },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
 
+    // Successful deletion response
     return NextResponse.json(
       { success: true, message: "Notification deleted successfully" },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (err) {
+    // Log the error and return a server error response
     console.error("Error deleting notification:", err);
     return NextResponse.json(
       { success: false, message: "Could not delete notification" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

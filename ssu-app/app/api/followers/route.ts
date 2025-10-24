@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import postgres from "postgres";
 import { corsHeaders } from "@/utilities/cors";
 
-
+// Initialize PostgreSQL connection
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 export async function GET() {
   try {
+    // Retrieve all users and their followers, grouped by user_id
     const rows = await sql`
       SELECT
         user_id::text AS "userId",
@@ -19,8 +20,14 @@ export async function GET() {
       GROUP BY user_id
       ORDER BY user_id
     `;
-    return NextResponse.json(rows, { status: 200 });
+
+    // Return list of users with their followers
+    return NextResponse.json(rows, { status: 200, headers: corsHeaders });
   } catch (err) {
-    return NextResponse.json({ error: String((err as any)?.message ?? err) }, { status: 500 });
+    // Handle database or server errors
+    return NextResponse.json(
+      { error: String((err as any)?.message ?? err) },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
