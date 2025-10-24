@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors"; 
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
+// Allow preflight CORS requests
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+}
 
 export async function GET(
   req: Request,
@@ -10,12 +16,15 @@ export async function GET(
   try {
     const { userId } = await context.params;
 
-    // Basic sanity check for UUID format
+    // ✅ Basic sanity check for UUID format
     if (!/^[0-9a-fA-F-]{36}$/.test(userId)) {
-      return NextResponse.json({ error: "Invalid userId format" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid userId format" },
+        { status: 400, headers: corsHeaders }
+      );
     }
 
-    // Fetch all post viewed by this user
+    // ✅ Fetch all posts viewed by this user
     const results = await sql`
       SELECT 
         v.post_id::text,
@@ -33,19 +42,22 @@ export async function GET(
     if (results.length === 0) {
       return NextResponse.json(
         { message: "No views found for this user.", views: [] },
-        { status: 200 }
+        { status: 200, headers: corsHeaders }
       );
     }
 
     return NextResponse.json(
       { message: "Views retrieved successfully.", views: results },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (error: any) {
     console.error("Error fetching user views:", error);
     return NextResponse.json(
-      { error: "Failed to fetch views", details: error.message },
-      { status: 500 }
+      {
+        error: "Failed to fetch views",
+        details: error.message,
+      },
+      { status: 500, headers: corsHeaders }
     );
   }
 }
