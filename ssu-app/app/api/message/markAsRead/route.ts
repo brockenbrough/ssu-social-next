@@ -1,6 +1,6 @@
-// app/message/markAsRead/route.ts
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -12,6 +12,10 @@ type MarkAsReadBody = {
 // Loosen UUID validation to accept seeded IDs (hyphenated hex)
 const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
+export async function OPTIONS(_req: Request) {
+  return NextResponse.json(null, { status: 200, headers: corsHeaders });
+}
+
 export async function PUT(req: Request) {
   try {
     // Parse JSON body
@@ -22,7 +26,7 @@ export async function PUT(req: Request) {
     if (!Array.isArray(messageIds)) {
       return NextResponse.json(
         { message: "Message IDs are required." },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -30,7 +34,7 @@ export async function PUT(req: Request) {
     if (messageIds.length === 0) {
       return NextResponse.json(
         { message: "Messages are marked as read successfully." },
-        { status: 200 }
+        { status: 200, headers: corsHeaders }
       );
     }
 
@@ -39,7 +43,7 @@ export async function PUT(req: Request) {
 
     // If nothing valid remains, behave like "no messages found"
     if (validIds.length === 0) {
-      return NextResponse.json({ message: "No messages found" }, { status: 404 });
+      return NextResponse.json({ message: "No messages found" }, { status: 404, headers: corsHeaders });
     }
 
     // Check which of these actually exist (old route did a find() first)
@@ -50,7 +54,7 @@ export async function PUT(req: Request) {
     `;
 
     if (found.length === 0) {
-      return NextResponse.json({ message: "No messages found" }, { status: 404 });
+      return NextResponse.json({ message: "No messages found" }, { status: 404, headers: corsHeaders });
     }
 
     // Update only the ones that exist; mirror old updateMany
@@ -63,10 +67,10 @@ export async function PUT(req: Request) {
     // Keep the exact success text
     return NextResponse.json(
       { message: "Messages are marked as read successfully." },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (err) {
     console.error("Error marking messages as read:", err);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    return NextResponse.json({ message: "Server error" }, { status: 500, headers: corsHeaders });
   }
 }
