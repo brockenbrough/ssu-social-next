@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
+export async function OPTIONS() {
+  return NextResponse.json(null, { status: 200, headers: corsHeaders });
+}
 
 export async function GET(
   _req: Request,
@@ -11,7 +16,7 @@ export async function GET(
     const { username } = await ctx.params;
 
     if (!username || typeof username !== "string" || !username.trim()) {
-      return NextResponse.json({ message: "username is required." }, { status: 400 });
+      return NextResponse.json({ message: "username is required." }, { status: 400, headers: corsHeaders });
     }
     const ident = username.trim();
     const isUuid = /^[0-9a-fA-F-]{36}$/.test(ident);
@@ -35,9 +40,9 @@ export async function GET(
     }
 
     const totalLikes = rows?.[0]?.count ?? 0;
-    return NextResponse.json(totalLikes, { status: 200 });
+    return NextResponse.json(totalLikes, { status: 200, headers: corsHeaders });
   } catch (err) {
     console.error("Error counting total likes for user:", err);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500, headers: corsHeaders });
   }
 }
