@@ -5,6 +5,14 @@ import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
+// Handle preflight requests (CORS)
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
 export async function GET(req: Request, context: any) {
   const params = await context.params;
   const { username } = params;
@@ -23,18 +31,27 @@ export async function GET(req: Request, context: any) {
     `;
 
     if (rows.length === 0) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "User not found" },
+        { status: 404, headers: corsHeaders }
+      );
     }
 
     const user = rows[0];
-    return NextResponse.json({
-      _id: user._id,
-      username: user.username,
-      biography: user.biography,
-      profileImage: user.profileImage || defaultProfileImageUrl,
-    });
+    return NextResponse.json(
+      {
+        _id: user._id,
+        username: user.username,
+        biography: user.biography,
+        profileImage: user.profileImage || defaultProfileImageUrl,
+      },
+      { headers: corsHeaders }
+    );
   } catch (error) {
     console.error("Error fetching user:", error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Server error" },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }

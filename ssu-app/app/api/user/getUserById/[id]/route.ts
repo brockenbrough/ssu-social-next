@@ -16,7 +16,15 @@ type ApiUser = {
   biography: string;
 };
 
-// GET /api/user/[id]
+// Handle preflight requests (CORS)
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
+// GET /api/user/getUserById/[id]
 export async function GET(
   _req: Request,
   ctx: { params: Promise<{ id: string }> }   // NOTE: params is a Promise now
@@ -24,9 +32,12 @@ export async function GET(
   try {
     const { id } = await ctx.params;
 
-    // Optional: basic UUID shape check to 400 early (keeps logs cleaner)
+    // Validate UUID format
     if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
-      return NextResponse.json({ error: "Invalid user id" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid user id" },
+        { status: 400, headers: corsHeaders }
+      );
     }
 
     const rows = await sql<ApiUser[]>`
@@ -46,13 +57,19 @@ export async function GET(
     `;
 
     if (rows.length === 0) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404, headers: corsHeaders }
+      );
     }
 
     const user = { ...rows[0], password: null }; // redact password
-    return NextResponse.json(user, { status: 200 });
+    return NextResponse.json(user, { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error("Error fetching user:", error);
-    return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch user" },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
