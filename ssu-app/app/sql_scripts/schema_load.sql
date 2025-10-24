@@ -12,6 +12,8 @@ DECLARE
     followee_uuid2 UUID := '33333333-3333-3333-3333-333333333333'; -- user3
     signup_existing_user_id UUID := '66666666-6666-6666-6666-666666666666';
     fixed_message_id UUID := '55555555-5555-5555-5555-555555555555'; -- fixed message ID for test
+    fixed_notification_id UUID := 'aaaa1111-bbbb-2222-cccc-3333dddd4444'; -- fixed notification ID for REST tests
+
 BEGIN
 -- ====================================
 -- Create default 'Deleted User'
@@ -427,6 +429,33 @@ END IF;
     SET user_id = EXCLUDED.user_id,
         comment_content = EXCLUDED.comment_content,
         created_at = NOW();
+      -- ====================================
+    -- FIXED NOTIFICATION (for REST tests)
+    -- ====================================
+    IF NOT EXISTS (
+        SELECT 1 FROM notifications WHERE notification_id = fixed_notification_id
+    ) THEN
+        INSERT INTO notifications (
+            notification_id,
+            notification_type,
+            user_id,           -- who receives the notification
+            action_user_id,    -- who triggered it
+            content,
+            post_id,
+            is_read,
+            created_at
+        )
+        VALUES (
+            fixed_notification_id,
+            'like',                         -- choose any enum/valid type you use: 'like' | 'comment' | 'follow' | ...
+            fixed_user_id1,                 -- receiver (test_user1)
+            fixed_user_id2,                 -- actor    (test_user2)
+            'test_user2 liked your fixed test post',
+            fixed_post_id,                  -- ties to existing seeded post
+            FALSE,
+            NOW()
+        );
+    END IF;
 
     -- ======================================================
     -- Seed likes MADE BY user1 so tests for "numberOfPostsLiked"

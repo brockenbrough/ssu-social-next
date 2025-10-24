@@ -7,37 +7,37 @@
 ###    output window. Make sure the field names and types 
 ###    match what is in user model in the original backend.
 
-### Test GET all posts - Angel
+### Test GET all posts 
 GET http://localhost:3000/api/posts/getAllPosts
 Accept: application/json
 
-### Test GET all posts test - Angel
+### Test GET all posts test 
 GET http://localhost:3000/api/posts/getAllPosts/test
 Accept: application/json
 
 ######################################
 
-### Test GET all posts by id - Angel
+### Test GET all posts by id 
 GET http://localhost:3000/api/posts/getPostById/33333333-3333-3333-3333-333333333333
 Accept: application/json
 
-### Test GET all posts by id test - Angel
+### Test GET all posts by id test 
 GET http://localhost:3000/api/posts/getPostById/33333333-3333-3333-3333-333333333333/test
 Accept: application/json
 
 ######################################
 
-### Test DELETE a specific post - Angel
+### Test DELETE a specific post 
 DELETE http://localhost:3000/api/posts/deletePost/33333333-3333-3333-3333-333333333333
 Accept: application/json
 
-### Test DELETE a specific post test - Angel
+### Test DELETE a specific post test 
 GET http://localhost:3000/api/posts/deletePost/33333333-3333-3333-3333-333333333333/test
 Accept: application/json
 
 ######################################
 
-### Create POST - Angel
+### Create POST 
 
 POST http://localhost:3000/api/posts/createPost
 Content-Type: application/json
@@ -52,14 +52,14 @@ Accept: application/json
   "hasOffensiveText": false
 }
 
-### Create POST test - Angel
+### Create POST test 
 
 GET http://localhost:3000/api/posts/createPost/test
 Accept: application/json
 
 ######################################
 
-### Update a post's content - Angel
+### Update a post's content
 POST http://localhost:3000/api/posts/updatePost
 Content-Type: application/json
 
@@ -68,9 +68,23 @@ Content-Type: application/json
   "content": "Updated content for this post!"
 }
 
-### Update a post's content test - Angel
+### Update a post's content test 
 GET http://localhost:3000/api/posts/updatePost/test
 Content-Type: application/json
+
+######################################
+
+### Search POST by id
+GET http://localhost:3000/api/posts/searchPost?postId=ce9c2c05-eb7d-43c6-864f-07b78c91ce89
+Content-Type: application/json
+
+######################################
+
+### Search POST by id test
+GET http://localhost:3000/api/posts/searchPost?postId=ce9c2c05-eb7d-43c6-864f-07b78c91ce89
+Content-Type: application/json
+
+######################################
 
 ### 🧩 Get paginated posts (manual) — YACINE
 GET http://localhost:3000/api/posts/GetPostPage?page=1&postPerPage=2

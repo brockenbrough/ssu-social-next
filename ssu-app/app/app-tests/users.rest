@@ -25,8 +25,8 @@ POST https://ssu-social-newwave.vercel.app/api/user/login
 Content-Type: application/json
 
 {
-  "username": "test_user1",
-  "password": "dummy_password_hash1"
+  "username": "testing101",
+  "password": "testing101"
 }
 
 ### Test POST /login - wrong password
@@ -53,9 +53,9 @@ POST https://ssu-social-newwave.vercel.app/api/user/signup
 Content-Type: application/json
 
 {
-  "username": "new_signup_user2",
-  "email": "new_signup_user2@example.com",
-  "password": "newuserpassword"
+  "username": "testing101",
+  "email": "testing101@gmail.com",
+  "password": "testing101"
 }
 
 ### Test POST /signup - username/email conflict
@@ -107,8 +107,37 @@ POST http://localhost:3000/api/user/login
 Content-Type: application/json
 
 {
-  "username": "test_user1",
-  "password": "dummy_password_hash1"
+  "username": "testing12345",
+  "password": "testing12345"
+}
+
+
+
+### Test PUT /user/edit - successful update
+### This route updates user information for the currently logged-in user.
+### Requires a valid Bearer accessToken in the Authorization header.
+### Make sure the token belongs to the same user you're editing.
+
+PUT http://localhost:3000/api/user/editUser
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYwNzA3NDAxLCJleHAiOjE3NjA3MTEwMDF9.-QMEzblnCOB1SeklwnKi81r_f_2RPPH3MjVbWuAs6HY
+Accept: application/json
+
+{
+  "username": "updated_test_user1",
+  "email": "updated_test_user1@example.com",
+  "biography": "This is the updated bio from REST test.",
+  "password": "new_secure_password123"
+}
+
+### something
+### Test PUT /user/edit - missing token (should fail)
+PUT http://localhost:3000/api/user/editUser
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "unauthorized_update"
 }
 
 ### test generate-token, this method takes your access token and EXTENDS the life of it.
@@ -123,7 +152,7 @@ POST http://localhost:3000/api/user/refresh-token
 Content-Type: application/json
 
 {
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYwNTkzODcyLCJleHAiOjE3NjExOTg2NzJ9.Ee4pndlYCaN6zPClaBQ4v4JSwr9ZirbOuIPJuEv9Vyw"
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYxMTAzNjQ0LCJleHAiOjE3NjE3MDg0NDR9.bPdOsAlplP4gzkE5GQk749XDhanLSQ2Ga72aDGnNpGI"
 }
 
 ######################################
@@ -166,4 +195,32 @@ Content-Type: application/json
 
 {
   "userIds": "invalid-string"
+}
+
+### Test GET /user/get-bio/[id] (LOCAL)
+GET http://localhost:3000/api/user/get-bio/11111111-1111-1111-1111-111111111111
+//Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
+Accept: application/json
+
+### Test GET /user/get-bio/[id] (Vercel)
+GET https://ssu-social-newwave.vercel.app/api/user/get-bio/11111111-1111-1111-1111-111111111111
+//Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
+Accept: application/json
+
+### Test PUT /user/update-bio/[id] (LOCAL)
+PUT http://localhost:3000/api/user/update-bio/11111111-1111-1111-1111-111111111111
+Content-Type: application/json
+//Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
+
+{
+  "biography": "I don't got internet"
+}
+
+### Test PUT /user/update-bio/[id] (Vercel)
+PUT https://localhost:3000/api/user/update-bio/11111111-1111-1111-1111-111111111111
+Content-Type: application/json
+//Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
+
+{
+  "biography": "Hello from Vercel test for bio."
 }

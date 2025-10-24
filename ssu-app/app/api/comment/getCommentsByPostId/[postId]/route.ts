@@ -15,6 +15,17 @@ type LegacyComment = {
   postId: string;
 };
 
+export async function OPTIONS(req: Request) {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization"
+    }
+  });
+}
+
 // GET /api/comment/postId/[postId]
 // Returns all comments for a given post in legacy shape
 export async function GET(
