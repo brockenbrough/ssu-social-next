@@ -42,21 +42,26 @@ export async function GET(
     // Fetch posts for the user
     const rows = await sql<ApiPost[]>`
       SELECT
-        p.post_id::text AS "_id",
-        p.user_id::text AS "userId",
-        p.content,
-        p.image_uri AS "imageUri",
-        p.is_sensitive AS "isSensitive",
-        p.has_offensive_text AS "hasOffensiveText",
-        p.created_at AS "createdAt"
+        p.post_id::text
       FROM posts p
-      JOIN ssu_users u ON p.user_id = u.user_id
-      WHERE u.username = ${username}
       ORDER BY p.created_at DESC
     `;
 
+    // The following fetches by username.  I have turned this off for now.
+        // p.user_id::text AS "userId",
+        // p.content,
+        // p.image_uri AS "imageUri",
+        // p.is_sensitive AS "isSensitive",
+        // p.has_offensive_text AS "hasOffensiveText",
+        // p.created_at AS "createdAt
+      // JOIN ssu_users u ON p.user_id = u.user_id
+      // WHERE u.username = ${username}
+
+      
+    const postIds = rows.map((row) => row.post_id);
+
     return NextResponse.json(
-      { feed: rows },
+      { feed: postIds },
       { status: 200, headers: corsHeaders }
     );
   } catch (error) {
