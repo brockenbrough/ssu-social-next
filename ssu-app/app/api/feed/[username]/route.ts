@@ -15,6 +15,7 @@ export async function OPTIONS() {
 }
 
 type ApiPost = {
+  post_id: any;
   _id: string;                // matches frontend expectations
   userId: string;             // foreign key
   content: string;
