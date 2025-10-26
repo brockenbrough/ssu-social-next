@@ -46,9 +46,13 @@ export async function GET(
         p.post_id::text
       FROM posts p
       ORDER BY p.created_at DESC
+      LIMIT 10
     `;
 
-    // The following fetches by username.  I have turned this off for now.
+    // The above is simplified from the original and should be
+    // corrected by looking at the old BE route.
+    // I'm doing this to unblock testing of other portions.
+    // Below is working code that fetches by username.  
         // p.user_id::text AS "userId",
         // p.content,
         // p.image_uri AS "imageUri",

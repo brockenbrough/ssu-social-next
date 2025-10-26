@@ -13,31 +13,14 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   try {
     const { id } = await ctx.params;
 
-    if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid user id" },
-        { status: 400, headers: corsHeaders }
-      );
-    }
-
-    const rows = await sql<{ followers: string[] }[]>`
-      SELECT
-        COALESCE(
-          ARRAY_AGG(follower_id::text ORDER BY follower_id)
-          FILTER (WHERE follower_id IS NOT NULL),
-          '{}'
-        ) AS followers
-      FROM followers
-      WHERE user_id = ${id}::uuid
-    `;
-
-    const followers = rows.length > 0 ? rows[0].followers : [];
+    // This API takes a user name.  This is just a temporary stub to return nothing.
+    const followers: string[] = []; // just an empty array
 
     return NextResponse.json(
       {
         success: true,
         message: "Followers list retrieved successfully",
-        data: { followers },
+        data: followers, // return directly
       },
       { status: 200, headers: corsHeaders }
     );
@@ -48,4 +31,5 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
       { status: 500, headers: corsHeaders }
     );
   }
+
 }
