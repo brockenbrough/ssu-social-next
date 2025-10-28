@@ -7,7 +7,7 @@ import { corsHeaders } from "@/utilities/cors";
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 // Fixed test IDs for reproducible testing
-const TEST_NOTIFICATION_ID = "dddd1111-bbbb-2222-cccc-3333dddd4444";
+const TEST_NOTIFICATION_ID = "de4a6ebc-e30d-4678-9c60-87fc1e1ec1f1";
 const RECEIVER_USER_ID = "11111111-1111-1111-1111-111111111111"; // fixed_user_id1
 const ACTOR_USER_ID = "22222222-2222-2222-2222-222222222222";   // fixed_user_id2
 

@@ -1,24 +1,24 @@
 ###  Update Notification (happy path)
-PUT http://localhost:3000/api/notifications/update
+PUT http://localhost:3000/api/notification/update
 Content-Type: application/json
 
 {
-  "id": "aaaa1111-bbbb-2222-cccc-3333dddd4444",
+  "id": "de4a6ebc-e30d-4678-9c60-87fc1e1ec1f1",
   "text": "Updated via REST test",
   "isRead": true
 }
 
 ### Run the integrated unit test for the update route
-GET http://localhost:3000/api/notifications/update/test
+GET http://localhost:3000/api/notification/update/test
 
 ### Delete by ID 
-DELETE http://localhost:3000/api/notifications/deleteById/aaaa1111-bbbb-2222-cccc-3333dddd4444
+DELETE http://localhost:3000/api/notification/deleteById/de4a6ebc-e30d-4678-9c60-87fc1e1ec1f1
 
 ### Run unit test for deleteById [id] route
-GET http://localhost:3000/api/notifications/deleteById/test
+GET http://localhost:3000/api/notification/deleteById/test
 
 ### Create a new notification
-POST http://localhost:3000/api/notifications/create
+POST http://localhost:3000/api/notification/create
 Content-Type: application/json
 
 {
@@ -32,7 +32,7 @@ Content-Type: application/json
 ###
 
 ### Get notifications by user_id
-POST http://localhost:3000/api/notifications/get
+POST http://localhost:3000/api/notification/get
 Content-Type: application/json
 
 {
@@ -41,4 +41,4 @@ Content-Type: application/json
 
 
 ### Get notifications by username
-GET http://localhost:3000/api/notifications/get/username?username=test_user1
+GET http://localhost:3000/api/notification/get/username?username=test_user1
