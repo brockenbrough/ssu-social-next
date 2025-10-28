@@ -1,23 +1,31 @@
-### 🧠 Get view count for a specific post
-GET http://localhost:3000/api/Views/GetViews/33333333-3333-3333-3333-333333333333
+##############################################
+### 🧪 GET /api/views/:postId — Fetch all views for a specific post
+##############################################
+
+### 🧪 Run the test route for GetViews (corrected)
+GET http://localhost:3000/api/views/33333333-3333-3333-3333-333333333333
 Accept: application/json
+
 
 ###
 
-### 🧪 Run the test route for GetViews
-GET http://localhost:3000/api/Views/GetViews/test
+### ⚠️ Example: Valid postId
+GET http://localhost:3000/api/views/33333333-3333-3333-3333-333333333333
 Accept: application/json
 
 ###
 
 ### ⚠️ Example: Missing or invalid postId
-GET http://localhost:3000/api/Views/GetViews/33333333-3333-3333-3333-333333333332
+GET http://localhost:3000/api/views/33333333-3333-3333-3333-333333333332
 Accept: application/json
 
 
+##############################################
+### 🧍‍♂️ POST /api/views/increase — Create or register a new view
+##############################################
 
-### 🧍‍♂️ Create new view (POST /api/Views/CreateView)
-POST http://localhost:3000/api/Views/CreateView
+### ✅ Base test (same user + same post)
+POST http://localhost:3000/api/views/increase
 Content-Type: application/json
 
 {
@@ -25,9 +33,10 @@ Content-Type: application/json
   "postId": "33333333-3333-3333-3333-333333333333"
 }
 
+###
 
-### Create a *new* view (different post)
-POST http://localhost:3000/api/Views/CreateView
+### 🆕 Create a *new* view (different post)
+POST http://localhost:3000/api/views/increase
 Content-Type: application/json
 
 {
@@ -35,8 +44,10 @@ Content-Type: application/json
   "postId": "11111111-1111-1111-1111-111111111111"
 }
 
-### Create another new view (different user/post)
-POST http://localhost:3000/api/Views/CreateView
+###
+
+### 👥 Create another new view (different user/post)
+POST http://localhost:3000/api/views/increase
 Content-Type: application/json
 
 {
@@ -44,9 +55,10 @@ Content-Type: application/json
   "postId": "55555555-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
 }
 
+###
 
-### Create another new view (different user & post)
-POST http://localhost:3000/api/Views/CreateView
+### 👤 Create another new view (different user & post)
+POST http://localhost:3000/api/views/increase
 Content-Type: application/json
 
 {
@@ -55,9 +67,13 @@ Content-Type: application/json
 }
 
 
+##############################################
+### 🤖 Run automated test for CreateView route
+##############################################
 
-### Run CreateView API test (automated validation)
-GET http://localhost:3000/api/Views/CreateView/test
+GET http://localhost:3000/api/views/increase/test
+Accept: application/json
+
 
 
 
