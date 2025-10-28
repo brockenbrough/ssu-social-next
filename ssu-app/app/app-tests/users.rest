@@ -73,8 +73,8 @@ DELETE https://ssu-social-newwave.vercel.app/api/user/deleteById/11111111-1111-1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYwMDQzNDg5LCJleHAiOjE3NjAwNDQzODl9.uAWWAd3Dj5CiJDlA_lC6wWE2__oXaIq4EN6dxDIYvZ0
 # Authorization is the accessToken from login
 
-### Test POST /user/removeProfileImage - remove profile image to default (by user_id)
-POST http://localhost:3000/api/user/removeProfileImage
+### Test POST /profile/remove - remove profile image to default (by user_id)
+POST http://localhost:3000/api/profile/remove
 Content-Type: application/json
 
 {
@@ -156,8 +156,8 @@ Content-Type: application/json
 }
 
 ######################################
-### Test POST /user/uploadProfileImage -set profile image by user_id
-POST http://localhost:3000/api/user/uploadProfileImage
+### Test POST /profile/upload -set profile image by user_id
+POST http://localhost:3000/api/profile/upload
 Content-Type: application/json
 Accept: application/json
 
@@ -166,8 +166,8 @@ Accept: application/json
   "image_url": "https://ssusocial.s3.amazonaws.com/profilepictures/test-profile-image.png"
 }
 
-### Test GET /user/uploadProfileImage/test - automated verification
-GET http://localhost:3000/api/user/uploadProfileImage/test
+### Test GET /profile/upload/test - automated verification
+GET http://localhost:3000/api/profile/upload/test
 Accept: application/json
 
 ### 🔹 1. Test fetching multiple users by IDs
@@ -197,18 +197,18 @@ Content-Type: application/json
   "userIds": "invalid-string"
 }
 
-### Test GET /user/get-bio/[id] (LOCAL)
-GET http://localhost:3000/api/user/get-bio/11111111-1111-1111-1111-111111111111
+### Test GET /get-bio/[id] (LOCAL)
+GET http://localhost:3000/api/get-bio/11111111-1111-1111-1111-111111111111
 //Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
 Accept: application/json
 
-### Test GET /user/get-bio/[id] (Vercel)
-GET https://ssu-social-newwave.vercel.app/api/user/get-bio/11111111-1111-1111-1111-111111111111
+### Test GET /get-bio/[id] (Vercel)
+GET https://ssu-social-newwave.vercel.app/api/get-bio/11111111-1111-1111-1111-111111111111
 //Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
 Accept: application/json
 
-### Test PUT /user/update-bio/[id] (LOCAL)
-PUT http://localhost:3000/api/user/update-bio/11111111-1111-1111-1111-111111111111
+### Test PUT /update-bio/[id] (LOCAL)
+PUT http://localhost:3000/api/update-bio/11111111-1111-1111-1111-111111111111
 Content-Type: application/json
 //Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
 
@@ -216,8 +216,8 @@ Content-Type: application/json
   "biography": "I don't got internet"
 }
 
-### Test PUT /user/update-bio/[id] (Vercel)
-PUT https://localhost:3000/api/user/update-bio/11111111-1111-1111-1111-111111111111
+### Test PUT /update-bio/[id] (Vercel)
+PUT https://localhost:3000/api/update-bio/11111111-1111-1111-1111-111111111111
 Content-Type: application/json
 //Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
 

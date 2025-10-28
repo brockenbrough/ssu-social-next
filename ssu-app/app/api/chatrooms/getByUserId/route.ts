@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -9,7 +10,8 @@ export async function GET(request: Request) {
         const userId = url.searchParams.get("userId");
 
         if (!userId) {
-            return NextResponse.json({ message: "UserId is required." }, { status: 400 });
+            return NextResponse.json({ message: "UserId is required." }, { status: 400, headers: corsHeaders  });
+  return NextResponse.json(null, { status: 200, headers: corsHeaders });
         }
 
         // Verify user exists
@@ -17,7 +19,7 @@ export async function GET(request: Request) {
             SELECT 1 FROM ssu_users WHERE user_id = ${userId}
         `;
         if (userExists.length === 0) {
-            return NextResponse.json({ message: `User with ID ${userId} not found.` }, { status: 404 });
+            return NextResponse.json({ message: `User with ID ${userId} not found.` }, { status: 404, headers: corsHeaders   });
         }
 
         // Find chatrooms where user participates
@@ -40,7 +42,7 @@ export async function GET(request: Request) {
         return NextResponse.json({ chatRooms });
     } catch (err) {
         console.error("Error fetching chat rooms:", err);
-        return NextResponse.json({ error: "Could not fetch chat rooms" }, { status: 500 });
+        return NextResponse.json({ error: "Could not fetch chat rooms" }, { status: 500, headers: corsHeaders });
     }
 }
 

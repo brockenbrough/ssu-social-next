@@ -25,6 +25,14 @@ type ApiUser = {
   biography: string;
 };
 
+// Handle preflight requests (CORS)
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
 export async function GET() {
   try {
     const rows = await sql<ApiUser[]>`
@@ -44,9 +52,15 @@ export async function GET() {
     // Redact password values to avoid leaking hashes; delete this map if you must return the stored password.
     const data = rows.map(u => ({ ...u, password: null }));
 
-    return NextResponse.json(data, { status: 200 });
+    return NextResponse.json(data, {
+      status: 200,
+      headers: corsHeaders,
+    });
   } catch (error) {
     console.error("Error fetching users:", error);
-    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch users" },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
