@@ -4,9 +4,9 @@ import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-export async function GET(_request: Request, context: { params: { userId: string } }) {
+export async function GET(_request: Request, context: { params: Promise<{ userId: string }> }) {
   try {
-    const userId = context?.params?.userId;
+    const { userId } = await context.params;
 
     if (!userId) {
       return NextResponse.json(
@@ -51,3 +51,4 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: corsHeaders });
 }
 
+ 
