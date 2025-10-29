@@ -10,8 +10,7 @@ export async function GET(request: Request) {
         const userId = url.searchParams.get("userId");
 
         if (!userId) {
-            return NextResponse.json({ message: "UserId is required." }, { status: 400, headers: corsHeaders  });
-  return NextResponse.json(null, { status: 200, headers: corsHeaders });
+            return NextResponse.json({ message: "UserId is required." }, { status: 400, headers: corsHeaders });
         }
 
         // Verify user exists
@@ -39,11 +38,15 @@ export async function GET(request: Request) {
             date: r.created_at,
         }));
 
-        return NextResponse.json({ chatRooms });
+        return NextResponse.json({ chatRooms }, { headers: corsHeaders });
     } catch (err) {
         console.error("Error fetching chat rooms:", err);
         return NextResponse.json({ error: "Could not fetch chat rooms" }, { status: 500, headers: corsHeaders });
     }
+}
+
+export async function OPTIONS() {
+    return new NextResponse(null, { status: 200, headers: corsHeaders });
 }
 
 

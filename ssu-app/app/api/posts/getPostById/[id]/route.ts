@@ -32,17 +32,19 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
 
     // Fetch only the post
     const rows = await sql<ApiPost[]>`
-      SELECT
-        p.post_id::text AS "_id",
-        p.user_id::text AS "userId",
-        p.content       AS "content",
-        p.image_uri     AS "imageUri",
-        p.is_sensitive  AS "isSensitive",
-        p.has_offensive_text AS "hasOffensiveText",
-        p.created_at    AS "createdAt"
-      FROM posts p
-      WHERE p.post_id = ${id}::uuid
-      LIMIT 1;
+SELECT
+  p.post_id::text AS "_id",
+  p.user_id::text AS "userId",
+  u.username      AS "username",
+  p.content       AS "content",
+  p.image_uri     AS "imageUri",
+  p.is_sensitive  AS "isSensitive",
+  p.has_offensive_text AS "hasOffensiveText",
+  p.created_at    AS "createdAt"
+FROM posts p
+JOIN ssu_users u ON u.user_id = p.user_id
+WHERE p.post_id = ${id}::uuid
+LIMIT 1;
     `;
 
     if (rows.length === 0) {

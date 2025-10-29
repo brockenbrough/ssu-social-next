@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
-import { corsHeaders } from "@/utilities/cors"; // ✅ add shared CORS headers
+import { corsHeaders } from "@/utilities/cors"; // ✅ shared CORS headers
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -9,10 +9,12 @@ export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
 
-export async function GET(req: Request) {
+export async function GET(
+  req: Request,
+  ctx: { params: Promise<{ username: string }> }
+) {
   try {
-    const { searchParams } = new URL(req.url);
-    const username = searchParams.get("username");
+    const { username } = await ctx.params;
 
     if (!username) {
       return NextResponse.json(
@@ -21,14 +23,17 @@ export async function GET(req: Request) {
       );
     }
 
+    const { searchParams } = new URL(req.url);
     const INITIAL_PAGE = 1;
     const DEFAULT_POSTS_PER_PAGE = 10;
+
     const page = parseInt(searchParams.get("page") || `${INITIAL_PAGE}`);
     const postsPerPage = parseInt(
       searchParams.get("postPerPage") || `${DEFAULT_POSTS_PER_PAGE}`
     );
     const offset = (page - 1) * postsPerPage;
 
+    // ✅ SQL query matches Express route logic
     const posts = await sql`
       SELECT p.post_id, p.user_id, p.content, p.created_at, u.username
       FROM posts p
@@ -43,7 +48,7 @@ export async function GET(req: Request) {
       { status: 200, headers: corsHeaders }
     );
   } catch (error: any) {
-    console.error("Error fetching posts by username:", error);
+    console.error("❌ Error fetching posts by username:", error);
     return NextResponse.json(
       {
         success: false,

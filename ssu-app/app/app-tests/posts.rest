@@ -87,23 +87,23 @@ Content-Type: application/json
 ######################################
 
 ### 🧩 Get paginated posts (manual) — YACINE
-GET http://localhost:3000/api/posts/GetPostPage?page=1&postPerPage=2
+GET http://localhost:3000/api/posts/getPostPage?page=1&postPerPage=2
 Accept: application/json
 
 
 ### ✅ Test paginated posts route (automated) — YACINE
-GET http://localhost:3000/api/posts/GetPostPage/test
+GET http://localhost:3000/api/posts/getPostPage/test
 Accept: application/json
 
 ######################################
 
-### 🧩 Get posts by username (manual) — YACINE
-GET http://localhost:3000/api/posts/getpostpagebyusername?username=test_user1&page=1&postPerPage=3
+### Get paginated posts by username -- YACINE
+GET http://localhost:3000/api/posts/getPostPageByUsername/test_user1?page=1&postPerPage=3
 Accept: application/json
 
 
-### ✅ Test getpostpagebyusername route (automated) — YACINE
-GET http://localhost:3000/api/posts/getpostpagebyusername/test
+### ✅ Test getPostPageByUsername route (automated) — YACINE
+GET http://localhost:3000/api/posts/getPostPageByUsername/test
 Accept: application/json
 
 

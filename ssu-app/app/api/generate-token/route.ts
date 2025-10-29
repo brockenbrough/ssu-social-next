@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, DecodedUser } from "../../../middleware/verifyToken";
 import { generateAccessToken } from "../../../utilities/generateToken";
+import { corsHeaders } from "@/utilities/cors";
+
+// Handle preflight requests (CORS)
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
 
 //method extends LOGIN LIFE of the ACCESSTOKEN , cannot be EXPIRED
 export async function GET(req: NextRequest) {
@@ -14,8 +23,8 @@ export async function GET(req: NextRequest) {
 
     const newAccessToken = generateAccessToken(id, email!, username!, role);
 
-    return NextResponse.json({ accessToken: newAccessToken }, { status: 200 });
+    return NextResponse.json({ accessToken: newAccessToken }, { status: 200, headers: corsHeaders });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 401 });
+    return NextResponse.json({ error: err.message }, { status: 401, headers: corsHeaders });
   }
 }
