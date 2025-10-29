@@ -12,6 +12,10 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
         headers: corsHeaders,
       });
     }
+   type ApiUser = {
+     _id: string;
+     username: string;
+  }
 
     export async function GET(
       _req: Request,
@@ -30,8 +34,10 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
         }
 
         // Get the list of usernames this user is following
-        const followerRows = await sql`
-          SELECT u.username
+        const followerRows = await sql<ApiUser[]>`
+        SELECT
+          u.user_id::text          AS "_id",
+          u.username               AS "username"
           FROM followers f
           JOIN ssu_users u ON f.follower_id = u.user_id
           WHERE f.user_id = ${userId}::uuid
