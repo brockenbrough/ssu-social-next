@@ -3,30 +3,35 @@ import { NextResponse } from "next/server";
 import postgres from "postgres";
 import { corsHeaders } from "@/utilities/cors";
 
-
 export const runtime = "nodejs";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-// Та же простая проверка UUID, как в followers
+// Simple UUID validation
 const SIMPLE_UUID_RE = /^[0-9a-fA-F-]{36}$/;
+
+
+// Handle preflight CORS requests
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 
 export async function DELETE(
   _req: Request,
   ctx: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Тот же способ получения параметров, как в followers
     const { id } = await ctx.params;
 
     if (!SIMPLE_UUID_RE.test(id)) {
       return NextResponse.json(
-        { success: false, message: "Invalid notification id" },
-        { status: 400 }
+        { success: false, message: "Invalid notification ID" },
+        { status: 400, headers: corsHeaders }
       );
     }
 
-    // Явный ::uuid чтобы не было конфликтов типов
+    // Explicit ::uuid to avoid type conflicts
     const rows = await sql/* sql */`
       DELETE FROM notifications
       WHERE notification_id = ${id}::uuid
@@ -36,19 +41,19 @@ export async function DELETE(
     if (rows.length === 0) {
       return NextResponse.json(
         { success: false, message: "Notification not found" },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
 
     return NextResponse.json(
       { success: true, message: "Notification deleted successfully" },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (err) {
     console.error("Error deleting notification:", err);
     return NextResponse.json(
       { success: false, message: "Could not delete notification" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
