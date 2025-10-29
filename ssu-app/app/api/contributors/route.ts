@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+
+export async function OPTIONS() {
+  return NextResponse.json(null, { status: 200, headers: corsHeaders });
+}
 
 type ApiContributor = {
   _id: string;
@@ -46,25 +54,29 @@ export async function POST(request: Request) {
     const items = Array.isArray(body) ? body : [body];
 
     const normalized = items.map((it) => ({
-      name: it?.name,
-      position: it?.position,
-      level: it?.level ?? it?.level_name, // accept either
+      name: String(it?.name ?? "").trim(),
+      position: String(it?.position ?? "").trim(),
+      level: String(it?.level ?? it?.level_name ?? "").trim(),
     }));
 
-    const allowedLevels = new Set(["Junior", "Mid", "Senior", "Lead"]);
+    // Validate/normalize level
+    const allowed = new Set(["junior", "mid", "senior", "lead"]);
     for (const it of normalized) {
       if (!it.name || !it.position || !it.level) {
         return NextResponse.json(
           { message: "name, position, and level (or level_name) are required." },
-          { status: 400 }
+          { status: 400, headers: corsHeaders }
         );
       }
-      if (!allowedLevels.has(String(it.level))) {
+      const lvl = it.level.toLowerCase();
+      if (!allowed.has(lvl)) {
         return NextResponse.json(
           { message: "level must be one of: Junior, Mid, Senior, Lead" },
-          { status: 400 }
+          { status: 400, headers: corsHeaders }
         );
       }
+      // Title-case the level so DB is consistent
+      it.level = lvl.charAt(0).toUpperCase() + lvl.slice(1);
     }
 
     const { pkCol, positionCol, levelCol } = await detectCols();
@@ -80,21 +92,30 @@ export async function POST(request: Request) {
           ${positionCol} as "position",
           ${levelCol}  as "level"
       `;
-      const rows = await sql.unsafe(insertQ, [it.name, it.position, it.level]);
-      out.push({
-        _id: rows[0]._id,
-        name: rows[0].name,
-        position: rows[0].position,
-        level: rows[0].level,
-      });
+
+      try {
+        // Type the result and guard against empty return
+        const rows = await sql.unsafe<ApiContributor[]>(insertQ, [it.name, it.position, it.level]);
+        const row = rows?.[0];
+        if (!row) {
+          throw new Error("Insert failed: no row returned from INSERT ... RETURNING");
+        }
+        out.push(row);
+      } catch (e: any) {
+        console.error("Insert error for payload:", it, ":", e?.message || e);
+        throw e; // bubble up to outer catch
+      }
     }
 
     return NextResponse.json(
       { message: "Contributor created successfully", data: Array.isArray(body) ? out : out[0] },
-      { status: 201 }
+      { status: 201, headers: corsHeaders }
     );
   } catch (error: any) {
     console.error("Error creating contributor:", error);
-    return NextResponse.json({ error: error?.message || "Could not create contributor" }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || "Could not create contributor" },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
