@@ -63,9 +63,9 @@ const nextConfig: NextConfig = {
     return [
       { source: "/message/generate", destination: "/api/message/generate" },
       { source: "/message/generate/:path*", destination: "/api/message/generate/:path*" },
-      // Legacy casing for chatRoom endpoints used by the frontend
-      { source: "/api/chatRoom", destination: "/api/chatroom" },
-      { source: "/api/chatRoom/getByUserId/:userId", destination: "/api/chatroom/getByUserId?userId=:userId" },
+      // Legacy casing support: map lowercase to canonical uppercase path
+      { source: "/api/chatroom", destination: "/api/chatRoom" },
+      { source: "/api/chatroom/getByUserId/:userId", destination: "/api/chatRoom/getByUserId/:userId" },
     ];
   },
 };

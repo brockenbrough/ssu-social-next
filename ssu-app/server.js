@@ -31,22 +31,6 @@ app.prepare().then(() => {
       return;
     }
 
-    // legacy path-param to query-param for chatRoom getByUserId
-    if (
-      req.method === "GET" &&
-      req.url &&
-      req.url.startsWith("/api/chatRoom/getByUserId/")
-    ) {
-      const [pathOnly, query] = req.url.split("?");
-      const prefix = "/api/chatRoom/getByUserId/";
-      const userId = pathOnly.substring(prefix.length);
-      if (userId) {
-        const rewritten = `/api/chatRoom/getByUserId?userId=${encodeURIComponent(
-          userId
-        )}${query ? `&${query}` : ""}`;
-        req.url = rewritten;
-      }
-    }
     handle(req, res);
   });
 
