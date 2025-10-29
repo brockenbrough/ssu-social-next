@@ -72,7 +72,7 @@ Accept: application/json
   "targetUserId": "bad-uuid"
 }
 
-## Restore baseline — ensure 1111 follows 2222
+## Restore baseline — ensure 1111 follows 222
 POST http://localhost:3000/api/followers/follow
 Content-Type: application/json
 Accept: application/json

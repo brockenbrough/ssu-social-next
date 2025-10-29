@@ -2,53 +2,51 @@ import { NextResponse } from "next/server";
 import postgres from "postgres";
 import { corsHeaders } from "@/utilities/cors";
 
-// Initialize PostgreSQL connection
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+const UUID_RE =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
-// Helper function for UUID validation
-const isUuid = (s: string) =>
-  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(s);
+async function resolveUser(input: string) {
+  const v = input.trim();
+  const column = UUID_RE.test(v) ? "user_id" : "username";
+  const rows = await sql<{ user_id: string; username: string }[]>`
+    SELECT user_id::text, username FROM ssu_users WHERE ${sql(column)} = ${v} LIMIT 1
+  `;
+  if (!rows.length) throw new Error(`User not found: ${v}`);
+  return rows[0];
+}
 
 export async function POST(req: Request) {
   try {
-    // Parse JSON request body
     const { userId, targetUserId } = await req.json();
 
-    // Validate UUIDs
-    if (!isUuid(userId) || !isUuid(targetUserId)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid UUID(s)" },
-        { status: 400, headers: corsHeaders }
-      );
-    }
+    if (!userId || !targetUserId)
+      return NextResponse.json({ success: false, error: "Missing parameters" },
+                               { status: 400, headers: corsHeaders });
 
-    // Prevent a user from following themselves
-    if (userId === targetUserId) {
-      return NextResponse.json(
-        { success: false, message: "Cannot follow yourself" },
-        { status: 400, headers: corsHeaders }
-      );
-    }
+    const follower = await resolveUser(userId); // who follows
+    const user = await resolveUser(targetUserId); // who is followed
 
-    // Insert a new follower relationship if it doesn't already exist
-    await sql`
-      INSERT INTO followers (user_id, follower_id, created_at)
-      SELECT ${targetUserId}::uuid, ${userId}::uuid, NOW()
-      WHERE NOT EXISTS (
-        SELECT 1 FROM followers WHERE user_id = ${targetUserId}::uuid AND follower_id = ${userId}::uuid
-      )
+    if (follower.user_id === user.user_id)
+      return NextResponse.json({ success: false, error: "Cannot follow yourself" },
+                               { status: 400, headers: corsHeaders });
+
+    const res = await sql`
+      INSERT INTO followers (user_id, follower_id)
+      VALUES (${user.user_id}::uuid, ${follower.user_id}::uuid)
+      ON CONFLICT DO NOTHING
     `;
+    const inserted = (res as any)?.count ?? 0;
 
-    // Return success response
-    return NextResponse.json(
-      { success: true, data: { userId, targetUserId } },
-      { status: 200, headers: corsHeaders }
-    );
+    const msg =
+      inserted === 0
+        ? `${follower.username} already follows ${user.username}`
+        : `${follower.username} followed ${user.username}`;
+
+    return NextResponse.json({ success: true, message: msg },
+                             { status: 200, headers: corsHeaders });
   } catch (err: any) {
-    // Handle errors and return structured response
-    return NextResponse.json(
-      { success: false, message: err?.message ?? String(err) },
-      { status: 500, headers: corsHeaders }
-    );
+    return NextResponse.json({ success: false, error: err.message },
+                             { status: 500, headers: corsHeaders });
   }
 }
