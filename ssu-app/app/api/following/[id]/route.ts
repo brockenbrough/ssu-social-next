@@ -12,58 +12,40 @@ export async function OPTIONS() {
   });
 }
 
-
-// GET /api/user/following/[id]
 export async function GET(
   _req: Request,
   ctx: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await ctx.params;
+    const { id: userId } = await ctx.params;
 
+    // Check that user exists
+    const userRow = await sql`SELECT user_id FROM ssu_users WHERE user_id = ${userId}::uuid`;
+    if (userRow.length === 0) {
+      return NextResponse.json(
+        { success: false, message: "User not found." },
+        { status: 404, headers: corsHeaders }
+      );
+    }
 
-    // This should take user name (not id).
+    // Get the list of usernames this user is following
+    const followingRows = await sql`
+      SELECT u.username
+      FROM followers f
+      JOIN ssu_users u ON f.user_id = u.user_id
+      WHERE f.follower_id = ${userId}::uuid
+    `;
 
-    // const rows = await sql<{ following: string[] }[]>`
-    //   SELECT
-    //     COALESCE(
-    //       ARRAY_AGG(user_id::text ORDER BY user_id)
-    //       FILTER (WHERE user_id IS NOT NULL),
-    //       '{}'
-    //     ) AS following
-    //   FROM followers
-    //   WHERE follower_id = ${id}::uuid
-    // `;
-
-    // const following = rows.length > 0 ? rows[0].following : [];
-
-    // return NextResponse.json(
-    //   {
-    //     success: true,
-    //     message: "Following list retrieved successfully",
-    //     data: { following },
-    //   },
-    //   { status: 200, headers: corsHeaders }
-    // );
-
-    // This is a stub that returns an empty list to unblock testing.
-    const followers: string[] = []; // just an empty array
+    const following: string[] = followingRows.map((r) => r.username);
 
     return NextResponse.json(
-      {
-        success: true,
-        message: "Followers list retrieved successfully",
-        data: followers, // return directly
-      },
+      { success: true, message: "Following list retrieved successfully", data: following },
       { status: 200, headers: corsHeaders }
     );
   } catch (err) {
     console.error("Error fetching following for user:", err);
     return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch following list",
-      },
+      { success: false, message: "Failed to fetch following list" },
       { status: 500, headers: corsHeaders }
     );
   }
