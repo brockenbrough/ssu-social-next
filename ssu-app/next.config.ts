@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
   // Silence the multi-lockfile workspace-root warning
   outputFileTracingRoot: path.join(__dirname),
   async headers() {
-    // const allowedOrigin = process.env.FRONTEND_ORIGIN || 'http://localhost:3001';
     return [
       {
         source: '/api/:path*',
@@ -14,6 +13,36 @@ const nextConfig: NextConfig = {
           { key: 'Access-Control-Allow-Origin', value: "*" },
           { key: 'Access-Control-Allow-Credentials', value: 'true' },
           { key: 'Access-Control-Allow-Methods', value: 'GET,POST,PUT,DELETE,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-Requested-With' },
+          { key: 'Vary', value: 'Origin' },
+        ],
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: "*" },
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-Requested-With' },
+          { key: 'Vary', value: 'Origin' },
+        ],
+      },
+      {
+        source: '/_next/image',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: "*" },
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-Requested-With' },
+          { key: 'Vary', value: 'Origin' },
+        ],
+      },
+      {
+        source: '/uploads/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: "*" },
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS' },
           { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-Requested-With' },
           { key: 'Vary', value: 'Origin' },
         ],
@@ -34,9 +63,9 @@ const nextConfig: NextConfig = {
     return [
       { source: "/message/generate", destination: "/api/message/generate" },
       { source: "/message/generate/:path*", destination: "/api/message/generate/:path*" },
-      // Legacy casing for chatRoom endpoints used by the frontend
-      { source: "/api/chatRoom", destination: "/api/chatroom" },
-      { source: "/api/chatRoom/getByUserId/:userId", destination: "/api/chatroom/getByUserId?userId=:userId" },
+      // Legacy casing support: map lowercase to canonical uppercase path
+      { source: "/api/chatroom", destination: "/api/chatRoom" },
+      { source: "/api/chatroom/getByUserId/:userId", destination: "/api/chatRoom/getByUserId/:userId" },
     ];
   },
 };

@@ -1,5 +1,5 @@
 ### Create or get chatroom by participants
-POST http://localhost:3000/api/chatrooms
+POST http://localhost:3000/api/chatRoom
 Content-Type: application/json
 Accept: application/json
 
@@ -11,7 +11,7 @@ Accept: application/json
 }
 
 ### Create a new chatroom for test_user1 and test_user3
-POST http://localhost:3000/api/chatrooms
+POST http://localhost:3000/api/chatRoom
 Content-Type: application/json
 Accept: application/json
 
@@ -23,7 +23,7 @@ Accept: application/json
 }
 
 ### Create a new chatroom for user2 and user3
-POST http://localhost:3000/api/chatrooms
+POST http://localhost:3000/api/chatRoom
 Content-Type: application/json
 Accept: application/json
 
@@ -34,12 +34,12 @@ Accept: application/json
   ]
 }
 
-### Get chatrooms by userId (query param)
-GET http://localhost:3000/api/chatrooms/getByUserId?userId=11111111-1111-1111-1111-111111111111
+### Get chatrooms by userId (path param)
+GET http://localhost:3000/api/chatRoom/getByUserId/11111111-1111-1111-1111-111111111111
 Accept: application/json
 
-# ### Verify chatrooms route via test endpoint
-# GET http://localhost:3000/api/chatrooms/test
+# ### Verify chatroom route via test endpoint
+# GET http://localhost:3000/api/chatroom/test
 # Accept: application/json
 
 
