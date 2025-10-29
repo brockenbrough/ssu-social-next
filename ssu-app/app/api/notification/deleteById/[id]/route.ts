@@ -11,6 +11,12 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 // Та же простая проверка UUID, как в followers
 const SIMPLE_UUID_RE = /^[0-9a-fA-F-]{36}$/;
 
+// Handle preflight CORS requests
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
+
 export async function DELETE(
   _req: Request,
   ctx: { params: Promise<{ id: string }> }
@@ -41,8 +47,7 @@ export async function DELETE(
     }
 
     return NextResponse.json(
-      { success: true, message: "Notification deleted successfully" },
-      { status: 200 }
+      { success: true, message: "Notification deleted successfully" }, { status: 200, headers: corsHeaders }
     );
   } catch (err) {
     console.error("Error deleting notification:", err);
