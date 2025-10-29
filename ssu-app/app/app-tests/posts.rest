@@ -106,27 +106,6 @@ Accept: application/json
 GET http://localhost:3000/api/posts/getpostpagebyusername/test
 Accept: application/json
 
-######################################
-
-### Upload image to post
-POST http://localhost:3000/api/posts/uploadImage
-Content-Type: multipart/form-data; boundary=FormBoundary
-
---FormBoundary
-Content-Disposition: form-data; name="post_id"
-
-33333333-3333-3333-3333-333333333333
---FormBoundary
-Content-Disposition: form-data; name="image"; filename="test_image.jpg"
-Content-Type: image/jpeg
-
-< ./test_image.jpg
---FormBoundary--
-
-### Upload image to test post (unit test)
-GET http://localhost:3000/api/posts/uploadImage/test
-Content-Type: application/json
-
 
 ###  Get number of posts a user has liked testing
 GET http://localhost:3000/api/user-numberOfPostsLiked/11111111-1111-1111-1111-111111111111
