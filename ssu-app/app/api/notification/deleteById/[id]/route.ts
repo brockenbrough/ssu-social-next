@@ -14,6 +14,12 @@ export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
 
+// Handle preflight CORS requests
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
+
 export async function DELETE(
   _req: Request,
   ctx: { params: Promise<{ id: string }> }
