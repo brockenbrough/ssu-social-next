@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
   // Silence the multi-lockfile workspace-root warning
   outputFileTracingRoot: path.join(__dirname),
   async headers() {
-    // const allowedOrigin = process.env.FRONTEND_ORIGIN || 'http://localhost:3001';
     return [
       {
         source: '/api/:path*',
@@ -14,6 +13,36 @@ const nextConfig: NextConfig = {
           { key: 'Access-Control-Allow-Origin', value: "*" },
           { key: 'Access-Control-Allow-Credentials', value: 'true' },
           { key: 'Access-Control-Allow-Methods', value: 'GET,POST,PUT,DELETE,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-Requested-With' },
+          { key: 'Vary', value: 'Origin' },
+        ],
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: "*" },
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-Requested-With' },
+          { key: 'Vary', value: 'Origin' },
+        ],
+      },
+      {
+        source: '/_next/image',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: "*" },
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-Requested-With' },
+          { key: 'Vary', value: 'Origin' },
+        ],
+      },
+      {
+        source: '/uploads/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: "*" },
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS' },
           { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-Requested-With' },
           { key: 'Vary', value: 'Origin' },
         ],
