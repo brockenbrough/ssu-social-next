@@ -224,3 +224,6 @@ Content-Type: application/json
 {
   "biography": "Hello from Vercel test for bio."
 }
+
+### Get Profile Image by Username
+GET http://localhost:3000/api/user/getProfileImage/test_user1
