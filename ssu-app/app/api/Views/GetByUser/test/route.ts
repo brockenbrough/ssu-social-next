@@ -5,7 +5,7 @@ const TEST_USER_ID = "33333333-3333-3333-3333-333333333333"; // Seeded user who 
 export async function GET() {
   try {
     // Call the route being tested
-    const res = await fetch(`http://localhost:3000/api/Views/GetByUser/${TEST_USER_ID}`);
+    const res = await fetch(`http://localhost:3000/api/views/GetByUser/${TEST_USER_ID}`);
     const data = await res.json();
 
     // Check for successful responses and expected structure
