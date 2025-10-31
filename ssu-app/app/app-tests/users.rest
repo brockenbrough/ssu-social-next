@@ -151,7 +151,7 @@ Accept: application/json
 ### test generate-token, this method takes your access token and EXTENDS the life of it.
 ### paramater: accesssToken
 GET http://localhost:3000/api/generate-token
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYwNTkzODcyLCJleHAiOjE3NjA1OTc0NzJ9.ADb0MkczsJvGMjJMibvbNCZO79SornT67NOHhdSuSWg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjNmYzU0ZmMwLTYxOTctNDNlNC04YmJjLTNhYTNhYWFhZDMzZSIsImVtYWlsIjoidGVzdGluZzEyMzQ1QGdtYWlsLmNvbSIsInVzZXJuYW1lIjoidGVzdGluZzEyMzQ1Iiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NjE3NTA2NDAsImV4cCI6MTc2MTc1NDI0MH0._O2O8hL_mtKnq8wjJ4whKnzDWmhgy1HIC6nYihBKolE
 Accept: application/json
 
 ### test refresh-token , This takes your refresh token and gives you a new refresh and access token
@@ -160,7 +160,7 @@ POST http://localhost:3000/api/user/refresh-token
 Content-Type: application/json
 
 {
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsImVtYWlsIjoidGVzdF91c2VyMUBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoidGVzdF91c2VyMSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYxMTAzNjQ0LCJleHAiOjE3NjE3MDg0NDR9.bPdOsAlplP4gzkE5GQk749XDhanLSQ2Ga72aDGnNpGI"
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjNmYzU0ZmMwLTYxOTctNDNlNC04YmJjLTNhYTNhYWFhZDMzZSIsImVtYWlsIjoidGVzdGluZzEyMzQ1QGdtYWlsLmNvbSIsInVzZXJuYW1lIjoidGVzdGluZzEyMzQ1Iiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NjE3NTA5MTQsImV4cCI6MTc2MjM1NTcxNH0.v9Yt0ifc-md7XS6jfIi1m9zEbIYWXVDPDOy2ltEWy5M"
 }
 
 ######################################
