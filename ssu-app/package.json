@@ -2,8 +2,8 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "next dev --turbopack",
-    "start": "next start",
+    "dev": "node server.js",
+    "start": "NODE_ENV=production node server.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
@@ -19,6 +19,7 @@
     "next": "^15.5.4",
     "next-auth": "5.0.0-beta.29",
     "openai": "6.3.0",
+    "socket.io": "^4.8.0",
     "pg": "^8.16.3",
     "postgres": "^3.4.6",
     "react": "^19.2.0",

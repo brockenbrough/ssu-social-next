@@ -1,0 +1,26 @@
+### Upload image to post
+POST http://localhost:3000/api/images/create
+Content-Type: multipart/form-data; boundary=FormBoundary
+
+--FormBoundary
+Content-Disposition: form-data; name="post_id"
+
+33333333-3333-3333-3333-333333333333
+--FormBoundary
+Content-Disposition: form-data; name="image"; filename="test_image.jpg"
+Content-Type: image/jpeg
+
+< ./test_image.jpg
+--FormBoundary--
+
+### Upload image to test post (unit test)
+GET http://localhost:3000/api/images/create/test
+Content-Type: application/json
+
+### Delete image by key
+DELETE http://localhost:3000/api/images/33333333-3333-3333-3333-333333333333-1761751656384.jpg
+Content-Type: application/json
+
+### Unit test for delete image route
+##GET http://localhost:3000/api/images/
+##Content-Type: application/json

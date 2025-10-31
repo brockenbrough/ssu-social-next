@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -12,6 +13,10 @@ type ApiChatRoom = {
     date: string | Date;
 };
 
+export async function OPTIONS() {
+    return new NextResponse(null, { status: 200, headers: corsHeaders });
+}
+
 export async function POST(request: Request) {
     try {
         const body = await request.json();
@@ -20,7 +25,7 @@ export async function POST(request: Request) {
         if (!participants || !Array.isArray(participants) || participants.length !== 2) {
             return NextResponse.json(
                 { message: "2 Participants are required." },
-                { status: 400 }
+                { status: 400, headers: corsHeaders   }
             );
         }
 
@@ -29,7 +34,7 @@ export async function POST(request: Request) {
         if (!p1.userId || !p2.userId) {
             return NextResponse.json(
                 { message: "Participants must have userId." },
-                { status: 400 }
+                { status: 400, headers: corsHeaders   }
             );
         }
 
@@ -40,7 +45,7 @@ export async function POST(request: Request) {
         if (users.length !== 2) {
             return NextResponse.json(
                 { message: "One or more users not found." },
-                { status: 404 }
+                { status: 404, headers: corsHeaders   }
             );
         }
 
@@ -78,15 +83,13 @@ export async function POST(request: Request) {
 
         return NextResponse.json(
             { message: existing.length > 0 ? "Chat room already exists" : "Chat room created successfully", chatRoom: apiResponse },
-            { status: existing.length > 0 ? 200 : 201 }
+            { status: existing.length > 0 ? 200 : 201, headers: corsHeaders   }
         );
     } catch (error) {
         console.error("Error creating chat room:", error);
         return NextResponse.json(
             { error: "Could not create chat room" },
-            { status: 500 }
+            { status: 500, headers: corsHeaders   }
         );
     }
 }
-
-
