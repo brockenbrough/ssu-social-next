@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import postgres from "postgres";
 import { corsHeaders } from "@/utilities/cors";
 
@@ -14,12 +14,13 @@ export async function OPTIONS() {
 
 // GET /api/user-likes/[userId]
 export async function GET(
-  _req: Request,
-  { params }: { params: { id: string } }
-) {
-  const { id: userId } = params;
+  _req: NextRequest,
+  ctx: { params: Promise<{ id: string }>} 
+)
+  {
+  const { id } = await ctx.params;
 
-  if (!userId) {
+  if (!id) {
     return NextResponse.json({ error: "Missing userId parameter" }, { status: 400 });
   }
 
@@ -28,7 +29,7 @@ export async function GET(
     const likedPosts = await sql<{ post_id: string }[]>`
       SELECT post_id
       FROM likes
-      WHERE user_id = ${userId}::uuid
+      WHERE user_id = ${id}::uuid
     `;
 
     // Format to match your frontend expectation
