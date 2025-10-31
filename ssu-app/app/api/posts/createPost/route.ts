@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         ${isSensitive ?? false},
         ${hasOffensiveText ?? false},
         NOW()
-      FROM users u
+      FROM ssu_users u
       WHERE u.username = ${username}
       RETURNING
         post_id::text        AS "_id",
