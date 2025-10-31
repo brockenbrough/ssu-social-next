@@ -1,11 +1,19 @@
 // app/api/notifications/get/username/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { corsHeaders } from "@/utilities/cors"; 
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+
+// Handle preflight CORS requests
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 
 export async function GET(req: NextRequest) {
   try {
@@ -54,7 +62,7 @@ export async function GET(req: NextRequest) {
   } catch (err: any) {
     return NextResponse.json(
       { success: false, error: err.message || "Unexpected error" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

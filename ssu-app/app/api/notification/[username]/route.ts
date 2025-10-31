@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import postgres from "postgres";
 import { corsHeaders } from "@/utilities/cors";
 
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 200, headers: corsHeaders });
+}
+
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 export async function GET(
