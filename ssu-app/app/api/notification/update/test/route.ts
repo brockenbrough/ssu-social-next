@@ -3,20 +3,23 @@ import { NextResponse } from "next/server";
 import postgres from "postgres";
 import { corsHeaders } from "@/utilities/cors";
 
-// Initialize PostgreSQL connection
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-// Fixed test IDs for reproducible testing
-const TEST_NOTIFICATION_ID = "de4a6ebc-e30d-4678-9c60-87fc1e1ec1f1";
-const RECEIVER_USER_ID = "11111111-1111-1111-1111-111111111111"; // fixed_user_id1
-const ACTOR_USER_ID = "22222222-2222-2222-2222-222222222222";   // fixed_user_id2
+// Stable IDs for reproducible test
+const TEST_NOTIFICATION_ID = "606ba5ef-d4a1-4295-b03d-15e2a3642152";
+const RECEIVER_USER_ID     = "11111111-1111-1111-1111-111111111111"; // fixed_user_id1
+const ACTOR_USER_ID        = "22222222-2222-2222-2222-222222222222"; // fixed_user_id2
 
-// GET endpoint — runs an end-to-end test for the update route
+// Preflight support
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+}
+
 export async function GET() {
   const report: Record<string, any> = {};
 
   try {
-    //  Seed a predictable test notification (idempotent)
+    // 1) Idempotent seed of a test notification
     const seeded = await sql/* sql */`
       INSERT INTO notifications (
         notification_id, notification_type, user_id, action_user_id, content, post_id, is_read, created_at
@@ -37,13 +40,10 @@ export async function GET() {
     `;
     report.seed = { ok: true, row: seeded[0] };
 
-    //  Call the real UPDATE endpoint using an HTTP request
-    const resp = await fetch("http://localhost:3000/api/notifications/update", {
+    // 2) Call the real UPDATE endpoint via HTTP (same server)
+    const resp = await fetch("http://localhost:3000/api/notification/update", {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders, // include CORS headers for consistency
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         id: TEST_NOTIFICATION_ID,
         text: "Updated via UNIT TEST",
@@ -54,19 +54,14 @@ export async function GET() {
 
     const json = await resp.json().catch(() => ({}));
     report.updateCall = { status: resp.status, body: json };
-
     if (!resp.ok) {
-      return NextResponse.json(
-        { ok: false, step: "updateCall", report },
-        { status: 500, headers: corsHeaders }
-      );
       return NextResponse.json(
         { ok: false, step: "updateCall", report },
         { status: 500, headers: corsHeaders }
       );
     }
 
-    //  Verify the update result in the database
+    // 3) Verify the result in DB
     const [row] = await sql/* sql */`
       SELECT notification_id, content, is_read
       FROM notifications
@@ -79,13 +74,11 @@ export async function GET() {
       { ok: pass, report },
       { status: pass ? 200 : 500, headers: corsHeaders }
     );
-    return NextResponse.json(
-      { ok: pass, report },
-      { status: pass ? 200 : 500, headers: corsHeaders }
-    );
   } catch (err: any) {
-    // Handle and return error details
     report.error = err?.message ?? String(err);
-    return NextResponse.json({ ok: false, report }, { status: 500, headers: corsHeaders });
+    return NextResponse.json(
+      { ok: false, report },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }

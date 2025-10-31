@@ -3,7 +3,7 @@ PUT http://localhost:3000/api/notification/update
 Content-Type: application/json
 
 {
-  "id": "de4a6ebc-e30d-4678-9c60-87fc1e1ec1f1",
+  "id": "606ba5ef-d4a1-4295-b03d-15e2a3642152",
   "text": "Updated via REST test",
   "isRead": true
 }
@@ -12,7 +12,7 @@ Content-Type: application/json
 GET http://localhost:3000/api/notification/update/test
 
 ### Delete by ID 
-DELETE http://localhost:3000/api/notification/deleteById/de4a6ebc-e30d-4678-9c60-87fc1e1ec1f1
+DELETE http://localhost:3000/api/notification/deleteById/ed56c372-9f65-4f77-9de8-f0c0136a8567
 
 ### Run unit test for deleteById [id] route
 GET http://localhost:3000/api/notification/deleteById/test

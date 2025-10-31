@@ -13,12 +13,12 @@ export async function GET(request: Request) {
             return NextResponse.json({ message: "UserId is required." }, { status: 400, headers: corsHeaders });
         }
 
-        // Verify user exists
+        // Verify user exists; if missing, return empty list for compatibility
         const userExists = await sql`
             SELECT 1 FROM ssu_users WHERE user_id = ${userId}
         `;
         if (userExists.length === 0) {
-            return NextResponse.json({ message: `User with ID ${userId} not found.` }, { status: 404, headers: corsHeaders   });
+            return NextResponse.json({ chatRooms: [] }, { headers: corsHeaders });
         }
 
         // Find chatrooms where user participates
