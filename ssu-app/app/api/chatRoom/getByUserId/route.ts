@@ -10,16 +10,15 @@ export async function GET(request: Request) {
         const userId = url.searchParams.get("userId");
 
         if (!userId) {
-            return NextResponse.json({ message: "UserId is required." }, { status: 400, headers: corsHeaders  });
-  return NextResponse.json(null, { status: 200, headers: corsHeaders });
+            return NextResponse.json({ message: "UserId is required." }, { status: 400, headers: corsHeaders });
         }
 
-        // Verify user exists
+        // Verify user exists; if missing, return empty list for compatibility
         const userExists = await sql`
             SELECT 1 FROM ssu_users WHERE user_id = ${userId}
         `;
         if (userExists.length === 0) {
-            return NextResponse.json({ message: `User with ID ${userId} not found.` }, { status: 404, headers: corsHeaders   });
+            return NextResponse.json({ chatRooms: [] }, { headers: corsHeaders });
         }
 
         // Find chatrooms where user participates
@@ -39,11 +38,15 @@ export async function GET(request: Request) {
             date: r.created_at,
         }));
 
-        return NextResponse.json({ chatRooms });
+        return NextResponse.json({ chatRooms }, { headers: corsHeaders });
     } catch (err) {
         console.error("Error fetching chat rooms:", err);
         return NextResponse.json({ error: "Could not fetch chat rooms" }, { status: 500, headers: corsHeaders });
     }
+}
+
+export async function OPTIONS() {
+    return new NextResponse(null, { status: 200, headers: corsHeaders });
 }
 
 
