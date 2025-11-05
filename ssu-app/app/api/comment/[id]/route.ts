@@ -14,7 +14,7 @@ export async function GET(
 
     // Validate UUID format for comment id
     if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
-      return NextResponse.json({ error: "Invalid comment id" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid comment id" }, { status: 400, headers: corsHeaders });
     }
 
     const rows = await sql`
@@ -32,17 +32,30 @@ export async function GET(
     `;
 
     if (rows.length === 0) {
-      return NextResponse.json({ error: "Comment not found" }, { status: 404 });
+      return NextResponse.json({ error: "Comment not found" }, { status: 404, headers: corsHeaders });
     }
 
     const comment = { ...rows[0], replies: [] }; // add replies array if you want
 
-    return NextResponse.json(comment, { status: 200 });
+    return NextResponse.json(comment, { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error("Error fetching comment:", error);
-    return NextResponse.json({ error: "Failed to fetch comment" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch comment" }, { status: 500, headers: corsHeaders });
   }
 }
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization"
+    }
+  });
+}
+
+
 
 // Delete Comment by Comment ID
 
@@ -54,7 +67,7 @@ export async function DELETE(
     const { id } = await ctx.params;
 
     if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
-      return NextResponse.json({ error: "Invalid comment id" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid comment id" }, { status: 400, headers: corsHeaders });
     }
 
     const result = await sql`
@@ -63,12 +76,12 @@ export async function DELETE(
     `;
 
     if (result.count === 0) {
-      return NextResponse.json({ error: "No comment" }, { status: 404 });
+      return NextResponse.json({ error: "No comment" }, { status: 404, headers: corsHeaders });
     }
 
-    return NextResponse.json({ msg: "comment deleted successfully" }, { status: 200 });
+    return NextResponse.json({ msg: "comment deleted successfully" }, { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error("Error deleting comment:", error);
-    return NextResponse.json({ error: "Failed to delete comment" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to delete comment" }, { status: 500, headers: corsHeaders });
   }
 }

@@ -6,6 +6,17 @@ import { corsHeaders } from "@/utilities/cors";  //Just add this line
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization"
+    }
+  });
+}
+
 export async function POST(
   request: Request,
   ctx: { params: Promise<{ id: string }> }
@@ -15,13 +26,13 @@ export async function POST(
 
     // Validate UUID format for comment id
     if (!/^[0-9a-fA-F-]{36}$/.test(parentCommentId)) {
-      return NextResponse.json({ error: "Invalid comment id" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid comment id" }, { status: 400, headers: corsHeaders });
     }
 
     const { replyContent, userId } = await request.json();
 
     if (!replyContent || !userId) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400, headers: corsHeaders });
     }
 
     // Fetch post_id of the comment being replied to
@@ -32,7 +43,7 @@ export async function POST(
     `;
 
     if (parentComment.length === 0) {
-      return NextResponse.json({ error: "Parent comment not found" }, { status: 404 });
+      return NextResponse.json({ error: "Parent comment not found" }, { status: 404, headers: corsHeaders });
     }
 
     const postId = parentComment[0].post_id;
@@ -43,9 +54,9 @@ export async function POST(
       VALUES (${userId}::uuid, ${postId}::uuid, ${replyContent})
     `;
 
-    return NextResponse.json({ message: "Reply added as a new comment" }, { status: 200 });
+    return NextResponse.json({ message: "Reply added as a new comment" }, { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error("Error adding reply:", error);
-    return NextResponse.json({ error: "Failed to add reply" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to add reply" }, { status: 500, headers: corsHeaders });
   }
 }
