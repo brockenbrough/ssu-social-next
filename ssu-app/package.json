@@ -4,6 +4,7 @@
     "build": "next build",
     "dev": "node server.js",
     "start": "NODE_ENV=production node server.js",
+    "socket-server": "node socket-server.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {

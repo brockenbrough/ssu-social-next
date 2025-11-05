@@ -36,7 +36,21 @@ app.prepare().then(() => {
 
   const io = new Server(server, {
     cors: {
-      origin: process.env.FRONTEND_ORIGIN || "http://localhost:3001",
+      origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        const allowedOrigins = [
+          "*",  // Local development
+          "https://ssu-social-newwave.vercel.app"  // Production
+        ];
+
+        if (allowedOrigins.indexOf(origin) !== -1) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       methods: ["GET", "POST", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
       credentials: true,
