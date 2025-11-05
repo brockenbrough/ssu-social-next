@@ -79,9 +79,15 @@ Content-Type: application/json
 
 ######################################
 
-### Search POST by id test
-GET http://localhost:3000/api/posts/searchPost?postId=33333333-3333-3333-3333-333333333333
-Content-Type: application/json
+### Search POST by keyword (case-insensitive)
+GET http://localhost:3000/api/posts/searchPost?q=fixed
+Accept: application/json
+
+### Search POST by phrase (case-insensitive)
+GET http://localhost:3000/api/posts/searchPost?q=This%20is
+Accept: application/json
+
+######################################
 
 ######################################
 
@@ -113,4 +119,15 @@ Accept: application/json
 
 ###Test number of posts liked by useer
 GET http://localhost:3000/api/user-numberOfPostsLiked/test
+Accept: application/json
+
+######################################
+
+
+### Search POST by keyword — /api/post/search/fixed
+GET http://localhost:3000/api/post/search/test%20case
+Accept: application/json
+
+### Search POST by phrase — /api/post/search/This%20is
+GET http://localhost:3000/api/post/search/This%20is
 Accept: application/json
