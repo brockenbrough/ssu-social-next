@@ -10,9 +10,12 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 // Simple UUID validation
 const SIMPLE_UUID_RE = /^[0-9a-fA-F-]{36}$/;
 
+
+// Handle preflight CORS requests
 export async function OPTIONS() {
-  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+  return NextResponse.json({}, { headers: corsHeaders });
 }
+
 
 export async function DELETE(
   _req: Request,
