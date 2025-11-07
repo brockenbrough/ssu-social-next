@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 
 import { corsHeaders } from "@/utilities/cors";
 
 // Connect to Postgres
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 // Define response type
 type ApiHashtag = {

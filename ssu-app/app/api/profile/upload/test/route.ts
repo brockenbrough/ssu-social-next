@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 export async function GET() {
   const seededUserId = "11111111-1111-1111-1111-111111111111";

@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+
+import { censorText } from "@/utilities/moderation";
+ 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { corsHeaders } from "@/utilities/cors";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -83,6 +85,12 @@ export async function PUT(req: Request) {
       hashedPassword = await bcrypt.hash(password, salt);
     }
 
+    let bioForUpdate = biography;
+    if (bioForUpdate) {
+      const { text } = await censorText(bioForUpdate);
+      bioForUpdate = text;
+    }
+
     // Update user in DB
     const [updatedUser] = await sql`
       UPDATE ssu_users
@@ -90,7 +98,7 @@ export async function PUT(req: Request) {
         username = COALESCE(${username}, username),
         email = COALESCE(${email}, email),
         password = ${hashedPassword},
-        biography = COALESCE(${biography}, biography)
+        biography = COALESCE(${bioForUpdate}, biography)
       WHERE user_id = ${userId}
       RETURNING
         user_id::text AS "_id",

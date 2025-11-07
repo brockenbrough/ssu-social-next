@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";
 import { reviveDates } from "@/utilities/reviveDates";
 
 // Connect to Postgres
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 type ApiPost = {
   _id: string;                // matches frontend expectations

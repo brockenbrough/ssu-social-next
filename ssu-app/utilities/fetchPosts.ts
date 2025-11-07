@@ -1,5 +1,5 @@
 // utilities/fetchPosts.ts
-import postgres from "postgres";
+ 
 
 export type Post = {
   _id: string;
@@ -11,7 +11,7 @@ export type Post = {
   createdAt: string;
 };
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 export default async function fetchPosts(query: string): Promise<Post[]> {
   const rows = await sql<Post[]>`

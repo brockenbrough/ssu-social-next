@@ -1,8 +1,8 @@
 // app/test/message/markAsRead/route.ts
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 // Toggle this if you want to keep the created message for manual inspection
 const CLEANUP_AFTER_TEST = true;

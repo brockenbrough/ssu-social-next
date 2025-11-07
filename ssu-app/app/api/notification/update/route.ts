@@ -1,11 +1,11 @@
 // app/api/notifications/update/route.ts
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";
 
 export const runtime = "nodejs"; // required for 'postgres' client
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 type UpdateBody = {
   id?: string;

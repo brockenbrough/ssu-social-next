@@ -1,10 +1,12 @@
 // reply to comment
 
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";  //Just add this line 
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import { censorText } from "@/utilities/moderation";
+
+import sql from "@/utilities/db";
 
 export async function OPTIONS() {
   return new Response(null, {
@@ -48,10 +50,13 @@ export async function POST(
 
     const postId = parentComment[0].post_id;
 
+    const { text: censoredReplyContent, changed } = await censorText(replyContent);
+    const hasOffensiveText = changed;
+
     // Insert new comment as a "reply" linked to same post
     await sql`
       INSERT INTO comments (user_id, post_id, comment_content)
-      VALUES (${userId}::uuid, ${postId}::uuid, ${replyContent})
+      VALUES (${userId}::uuid, ${postId}::uuid, ${censoredReplyContent})
     `;
 
     return NextResponse.json({ message: "Reply added as a new comment" }, { status: 200, headers: corsHeaders });
