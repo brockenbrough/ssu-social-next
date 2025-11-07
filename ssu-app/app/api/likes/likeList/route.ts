@@ -7,6 +7,7 @@ type LikeRow = {
   created_At: string;
 }
 import sql from "@/utilities/db";
+import { corsHeaders } from "@/utilities/cors";
 
 export async function GET() {
   try {
@@ -16,7 +17,7 @@ export async function GET() {
       FROM likes l
     `;
 
-    return NextResponse.json(rows, { status: 200 });
+    return NextResponse.json(rows, { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error("Error fetching likes:", error);
     return NextResponse.json({ error: "Failed to fetch likes" }, { status: 500 });

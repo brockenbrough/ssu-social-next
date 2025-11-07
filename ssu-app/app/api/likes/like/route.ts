@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
  
-
 import sql from "@/utilities/db";
+import { corsHeaders } from "@/utilities/cors";
 
 export async function POST(req: Request) {
   try {
@@ -33,6 +33,8 @@ export async function POST(req: Request) {
       success: true,
       message: "Post Liked.",
       data: inserted[0],
+    }, 
+    { status: 200, headers: corsHeaders
     });
   } catch (err: any) {
     console.error("Couldn't like post, error:", err);

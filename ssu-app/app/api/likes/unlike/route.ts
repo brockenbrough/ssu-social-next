@@ -1,5 +1,12 @@
 import { NextResponse } from "next/server";
 import sql from "@/utilities/db";
+import { corsHeaders } from "@/utilities/cors";
+
+
+function connOptions() {
+  return process.env.NODE_ENV === "production" ? { ssl: { rejectUnauthorized: false } } : {};
+}
+
 
 export async function DELETE(req: Request) {
   try {

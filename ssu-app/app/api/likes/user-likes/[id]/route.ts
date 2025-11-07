@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
- 
-
 import sql from "@/utilities/db";
+import { corsHeaders } from "@/utilities/cors";
 
 type ApiLike = {
   user_id: string;
@@ -35,7 +34,7 @@ export async function GET(
     }
 
     const user = { ...rows[0], password: null }; // redact password
-    return NextResponse.json(user, { status: 200 });
+    return NextResponse.json(user, { status: 200, headers: corsHeaders});
   } catch (error) {
     console.error("Error fetching user:", error);
     return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
