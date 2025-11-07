@@ -2,23 +2,7 @@
 GET http://localhost:3000/api/followers/ksalaiev
 Accept: application/json 
 
-### Follow user
-POST http://localhost:3000/api/followers/follow
-Content-Type: application/json
 
-{
-  "username": "ksalaiev",
-  "targetUsername": "test_user1"
-}
-
-### Unfollow user
-DELETE http://localhost:3000/api/followers/unfollow
-Content-Type: application/json
-
-{
-  "username": "ksalaiev",
-  "targetUsername": "test_user1"
-}
 
 
 ### Run test for followers (unit test route)
