@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
+
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -33,6 +35,8 @@ export async function POST(req: Request) {
       success: true,
       message: "Post Liked.",
       data: inserted[0],
+    }, 
+    { status: 200, headers: corsHeaders
     });
   } catch (err: any) {
     console.error("Couldn't like post, error:", err);

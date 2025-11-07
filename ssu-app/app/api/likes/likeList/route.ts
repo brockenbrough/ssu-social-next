@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
+
 
 type LikeRow = {
   user_Id: string;
@@ -16,7 +18,7 @@ export async function GET() {
       FROM likes l
     `;
 
-    return NextResponse.json(rows, { status: 200 });
+    return NextResponse.json(rows, { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error("Error fetching likes:", error);
     return NextResponse.json({ error: "Failed to fetch likes" }, { status: 500 });

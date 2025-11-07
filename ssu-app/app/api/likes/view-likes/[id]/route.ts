@@ -1,3 +1,4 @@
+import { corsHeaders } from "@/utilities/cors";
 import { NextResponse } from "next/server";
 import postgres from "postgres";
 
@@ -35,9 +36,9 @@ export async function GET(
     }
 
     const user = { ...rows[0], password: null }; // redact password
-    return NextResponse.json(user, { status: 200 });
+    return NextResponse.json(user, { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error("Error fetching post:", error);
-    return NextResponse.json({ error: "Failed to fetch post" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch post" }, { status: 500});
   }
 }

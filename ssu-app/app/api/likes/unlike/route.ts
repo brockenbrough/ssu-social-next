@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
+import { corsHeaders } from "@/utilities/cors";
+
 
 function connOptions() {
   return process.env.NODE_ENV === "production" ? { ssl: { rejectUnauthorized: false } } : {};
@@ -53,7 +55,7 @@ export async function DELETE(req: Request) {
         return NextResponse.json({ success: false, message: "Like not found" }, { status: 404 });
       }
 
-      return NextResponse.json(deleted[0], { status: 200 });
+      return NextResponse.json(deleted[0], { status: 200, headers: corsHeaders });
     } finally {
       try { await sql.end({ timeout: 1000 }); } catch {}
     }
