@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
-import { corsHeaders } from "@/utilities/cors";
-
+ 
 
 type LikeRow = {
   user_Id: string;
   post_Id: string;
   created_At: string;
 }
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
+import { corsHeaders } from "@/utilities/cors";
 
 export async function GET() {
   try {

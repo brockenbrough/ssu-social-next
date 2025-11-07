@@ -1,9 +1,9 @@
 // app/api/notifications/update/test/route.ts
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 // Stable IDs for reproducible test
 const TEST_NOTIFICATION_ID = "606ba5ef-d4a1-4295-b03d-15e2a3642152";

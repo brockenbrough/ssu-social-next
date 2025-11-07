@@ -1,10 +1,10 @@
 // app/api/notifications/deleteById/test/route.ts
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 // Reusable fixed test IDs
 const TEST_NOTIFICATION_ID = "bbbb1111-2222-3333-4444-555566667777";

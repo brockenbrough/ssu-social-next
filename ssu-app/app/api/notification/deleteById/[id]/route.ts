@@ -1,11 +1,11 @@
 // app/api/notifications/deleteById/[id]/route.ts
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";
 
 export const runtime = "nodejs";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 // Simple UUID validation
 const SIMPLE_UUID_RE = /^[0-9a-fA-F-]{36}$/;

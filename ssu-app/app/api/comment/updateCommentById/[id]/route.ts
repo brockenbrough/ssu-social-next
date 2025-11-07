@@ -1,10 +1,10 @@
 // app/api/comment/updateCommentById/[id]/route.ts
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";  //Just add this line 
 
 export const runtime = "nodejs";
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 type LegacyComment = {
   _id: string;

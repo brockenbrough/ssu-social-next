@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 import { corsHeaders } from "@/utilities/cors";
-import postgres from "postgres";
+ 
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 // Handle CORS preflight
 export async function OPTIONS() {

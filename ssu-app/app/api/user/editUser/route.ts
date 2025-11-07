@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { corsHeaders } from "@/utilities/cors";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 export async function OPTIONS() {
   return new NextResponse(null, {

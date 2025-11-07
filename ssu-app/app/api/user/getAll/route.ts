@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+import sql from "@/utilities/db";
 import { corsHeaders } from "@/utilities/cors";
 
 // In these routes, we must match the field definitions in
@@ -11,7 +11,6 @@ import { corsHeaders } from "@/utilities/cors";
 // We also have to coerce some types (role and _id) to string
 // to match the original backend.
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 type ApiUser = {
   _id: string;

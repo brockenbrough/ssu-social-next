@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";
 
 // ✅ Create a single SQL client (same convention as other routes)
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 // Define the expected type of a returned post
 type ApiPost = {
