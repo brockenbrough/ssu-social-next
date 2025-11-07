@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import bcrypt from "bcrypt";
 import { corsHeaders } from "@/utilities/cors";
 import { generateAccessToken, generateRefreshToken } from "@/utilities/generateToken";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 type ApiUser = {
   _id: string;

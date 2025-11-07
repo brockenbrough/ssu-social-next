@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { auth } from "@/app/lib/auth";
 import { corsHeaders } from "@/utilities/cors";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 // Type matching the original API response format (using mongoose field names)
 type ApiMessage = {

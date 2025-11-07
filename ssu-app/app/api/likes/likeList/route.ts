@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 
 type LikeRow = {
   user_Id: string;
   post_Id: string;
   created_At: string;
 }
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 export async function GET() {
   try {
