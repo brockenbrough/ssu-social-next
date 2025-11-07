@@ -64,7 +64,7 @@ export async function POST(req: Request) {
         image_uri            AS "imageUri",
         is_sensitive         AS "isSensitive",
         has_offensive_text   AS "hasOffensiveText",
-        created_at           AS "createdAt"
+        created_at::text     AS "date"
     `;
 
     // Step 3: Handle case where username not found
