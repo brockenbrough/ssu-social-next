@@ -33,7 +33,7 @@ Content-Type: application/json
 
 
 ### Test CREATE comment
-POST http://localhost:3000/api/comment/createComment
+POST http://localhost:3000/api/comments/add
 Content-Type: application/json
 Accept: application/json
 

@@ -1,0 +1,3 @@
+### Get comment count for a post
+GET http://localhost:3000/api/count/comments-for-post/33333333-3333-3333-3333-333333333333
+Accept: application/json

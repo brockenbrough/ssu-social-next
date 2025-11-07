@@ -12,6 +12,18 @@ type CreateCommentRequest = {
   userId: string;
 };
 
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization"
+    }
+  });
+}
+
+
 
 // POST /api/comments
 export async function POST(req: NextRequest) {
@@ -20,7 +32,7 @@ export async function POST(req: NextRequest) {
     const { commentContent, postId, userId } = body;
 
     if (!commentContent || !postId || !userId) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400, headers: corsHeaders });
     }
 
     // Insert comment
@@ -49,10 +61,10 @@ export async function POST(req: NextRequest) {
           replies: [],
         },
       },
-      { status: 201 }
+      { status: 201, headers: corsHeaders }
     );
   } catch (error) {
     console.error("Error creating comment:", error);
-    return NextResponse.json({ error: "Failed to create comment" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to create comment" }, { status: 500, headers: corsHeaders });
   }
 }
