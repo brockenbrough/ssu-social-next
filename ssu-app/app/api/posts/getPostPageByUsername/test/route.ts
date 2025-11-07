@@ -6,7 +6,7 @@ const TEST_USERNAME = "test_user1";
 export async function GET() {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/posts/getpostpagebyusername?username=${TEST_USERNAME}&page=1&postPerPage=3`
+      `http://localhost:3000/api/posts/getPostPageByUsername?username=${TEST_USERNAME}&page=1&postPerPage=3`
     );
 
     const data = await res.json();

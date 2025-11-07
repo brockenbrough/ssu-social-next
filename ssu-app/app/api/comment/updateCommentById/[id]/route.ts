@@ -15,6 +15,17 @@ type LegacyComment = {
   postId: string;
 };
 
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization"
+    }
+  });
+}
+
 export async function PATCH(
   req: Request,
   ctx: { params: Promise<{ id: string }> }   // <-- Promise here
@@ -24,26 +35,26 @@ export async function PATCH(
 
     // UUID guard
     if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
-      return NextResponse.json({ error: "Invalid comment id" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid comment id" }, { status: 400, headers: corsHeaders });
     }
 
     // Parse body
     let body: unknown;
     try { body = await req.json(); }
-    catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
+    catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400, headers: corsHeaders }); }
 
     const commentContent = (body as { commentContent?: unknown })?.commentContent;
     if (typeof commentContent !== "string" || commentContent.trim() === "") {
       return NextResponse.json(
         { error: "commentContent is required and must be a non-empty string" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
     // Ensure the row exists (so 404 is true "not found")
     const pre = await sql`SELECT 1 FROM public.comments WHERE comment_id = ${id}::uuid`;
     if (pre.length === 0) {
-      return NextResponse.json({ error: "Comment not found" }, { status: 404 });
+      return NextResponse.json({ error: "Comment not found" }, { status: 404, headers: corsHeaders });
     }
 
     // Update + return legacy shape
@@ -66,10 +77,10 @@ export async function PATCH(
     `;
 
     return rows.length
-      ? NextResponse.json({ ...rows[0], replies: [] as string[] }, { status: 200 })
-      : NextResponse.json({ error: "Update blocked" }, { status: 403 });
+      ? NextResponse.json({ ...rows[0], replies: [] as string[] }, { status: 200, headers: corsHeaders })
+      : NextResponse.json({ error: "Update blocked" }, { status: 403, headers: corsHeaders });
   } catch (e) {
     console.error("Error updating comment by id:", e);
-    return NextResponse.json({ error: "Failed to update comment" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update comment" }, { status: 500, headers: corsHeaders });
   }
 }

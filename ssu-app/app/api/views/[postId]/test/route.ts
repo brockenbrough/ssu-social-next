@@ -5,7 +5,7 @@ const TEST_POST_ID = "33333333-3333-3333-3333-333333333333";
 export async function GET() {
   try {
     // Call the route being tested
-    const res = await fetch(`http://localhost:3000/api/Views/GetViews/${TEST_POST_ID}`);
+    const res = await fetch(`http://localhost:3000/api/views/GetViews/${TEST_POST_ID}`);
     const data = await res.json();
 
     // Check for successful response and valid structure

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import postgres from "postgres";
 import { corsHeaders } from "@/utilities/cors";
+import { reviveDates } from "@/utilities/reviveDates";
 
 // Connect to Postgres
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
@@ -25,12 +26,14 @@ export async function GET() {
         image_uri            AS "imageUri",
         is_sensitive         AS "isSensitive",
         has_offensive_text   AS "hasOffensiveText",
-        created_at           AS "createdAt"
+        created_at           AS "date"
       FROM posts
       ORDER BY created_at DESC
     `;
 
-    return NextResponse.json(rows, {
+    const posts = reviveDates(rows);
+
+    return NextResponse.json(posts, {
       status: 200,
       headers: corsHeaders,
     });
