@@ -1,0 +1,41 @@
+### Valid search query - should return results
+POST http://localhost:3000/api/smartPostSearch/47d0be92-e602-4e25-8ed6-fa2e4964096f
+Content-Type: application/json
+
+{
+  "query": "monkey"
+}
+
+###
+
+### Test empty query (should return 400)
+POST http://localhost:3000/api/smartPostSearch/47d0be92-e602-4e25-8ed6-fa2e4964096f
+Content-Type: application/json
+
+{
+  "query": ""
+}
+
+###
+
+### Test missing query (should return 400)
+POST http://localhost:3000/api/smartPostSearch/47d0be92-e602-4e25-8ed6-fa2e4964096f
+Content-Type: application/json
+
+{
+}
+
+###
+
+### Test query with no matching posts (should return 404)
+POST http://localhost:3000/api/smartPostSearch/47d0be92-e602-4e25-8ed6-fa2e4964096f
+Content-Type: application/json
+
+{
+  "query": "query_that_matches_nothing"
+}
+
+###
+
+### Test OPTIONS preflight request (CORS)
+OPTIONS http://localhost:3000/api/smartPostSearch/47d0be92-e602-4e25-8ed6-fa2e4964096f
