@@ -41,15 +41,14 @@ app.prepare().then(() => {
         if (!origin) return callback(null, true);
 
         const allowedOrigins = [
-          "*",  // Local development
+          "http://localhost:3001",
           "https://ssu-social-newwave.vercel.app"  // Production
         ];
 
-        if (allowedOrigins.indexOf(origin) !== -1) {
-          callback(null, true);
-        } else {
-          callback(new Error('Not allowed by CORS'));
+        if (allowedOrigins.includes(origin)) {
+          return callback(null, true);
         }
+        return callback(new Error("Not allowed by CORS: " + origin));
       },
       methods: ["GET", "POST", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
@@ -57,28 +56,32 @@ app.prepare().then(() => {
     },
   });
 
-  io.on("connection", (socket) => {
-    console.log(`New client connected: ${socket.id}`);
-    console.log(`Total clients connected: ${io.engine.clientsCount}`);
+  const chatNamespace = io.of("/api");
+
+  chatNamespace.on("connection", (socket) => {
+    console.log(`New client connected on /api: ${socket.id}`);
+    console.log(
+      `Total clients connected on /api: ${chatNamespace.server.engine.clientsCount}`
+    );
 
     socket.on("message", (data) => {
-      io.emit("message", data);
+      chatNamespace.emit("message", data);
     });
 
     socket.on("messageRead", (data) => {
-      io.emit("messageRead", data);
+      chatNamespace.emit("messageRead", data);
     });
 
     socket.on("comment", (data) => {
-      io.emit("comment", data);
+      chatNamespace.emit("comment", data);
     });
 
     socket.on("deleteComment", (data) => {
-      io.emit("deleteComment", data);
+      chatNamespace.emit("deleteComment", data);
     });
 
-    socket.on("disconnect", () => {});
   });
+
 
   server.listen(port, () => {
     setTimeout(() => {
