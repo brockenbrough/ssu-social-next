@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
- 
+import postgres from "postgres";
 
-import sql from "@/utilities/db";
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 type ApiLike = {
   user_id: string;
