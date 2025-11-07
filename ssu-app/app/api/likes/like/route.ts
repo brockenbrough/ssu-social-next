@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 export async function POST(req: Request) {
   try {

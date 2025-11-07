@@ -1,11 +1,11 @@
 // app/api/images/create/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import fs from "fs/promises";
 import path from "path";
 import { corsHeaders } from "@/utilities/cors";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 // Handle preflight CORS requests
 export async function OPTIONS() {

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 // NOTE: Auth is intentionally commented out so route works unauthenticated for now.
 // import jwt from "jsonwebtoken";
