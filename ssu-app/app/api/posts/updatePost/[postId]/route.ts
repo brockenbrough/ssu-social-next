@@ -4,41 +4,59 @@ import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-export async function POST(req: Request) {
+export async function PUT(req: Request, ctx: { params: Promise<{ postId: string }> }) {
   try {
+    console.log("=== UpdatePost Route Called ===");
+    console.log("Request method:", req.method);
+
+    // Await dynamic route params
+    const { postId } = await ctx.params;
+    console.log("Param postId:", postId);
+
     const body = await req.json();
-    const { postId, content } = body;
+    console.log("Body received:", body);
+
+    const content = body.content;
+    const isSensitive = body.isSensitive;
 
     if (!postId || !content) {
+      console.warn("Missing required fields:", { postId, content });
       return NextResponse.json(
         { error: "Missing required fields: postId or content" },
         { status: 400, headers: corsHeaders }
       );
     }
 
-    // Update the specific post
+    // Update post
     const updated = await sql<{
       post_id: string;
       user_id: string;
       content: string;
+      is_sensitive: boolean;
     }[]>`
       UPDATE posts
-      SET content = ${content}
+      SET 
+        content = ${content}, 
+        is_sensitive = COALESCE(${isSensitive}, is_sensitive)
       WHERE post_id = ${postId}::uuid
-      RETURNING post_id, user_id, content;
+      RETURNING post_id, user_id, content, is_sensitive;
     `;
 
+    console.log("Database update result:", updated);
+
     if (updated.length === 0) {
+      console.warn("Post not found in database:", postId);
       return NextResponse.json(
         { error: "Post not found" },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
 
+    console.log("Post updated successfully:", updated[0]);
     return NextResponse.json({
       success: true,
       message: "Post updated successfully",
-      data: updated[0],
+      post: updated[0],
     });
 
   } catch (err: any) {
