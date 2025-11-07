@@ -5,6 +5,17 @@ const nextConfig: NextConfig = {
   /* config options here */
   // Silence the multi-lockfile workspace-root warning
   outputFileTracingRoot: path.join(__dirname),
+
+  // Add this webpack fallback to handle Node-only modules
+  webpack: (config) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      'webworker-threads': false,
+      'aws4': false,
+    };
+    return config;
+  },
+
   async headers() {
     return [
       {
