@@ -26,7 +26,7 @@ export async function GET() {
         image_uri            AS "imageUri",
         is_sensitive         AS "isSensitive",
         has_offensive_text   AS "hasOffensiveText",
-        created_at           AS "createdAt"
+        created_at           AS "date"
       FROM posts
       ORDER BY created_at DESC
     `;
