@@ -46,7 +46,6 @@ export async function GET(
         p.post_id::text
       FROM posts p
       ORDER BY p.created_at DESC
-      LIMIT 10
     `;
 
     // The above is simplified from the original and should be
