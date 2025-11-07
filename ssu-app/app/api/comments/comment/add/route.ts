@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
  
 import { corsHeaders } from "@/utilities/cors";  //Just add this line 
 
+import { censorText } from "@/utilities/moderation";
+
 import sql from "@/utilities/db";
 
 type CreateCommentRequest = {
@@ -35,10 +37,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400, headers: corsHeaders });
     }
 
+    const { text: censoredContent, changed } = await censorText(commentContent);
+    const hasOffensiveText = changed;
+
     // Insert comment
     const [newComment] = await sql`
       INSERT INTO comments (user_id, post_id, comment_content)
-      VALUES (${userId}, ${postId}, ${commentContent})
+      VALUES (${userId}, ${postId}, ${censoredContent})
       RETURNING
         comment_id::text      AS "_id",
         user_id::text         AS "userId",

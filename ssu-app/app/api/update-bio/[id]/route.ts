@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
  
 import { corsHeaders } from "@/utilities/cors";
 
+import { censorText } from "@/utilities/moderation";
+
 import sql from "@/utilities/db";
 
 // NOTE: Auth/moderation intentionally commented so route works unauthenticated for now.
@@ -65,9 +67,12 @@ export async function PUT(
     //   return NextResponse.json({ message: "Biography failed moderation" }, { status: 400, headers: corsHeaders });
     // }
 
+    const { text: censoredBiography, changed } = await censorText(biography);
+    const hasOffensiveText = changed;
+
     const rows = await sql<{ biography: string }[]>`
       UPDATE ssu_users
-      SET biography = ${biography}
+      SET biography = ${censoredBiography}
       WHERE user_id = ${id}::uuid
       RETURNING COALESCE(biography, '') AS biography
     `;
