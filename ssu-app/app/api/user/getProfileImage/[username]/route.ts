@@ -3,6 +3,8 @@ import postgres from "postgres";
 import { corsHeaders } from "@/utilities/cors";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+const defaultProfileImageUrl =
+  "https://ssusocial.s3.amazonaws.com/profilepictures/ProfileIcon.png";
 
 // GET /api/user/getProfileImage/:username
 export async function GET(
@@ -33,17 +35,14 @@ export async function GET(
       );
     }
 
-    const imageUri = result[0].profile_image;
-
-    if (!imageUri) {
-      return NextResponse.json(
-        { success: false, message: "Profile image not found." },
-        { status: 404, headers: corsHeaders }
-      );
-    }
+    // Return a same-origin proxy URL to avoid frontend CORS calls to S3
+    const proxyUrl = new URL(
+      `/api/user/profileImageProxy/${encodeURIComponent(username)}`,
+      req.nextUrl.origin
+    ).toString();
 
     return NextResponse.json(
-      { success: true, imageUri },
+      { success: true, imageUri: proxyUrl },
       { status: 200, headers: corsHeaders }
     );
   } catch (error: any) {
