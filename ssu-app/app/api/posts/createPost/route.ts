@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import { censorText } from "@/utilities/moderation";
+
+import sql from "@/utilities/db";
 
 // Handle preflight requests (CORS)
 export async function OPTIONS() {
@@ -27,7 +29,10 @@ type ApiPost = {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { username, content, imageUri, isSensitive, hasOffensiveText } = body;
+    const { username, content, imageUri, isSensitive } = body;
+
+    const { text: censoredContent, changed } = await censorText(content);
+    const hasOffensiveText = changed;
 
     // Step 1: Validate
     if (!username || !content) {
@@ -49,10 +54,10 @@ export async function POST(req: Request) {
       )
       SELECT 
         u.user_id,
-        ${content},
+        ${censoredContent},
         ${imageUri || null},
         ${isSensitive ?? false},
-        ${hasOffensiveText ?? false},
+        ${hasOffensiveText},
         NOW()
       FROM ssu_users u
       WHERE u.username = ${username}
@@ -64,7 +69,7 @@ export async function POST(req: Request) {
         image_uri            AS "imageUri",
         is_sensitive         AS "isSensitive",
         has_offensive_text   AS "hasOffensiveText",
-        created_at           AS "createdAt"
+        created_at::text     AS "date"
     `;
 
     // Step 3: Handle case where username not found

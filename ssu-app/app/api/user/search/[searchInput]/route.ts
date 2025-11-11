@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";
 
 // This route mirrors the legacy backend: GET /user/search/:searchInput
@@ -7,7 +7,7 @@ import { corsHeaders } from "@/utilities/cors";
 // as the original API. Password is included as null to preserve shape
 // without exposing hashes.
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 type ApiUser = {
   _id: string;

@@ -5,6 +5,17 @@ const nextConfig: NextConfig = {
   /* config options here */
   // Silence the multi-lockfile workspace-root warning
   outputFileTracingRoot: path.join(__dirname),
+
+  // Add this webpack fallback to handle Node-only modules
+  webpack: (config) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      'webworker-threads': false,
+      'aws4': false,
+    };
+    return config;
+  },
+
   async headers() {
     return [
       {
@@ -66,6 +77,8 @@ const nextConfig: NextConfig = {
       // Legacy casing support: map lowercase to canonical uppercase path
       { source: "/api/chatroom", destination: "/api/chatRoom" },
       { source: "/api/chatroom/getByUserId/:userId", destination: "/api/chatRoom/getByUserId/:userId" },
+      // Support older frontend hitting /api/likes/unLike (capital L)
+      { source: "/api/likes/unLike", destination: "/api/likes/unlike" },
       // Proxy Socket.IO requests to external WebSocket server (always active if SOCKET_SERVER_ORIGIN is set)
       ...(process.env.SOCKET_SERVER_ORIGIN
         ? [{ source: "/socket.io/:path*", destination: `${process.env.SOCKET_SERVER_ORIGIN}/socket.io/:path*` }]

@@ -1,10 +1,10 @@
 // app/api/feed/[username]/route.ts
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";
 
 // Connect to Postgres
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 // Handle preflight requests (CORS)
 export async function OPTIONS() {
@@ -46,7 +46,6 @@ export async function GET(
         p.post_id::text
       FROM posts p
       ORDER BY p.created_at DESC
-      LIMIT 10
     `;
 
     // The above is simplified from the original and should be

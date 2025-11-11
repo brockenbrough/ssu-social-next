@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+ 
 import { corsHeaders } from "@/utilities/cors";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+import sql from "@/utilities/db";
 
 type ApiPost = {
   _id: string;
@@ -40,7 +40,7 @@ SELECT
   p.image_uri     AS "imageUri",
   p.is_sensitive  AS "isSensitive",
   p.has_offensive_text AS "hasOffensiveText",
-  p.created_at    AS "createdAt"
+  p.created_at    AS "date"
 FROM posts p
 JOIN ssu_users u ON u.user_id = p.user_id
 WHERE p.post_id = ${id}::uuid
