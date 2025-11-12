@@ -62,13 +62,6 @@ export async function POST(req: NextRequest) {
       VALUES (${fetchedTargetUserId}, ${fetchedUserId})
     `;
 
-    if (result.length === 0) {
-      return NextResponse.json(
-        { success: true, message: "Already following" },
-        { status: 200, headers: corsHeaders }
-      );
-    }
-
     return NextResponse.json(
       { message: "Followed successfully" },
       { status: 201, headers: corsHeaders }
