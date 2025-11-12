@@ -2,17 +2,29 @@ import { NextResponse } from "next/server";
 import sql from "@/utilities/db";
 import { corsHeaders } from "@/utilities/cors";
 
+// Expected response row type
 type Row = { username: string; followers: string[] };
+
+// UUID format for validation (both uppercase and lowercase)
 const UUID_RE =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
+// Handle preflight (CORS)
 export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: corsHeaders });
 }
 
-// Accepts either username or UUID in the [username] segment for compatibility
-export async function GET(_req: Request, ctx: { params: { username: string } }) {
-  const key = (ctx?.params?.username ?? "").trim();
+// GET /api/followers/[username]
+// Supports both username and UUID for compatibility
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ username: string }> } // In Next.js 15+, params must be awaited
+) {
+  // Await the params Promise
+  const { username: raw } = await params;
+  const key = (raw ?? "").trim();
+
+  // If no key provided, return stable empty shape
   if (!key) {
     return NextResponse.json([{ username: "", followers: [] }], {
       status: 200,
@@ -21,11 +33,16 @@ export async function GET(_req: Request, ctx: { params: { username: string } }) 
   }
 
   try {
+    // Select user info (by UUID or username)
     const rows = await sql<Row[]>`
       WITH target AS (
         SELECT u.user_id, u.username
         FROM ssu_users u
-        WHERE ${UUID_RE.test(key) ? sql`u.user_id::text = ${key}` : sql`u.username = ${key}`}
+        WHERE ${
+          UUID_RE.test(key)
+            ? sql`u.user_id::text = ${key}`
+            : sql`u.username = ${key}`
+        }
         LIMIT 1
       )
       SELECT
@@ -41,7 +58,7 @@ export async function GET(_req: Request, ctx: { params: { username: string } }) 
       GROUP BY t.username
     `;
 
-    // Stable shape: if user missing, still return array with empty followers
+    // Always return a consistent array shape, even if user not found
     if (rows.length === 0) {
       return NextResponse.json([{ username: key, followers: [] }], {
         status: 200,
@@ -49,8 +66,11 @@ export async function GET(_req: Request, ctx: { params: { username: string } }) 
       });
     }
 
+    // Return followers list
     return NextResponse.json(rows, { status: 200, headers: corsHeaders });
   } catch (err: any) {
+    console.error("Error fetching followers:", err);
+    // On error, still return stable structure (to prevent frontend crash)
     return NextResponse.json([{ username: key, followers: [] }], {
       status: 200,
       headers: corsHeaders,
