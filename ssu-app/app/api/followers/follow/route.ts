@@ -1,62 +1,65 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { corsHeaders } from "@/utilities/cors";
 import sql from "@/utilities/db";
 
-// Handle CORS preflight
-export async function OPTIONS() {
-  return new NextResponse(null, { status: 200, headers: corsHeaders });
-}
-
-// POST /api/followers/follow
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { userId, targetUserId } = await req.json();
-
-    // Validate presence
-    if (!userId || !targetUserId) {
+    const body = await req.json();
+    const { userId, targetUserId } = body;
+    const userName = userId;
+    const targetUserName = targetUserId;
+    // Validate input
+    if (!userName || !targetUserName) {
       return NextResponse.json(
-        { success: false, message: "Both userId and targetUserId are required" },
+        { error: "Missing username(s)" },
         { status: 400, headers: corsHeaders }
       );
     }
 
-    // Prevent self-follow
-    if (userId === targetUserId) {
+    if (userName === targetUserName) {
       return NextResponse.json(
-        { success: false, message: "You cannot follow yourself" },
+        { error: "Cannot follow yourself" },
         { status: 400, headers: corsHeaders }
       );
     }
 
-    // Lookup follower user
-    const [followerUser] = await sql`
-      SELECT user_id FROM ssu_users WHERE username = ${userId} OR user_id::text = ${userId}
-    `;
-    // Lookup target user
-    const [targetUser] = await sql`
-      SELECT user_id FROM ssu_users WHERE username = ${targetUserId} OR user_id::text = ${targetUserId}
+    // Lookup users by username
+    const users = await sql`
+      SELECT user_id, username
+      FROM ssu_users
+      WHERE username IN (${userName}, ${targetUserName})
     `;
 
-    if (!followerUser || !targetUser) {
+    if (users.length !== 2) {
       return NextResponse.json(
-        { success: false, message: "User or target not found" },
+        { error: "User(s) not found" },
         { status: 404, headers: corsHeaders }
       );
     }
 
-    const followerUUID = followerUser.user_id;
-    const targetUUID = targetUser.user_id;
+    const userIdMap: Record<string, string> = {};
+    users.forEach(u => (userIdMap[u.username] = u.user_id));
 
-    // Insert follow relationship if not already existing
-    const result = await sql`
-      INSERT INTO followers (user_id, follower_id, created_at)
-      SELECT ${targetUUID}::uuid, ${followerUUID}::uuid, NOW()
-      WHERE NOT EXISTS (
-        SELECT 1 FROM followers
-        WHERE user_id = ${targetUUID}::uuid
-        AND follower_id = ${followerUUID}::uuid
-      )
-      RETURNING *
+    const fetchedUserId = userIdMap[userName];
+    const fetchedTargetUserId = userIdMap[targetUserName];
+
+    // Check if already following
+    const existing = await sql`
+      SELECT 1 FROM followers
+      WHERE user_id = ${fetchedTargetUserId} AND follower_id = ${fetchedUserId}
+    `;
+
+    if (existing.length > 0) {
+      return NextResponse.json(
+        { message: "Already following" },
+        { status: 200, headers: corsHeaders }
+      );
+    }
+
+    // Insert follow record
+    await sql`
+      INSERT INTO followers (user_id, follower_id)
+      VALUES (${fetchedTargetUserId}, ${fetchedUserId})
     `;
 
     if (result.length === 0) {
@@ -67,15 +70,14 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(
-      {
-        success: true,
-        message: `${userId} successfully followed ${targetUserId}`,
-      },
-      { status: 200, headers: corsHeaders }
+      { message: "Followed successfully" },
+      { status: 201, headers: corsHeaders }
     );
+
   } catch (err: any) {
+    console.error("Error in /followers/follow:", err);
     return NextResponse.json(
-      { success: false, message: err?.message ?? String(err) },
+      { error: "Internal server error" },
       { status: 500, headers: corsHeaders }
     );
   }

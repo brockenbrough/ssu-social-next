@@ -77,6 +77,8 @@ const nextConfig: NextConfig = {
       // Legacy casing support: map lowercase to canonical uppercase path
       { source: "/api/chatroom", destination: "/api/chatRoom" },
       { source: "/api/chatroom/getByUserId/:userId", destination: "/api/chatRoom/getByUserId/:userId" },
+      // Support older frontend hitting /api/likes/unLike (capital L)
+      { source: "/api/likes/unLike", destination: "/api/likes/unlike" },
       // Proxy Socket.IO requests to external WebSocket server (always active if SOCKET_SERVER_ORIGIN is set)
       ...(process.env.SOCKET_SERVER_ORIGIN
         ? [{ source: "/socket.io/:path*", destination: `${process.env.SOCKET_SERVER_ORIGIN}/socket.io/:path*` }]
