@@ -1,66 +1,75 @@
 import { NextResponse } from "next/server";
- 
 import { corsHeaders } from "@/utilities/cors";
-
 import sql from "@/utilities/db";
 
-// Handle preflight requests (CORS)
+// Handle CORS preflight
 export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: corsHeaders });
 }
 
-// POST /followers/follow
+// POST /api/followers/follow
 export async function POST(req: Request) {
   try {
-    const { username, targetUsername } = await req.json();
+    const { userId, targetUserId } = await req.json();
 
-    if (!username || !targetUsername) {
+    // Validate presence
+    if (!userId || !targetUserId) {
       return NextResponse.json(
-        { success: false, message: "Both usernames are required" },
+        { success: false, message: "Both userId and targetUserId are required" },
         { status: 400, headers: corsHeaders }
       );
     }
 
-    if (username === targetUsername) {
+    // Prevent self-follow
+    if (userId === targetUserId) {
       return NextResponse.json(
-        { success: false, message: "Cannot follow yourself" },
+        { success: false, message: "You cannot follow yourself" },
         { status: 400, headers: corsHeaders }
       );
     }
 
-    // 🔍 Step 1: Look up user IDs based on usernames from ssu_users
-    const [user] = await sql`
-      SELECT user_id FROM ssu_users WHERE username = ${username}
+    // Lookup follower user
+    const [followerUser] = await sql`
+      SELECT user_id FROM ssu_users WHERE username = ${userId} OR user_id::text = ${userId}
     `;
+    // Lookup target user
     const [targetUser] = await sql`
-      SELECT user_id FROM ssu_users WHERE username = ${targetUsername}
+      SELECT user_id FROM ssu_users WHERE username = ${targetUserId} OR user_id::text = ${targetUserId}
     `;
 
-    if (!user || !targetUser) {
+    if (!followerUser || !targetUser) {
       return NextResponse.json(
-        { success: false, message: "One or both usernames do not exist" },
+        { success: false, message: "User or target not found" },
         { status: 404, headers: corsHeaders }
       );
     }
 
-    const userId = user.user_id;
-    const targetUserId = targetUser.user_id;
+    const followerUUID = followerUser.user_id;
+    const targetUUID = targetUser.user_id;
 
-    // 🔁 Step 2: Insert follower relationship if not exists
-    await sql`
+    // Insert follow relationship if not already existing
+    const result = await sql`
       INSERT INTO followers (user_id, follower_id, created_at)
-      SELECT ${targetUserId}::uuid, ${userId}::uuid, NOW()
+      SELECT ${targetUUID}::uuid, ${followerUUID}::uuid, NOW()
       WHERE NOT EXISTS (
         SELECT 1 FROM followers
-        WHERE user_id = ${targetUserId}::uuid
-        AND follower_id = ${userId}::uuid
+        WHERE user_id = ${targetUUID}::uuid
+        AND follower_id = ${followerUUID}::uuid
       )
+      RETURNING *
     `;
+
+    if (result.length === 0) {
+      return NextResponse.json(
+        { success: true, message: "Already following" },
+        { status: 200, headers: corsHeaders }
+      );
+    }
 
     return NextResponse.json(
       {
         success: true,
-        data: { follower: username, following: targetUsername },
+        message: `${userId} successfully followed ${targetUserId}`,
       },
       { status: 200, headers: corsHeaders }
     );

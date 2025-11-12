@@ -1,12 +1,28 @@
-### Get all followers (main route)
-GET http://localhost:3000/api/followers
 
-### Run test for followers (unit test route)
-GET http://localhost:3000/api/followers/test
-
-### followers for a specific user
 ### Get followers by username
-GET http://localhost:3000/api/followers/test_user1
+GET http://localhost:3000/api/followers/test_user1 
+Accept: application/json
+
+### FOLLOW: test_user1 follows test_user2
+POST http://localhost:3000/api/followers/follow
+Content-Type: application/json
+Accept: application/json
+
+{
+  "userId": "test_user1",
+  "targetUserId": "test_user2"
+}
+### UNFOLLOW: test_user1 unfollows test_user2
+DELETE http://localhost:3000/api/followers/unfollow
+Content-Type: application/json
+
+{
+  "userId": "test_user1",
+  "targetUserId": "test_user2"
+}
+
+
+
 
 
 ### Invalid UUID should return 400
@@ -29,16 +45,6 @@ Accept: application/json
 GET http://localhost:3000/api/followers/22222222-2222-2222-2222-222222222222
 Accept: application/json
 
-### UNFOLLOW: 1111 unfollows 2222
-### UNFOLLOW: test_user1 unfollows test_user2
-DELETE http://localhost:3000/api/followers/unfollow
-Content-Type: application/json
-Accept: application/json
-
-{
-  "username": "test_user1",
-  "targetUsername": "test_user2"
-}
 
 ### VERIFY after UNFOLLOW: followers of 2222 should NOT include 1111
 GET http://localhost:3000/api/followers/22222222-2222-2222-2222-222222222222
