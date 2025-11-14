@@ -12,8 +12,6 @@ const sql: Sql<any> =
   postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 // Save the client globally in dev to reuse across HMR reloads
-if (process.env.NODE_ENV !== "production") {
   globalThis.postgresClient = sql;
-}
 
 export default sql;
