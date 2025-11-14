@@ -9,7 +9,12 @@ declare global {
 
 const sql: Sql<any> =
   globalThis.postgresClient ||
-  postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+  postgres(process.env.POSTGRES_URL!, { 
+    ssl: "require" ,
+    idle_timeout: 15,      
+    max: 14,
+    connect_timeout: 10,   
+  });
 
 // Save the client globally in dev to reuse across HMR reloads
   globalThis.postgresClient = sql;
