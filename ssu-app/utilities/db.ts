@@ -12,6 +12,7 @@ const sql: Sql<any> =
   postgres(process.env.POSTGRES_URL!, { 
     ssl: "require" ,
     idle_timeout: 15,      
+    max: 14,
     connect_timeout: 10,   
   });
 
