@@ -1,10 +1,6 @@
-// deleting post pictures
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { corsHeaders } from "@/utilities/cors";
- 
-
 import sql from "@/utilities/db";
 
 // Handle CORS preflight
@@ -12,30 +8,46 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
+// Configure S3 Client
+const s3 = new S3Client({
+  region: process.env.AWS_REGION!,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
+
 export async function DELETE(
   req: NextRequest,
   context: { params: Promise<{ imageKey: string }> }
 ) {
-  const { imageKey } = await context.params; // await params
-
   try {
-    // Construct absolute path to the uploaded file
-    const imagePath = path.join(process.cwd(), "public", "uploads", imageKey);
+    const { imageKey } = await context.params;
 
-    // Try to delete from file system
+    // imageKey = "12345-1710790023000.jpg"
+    // Need to convert to S3 key: "uploads/<imageKey>"
+    const s3Key = `uploads/${imageKey}`;
+
+    // Delete from S3
     try {
-      await fs.unlink(imagePath);
-      console.log(`Deleted local file: ${imagePath}`);
+      await s3.send(
+        new DeleteObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME!,
+          Key: s3Key,
+        })
+      );
+      console.log(`Deleted from S3: ${s3Key}`);
     } catch (err) {
-      console.warn(`File not found: ${imagePath}`);
+      console.warn(`S3 delete failed or object missing: ${s3Key}`, err);
     }
 
-    // Remove image reference in the database
-    const imageUri = `/uploads/${imageKey}`;
+    // Remove image_uri from posts where it matches the S3 URL
+    const fullImageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${s3Key}`;
+
     await sql`
       UPDATE posts
       SET image_uri = NULL
-      WHERE image_uri = ${imageUri}
+      WHERE image_uri = ${fullImageUrl}
     `;
 
     return NextResponse.json(
