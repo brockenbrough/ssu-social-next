@@ -4,6 +4,17 @@ import { corsHeaders } from "@/utilities/cors"; // ✅ shared CORS headers
 
 import sql from "@/utilities/db";
 
+type ApiPost = {
+  _id: string;
+  userId: string;
+  username: string;
+  content: string;
+  imageUri: string | null;
+  isSensitive: boolean;
+  hasOffensiveText: boolean;
+  date: string | Date;
+};
+
 // ✅ Allow preflight CORS requests
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
@@ -33,9 +44,16 @@ export async function GET(
     );
     const offset = (page - 1) * postsPerPage;
 
-    // ✅ SQL query matches Express route logic
-    const posts = await sql`
-      SELECT p.post_id, p.user_id, p.content, p.created_at, u.username
+    const posts = await sql<ApiPost[]>`
+      SELECT 
+        p.post_id::text           AS "_id",
+        p.user_id::text           AS "userId",
+        u.username                AS "username",
+        p.content                 AS "content",
+        p.image_uri               AS "imageUri",
+        p.is_sensitive            AS "isSensitive",
+        p.has_offensive_text      AS "hasOffensiveText",
+        p.created_at              AS "date"
       FROM posts p
       JOIN ssu_users u ON p.user_id = u.user_id
       WHERE u.username = ${username}
@@ -43,10 +61,7 @@ export async function GET(
       OFFSET ${offset} LIMIT ${postsPerPage};
     `;
 
-    return NextResponse.json(
-      { success: true, username, page, postsPerPage, data: posts },
-      { status: 200, headers: corsHeaders }
-    );
+    return NextResponse.json(posts, { status: 200, headers: corsHeaders });
   } catch (error: any) {
     console.error("❌ Error fetching posts by username:", error);
     return NextResponse.json(
