@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
+import sql from "@/utilities/db";
 import { corsHeaders } from "@/utilities/cors";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 type LikeRow = {
   _id: string;

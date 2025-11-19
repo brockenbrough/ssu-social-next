@@ -1,27 +1,8 @@
+### Get all followers (main route)
+GET http://localhost:3000/api/followers
 
-### Get followers by username
-GET http://localhost:3000/api/followers/test_user1 
-Accept: application/json
-
-### FOLLOW: test_user1 follows test_user2
-POST http://localhost:3000/api/followers/follow
-Content-Type: application/json
-Accept: application/json
-
-{
-  "userId": "test_user1",
-  "targetUserId": "test_user2"
-}
-### UNFOLLOW: test_user1 unfollows test_user2
-DELETE http://localhost:3000/api/followers/unfollow
-Content-Type: application/json
-
-{
-  "userId": "test_user1",
-  "targetUserId": "test_user2"
-}
-
-
+### Run test for followers (unit test route)
+GET http://localhost:3000/api/followers/test
 
 # TEST ROUTE: /api/followers/[username]/test
 

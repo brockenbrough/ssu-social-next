@@ -81,11 +81,11 @@ Accept: application/json
 
 
 ### 🧪 Test GetByUser (automated test route)
-GET http://localhost:3000/api/Views/GetByUser/test
+GET http://localhost:3000/api/views/GetByUser/test
 Accept: application/json
 
 
 ### 🧩 Get Views by Specific UserId (manual test)
-GET http://localhost:3000/api/Views/GetByUser/33333333-3333-3333-3333-333333333333
+GET http://localhost:3000/api/views/GetByUser/33333333-3333-3333-3333-333333333333
 Accept: application/json
 

@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
-import postgres from "postgres";
 import { NextResponse } from "next/server";
 import { invoices, customers, revenue, users } from "../../lib/placeholder-data";
+import sql from "@/utilities/db";
+import type { Sql } from "postgres";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-async function seedUsers(db: postgres.Sql) {
+async function seedUsers(db: Sql<any>) {
   await db`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
   await db`
     CREATE TABLE IF NOT EXISTS users (
@@ -28,7 +28,7 @@ async function seedUsers(db: postgres.Sql) {
   );
 }
 
-async function seedCustomers(db: postgres.Sql) {
+async function seedCustomers(db: Sql<any>) {
   await db`
     CREATE TABLE IF NOT EXISTS customers (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -49,7 +49,7 @@ async function seedCustomers(db: postgres.Sql) {
   );
 }
 
-async function seedInvoices(db: postgres.Sql) {
+async function seedInvoices(db: Sql<any>) {
   await db`
     CREATE TABLE IF NOT EXISTS invoices (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -71,7 +71,7 @@ async function seedInvoices(db: postgres.Sql) {
   );
 }
 
-async function seedRevenue(db: postgres.Sql) {
+async function seedRevenue(db: Sql<any>) {
   await db`
     CREATE TABLE IF NOT EXISTS revenue (
       month VARCHAR(4) NOT NULL UNIQUE,
