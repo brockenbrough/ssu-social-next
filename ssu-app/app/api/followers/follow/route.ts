@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
     const { userId, targetUserId } = body;
     const userName = userId;
     const targetUserName = targetUserId;
+
     // Validate input
     if (!userName || !targetUserName) {
       return NextResponse.json(
@@ -38,7 +39,9 @@ export async function POST(req: NextRequest) {
     }
 
     const userIdMap: Record<string, string> = {};
-    users.forEach(u => (userIdMap[u.username] = u.user_id));
+    users.forEach((u: any) => {
+      userIdMap[u.username] = u.user_id;
+    });
 
     const fetchedUserId = userIdMap[userName];
     const fetchedTargetUserId = userIdMap[targetUserName];
@@ -58,22 +61,14 @@ export async function POST(req: NextRequest) {
 
     // Insert follow record
     await sql`
-      INSERT INTO followers (user_id, follower_id)
-      VALUES (${fetchedTargetUserId}, ${fetchedUserId})
+      INSERT INTO followers (user_id, follower_id, created_at)
+      VALUES (${fetchedTargetUserId}, ${fetchedUserId}, NOW())
     `;
-
-    if (result.length === 0) {
-      return NextResponse.json(
-        { success: true, message: "Already following" },
-        { status: 200, headers: corsHeaders }
-      );
-    }
 
     return NextResponse.json(
       { message: "Followed successfully" },
       { status: 201, headers: corsHeaders }
     );
-
   } catch (err: any) {
     console.error("Error in /followers/follow:", err);
     return NextResponse.json(
