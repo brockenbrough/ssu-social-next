@@ -11,7 +11,7 @@ const sql: Sql<any> =
   globalThis.postgresClient ||
   postgres(process.env.POSTGRES_URL!, { 
     ssl: "require" ,
-    idle_timeout: 15,      
+    idle_timeout: 30,      
     max: 14,
     connect_timeout: 10,   
   });

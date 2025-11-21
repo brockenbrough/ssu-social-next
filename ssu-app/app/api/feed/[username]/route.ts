@@ -1,31 +1,9 @@
 // app/api/feed/[username]/route.ts
 import { NextResponse } from "next/server";
- 
 import { corsHeaders } from "@/utilities/cors";
-
-// Connect to Postgres
 import sql from "@/utilities/db";
+import { reviveDates } from "@/utilities/reviveDates";
 
-// Handle preflight requests (CORS)
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: corsHeaders,
-  });
-}
-
-type ApiPost = {
-  post_id: any;
-  _id: string;                // matches frontend expectations
-  userId: string;             // foreign key
-  content: string;
-  imageUri: string | null;
-  isSensitive: boolean;
-  hasOffensiveText: boolean;
-  createdAt: string | Date;
-};
-
-// GET /api/feed/[username]
 export async function GET(
   _req: Request,
   ctx: { params: Promise<{ username: string }> }
@@ -33,45 +11,80 @@ export async function GET(
   try {
     const { username } = await ctx.params;
 
-    if (!username || typeof username !== "string") {
+    if (!username) {
       return NextResponse.json(
         { error: "Username is required" },
         { status: 400, headers: corsHeaders }
       );
     }
 
-    // Fetch posts for the user
-    const rows = await sql<ApiPost[]>`
+    const rows = await sql`
+      WITH user_target AS (
+        SELECT user_id
+        FROM ssu_users
+        WHERE username = ${username}
+      )
       SELECT
-        p.post_id::text
+        p.post_id::text AS "_id",
+        p.content,
+        p.image_uri AS "imageUri",
+        p.created_at AS "date",
+        u.username,
+        u.user_id::text as "userid",
+        COALESCE(u.profile_image, 'https://ssusocial.s3.amazonaws.com/profilepictures/ProfileIcon.png') AS "profileImage",
+        COALESCE(l.like_count, 0) AS "likeCount",
+        COALESCE(c.comment_count, 0) AS "commentCount",
+        COALESCE(v.view_count, 0) AS "viewCount",
+        COALESCE(fol.follower_count, 0) AS "followerCount",
+        COALESCE(fow.following_count, 0) AS "followingCount"
       FROM posts p
+      JOIN ssu_users u ON p.user_id = u.user_id
+
+
+      LEFT JOIN (
+        SELECT post_id, COUNT(*)::int AS like_count
+        FROM likes
+        GROUP BY post_id
+      ) l ON l.post_id = p.post_id
+
+      LEFT JOIN (
+        SELECT post_id, COUNT(*)::int AS comment_count
+        FROM comments
+        GROUP BY post_id
+      ) c ON c.post_id = p.post_id
+
+      LEFT JOIN (
+        SELECT post_id, COUNT(*)::int AS view_count
+        FROM views
+        GROUP BY post_id
+      ) v ON v.post_id = p.post_id
+
+      -- Followers count of the post author
+      LEFT JOIN (
+        SELECT user_id, COUNT(*)::int AS follower_count
+        FROM followers
+        GROUP BY user_id
+      ) fol ON fol.user_id = p.user_id
+
+      -- Following count of the post author
+      LEFT JOIN (
+        SELECT follower_id AS user_id, COUNT(*)::int AS following_count
+        FROM followers
+        GROUP BY follower_id
+      ) fow ON fow.user_id = p.user_id      
+
       ORDER BY p.created_at DESC
+      LIMIT 20
     `;
+    const postsWithDates = reviveDates(rows);
 
-    // The above is simplified from the original and should be
-    // corrected by looking at the old BE route.
-    // I'm doing this to unblock testing of other portions.
-    // Below is working code that fetches by username.  
-        // p.user_id::text AS "userId",
-        // p.content,
-        // p.image_uri AS "imageUri",
-        // p.is_sensitive AS "isSensitive",
-        // p.has_offensive_text AS "hasOffensiveText",
-        // p.created_at AS "createdAt
-      // JOIN ssu_users u ON p.user_id = u.user_id
-      // WHERE u.username = ${username}
+    return NextResponse.json(postsWithDates, { status: 200, headers: corsHeaders });
 
-      
-    const postIds = rows.map((row) => row.post_id);
 
-    return NextResponse.json(
-      { feed: postIds },
-      { status: 200, headers: corsHeaders }
-    );
   } catch (error) {
-    console.error("Error fetching feed:", error);
+    console.error("Feed error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch feed" },
+      { error: "Failed to load feed." },
       { status: 500, headers: corsHeaders }
     );
   }
