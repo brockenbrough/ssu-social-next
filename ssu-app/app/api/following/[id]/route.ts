@@ -24,18 +24,28 @@
     try {
       const { id } = await ctx.params;
 
+      // Treat missing/invalid identifiers (including literal "undefined"/"null") as empty.
+      const key = (id ?? "").trim();
+      if (key.length === 0 || key === "undefined" || key === "null") {
+        return NextResponse.json(
+          [{ following: [] as string[] }],
+          { status: 200, headers: corsHeaders }
+        );
+      }
+
       // Support both UUID and username
-      const isUuid = /^[0-9a-fA-F-]{36}$/.test(id);
+      const isUuid = /^[0-9a-fA-F-]{36}$/.test(key);
       let userId: string | null = null;
 
       if (isUuid) {
-        userId = id;
+        userId = key;
       } else {
-        const byUsername = await sql`SELECT user_id::text AS user_id FROM ssu_users WHERE username = ${id}`;
+        const byUsername = await sql`SELECT user_id::text AS user_id FROM ssu_users WHERE username = ${key}`;
         if (byUsername.length === 0) {
+          // Return a stable empty shape instead of 404 to avoid client errors
           return NextResponse.json(
-            { message: "User not found." },
-            { status: 404, headers: corsHeaders }
+            [{ following: [] as string[] }],
+            { status: 200, headers: corsHeaders }
           );
         }
         userId = byUsername[0].user_id as string;
