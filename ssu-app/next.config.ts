@@ -72,6 +72,8 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
+      { source: "/api/followers/", destination: "/api/followers" },
+      { source: "/api/following/", destination: "/api/following" },
       { source: "/message/generate", destination: "/api/message/generate" },
       { source: "/message/generate/:path*", destination: "/api/message/generate/:path*" },
       // Legacy casing support: map lowercase to canonical uppercase path
