@@ -1,11 +1,26 @@
 import { NextResponse } from "next/server";
- 
 import { corsHeaders } from "@/utilities/cors";
-
 import sql from "@/utilities/db";
 
+type ApiPost = {
+  _id: string;
+  userId: string;
+  username: string;
+  content: string;
+  imageUri: string | null;
+  isSensitive: boolean;
+  hasOffensiveText: boolean;
+  date: string | Date;
+  createdAt: string | Date;
+};
+
+// Handle CORS preflight for clients that send custom headers
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+}
+
 export async function GET(
-  req: Request,
+  _req: Request,
   ctx: { params: Promise<{ searchTerm: string }> }
 ) {
   try {
@@ -21,19 +36,23 @@ export async function GET(
     // Decode URL-encoded search term (e.g., "This%20is" -> "This is")
     const decodedTerm = decodeURIComponent(searchTerm);
     const like = `%${decodedTerm}%`;
-    
-    const rows = await sql`
+
+    // Include username + canonical date field so the frontend can render tooltips and avatars
+    const rows = await sql<ApiPost[]>`
       SELECT
-        post_id::text AS "_id",
-        user_id::text AS "userId",
-        content,
-        image_uri AS "imageUri",
-        is_sensitive AS "isSensitive",
-        has_offensive_text AS "hasOffensiveText",
-        created_at AS "createdAt"
-      FROM posts
-      WHERE content ILIKE ${like}
-      ORDER BY created_at DESC
+        p.post_id::text          AS "_id",
+        p.user_id::text          AS "userId",
+        u.username               AS "username",
+        p.content                AS "content",
+        p.image_uri              AS "imageUri",
+        p.is_sensitive           AS "isSensitive",
+        p.has_offensive_text     AS "hasOffensiveText",
+        p.created_at             AS "date",
+        p.created_at             AS "createdAt"
+      FROM posts p
+      JOIN ssu_users u ON p.user_id = u.user_id
+      WHERE p.content ILIKE ${like}
+      ORDER BY p.created_at DESC
     `;
 
     return NextResponse.json(rows, { headers: corsHeaders });
@@ -45,4 +64,3 @@ export async function GET(
     );
   }
 }
-
