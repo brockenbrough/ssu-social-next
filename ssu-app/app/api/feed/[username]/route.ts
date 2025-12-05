@@ -18,6 +18,22 @@ export async function GET(
       );
     }
 
+    const userRows = await sql<{ user_id: string }[]>`
+      SELECT user_id::text AS user_id
+      FROM ssu_users
+      WHERE username = ${username}
+      LIMIT 1
+    `;
+
+    if (userRows.length === 0) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404, headers: corsHeaders }
+      );
+    }
+
+    const targetUserId = userRows[0].user_id; 
+
     const rows = await sql`
       WITH user_target AS (
         SELECT user_id
@@ -36,7 +52,8 @@ export async function GET(
         COALESCE(c.comment_count, 0) AS "commentCount",
         COALESCE(v.view_count, 0) AS "viewCount",
         COALESCE(fol.follower_count, 0) AS "followerCount",
-        COALESCE(fow.following_count, 0) AS "followingCount"
+        COALESCE(fow.following_count, 0) AS "followingCount",
+        CASE WHEN ul.user_id IS NOT NULL THEN true ELSE false END AS "isLiked"
       FROM posts p
       JOIN ssu_users u ON p.user_id = u.user_id
 
@@ -73,10 +90,35 @@ export async function GET(
         GROUP BY follower_id
       ) fow ON fow.user_id = p.user_id      
 
+      -- Check if current user liked the post
+      LEFT JOIN likes ul
+        ON ul.post_id = p.post_id
+        AND ul.user_id = (
+          SELECT user_id
+          FROM ssu_users
+          WHERE username = ${username} 
+          LIMIT 1
+        )
+  
       ORDER BY p.created_at DESC
       LIMIT 20
     `;
     const postsWithDates = reviveDates(rows);
+
+
+   if (rows.length > 0) {
+      await sql`
+        INSERT INTO views (user_id, post_id)
+        SELECT ${targetUserId}::uuid, p.post_id
+        FROM posts p
+        WHERE p.user_id = ${targetUserId}::uuid
+        ORDER BY p.created_at DESC
+        LIMIT 20
+        ON CONFLICT (user_id, post_id) DO NOTHING
+      `;
+    }
+
+
 
     return NextResponse.json(postsWithDates, { status: 200, headers: corsHeaders });
 
