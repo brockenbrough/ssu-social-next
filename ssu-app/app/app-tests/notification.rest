@@ -41,4 +41,36 @@ Content-Type: application/json
 
 
 ### Get notifications by username
-GET http://localhost:3000/api/notification/get/username?username=test_user1
+GET http://localhost:3000/api/notification/user/ba3ec3af-97f2-4ec2-9b8f-c0bccc6cebb3
+
+
+### Create another notification
+POST http://localhost:3000/api/notification/create
+Content-Type: application/json
+
+{
+  "notification_type": "comment",
+  "user_id": "ba3ec3af-97f2-4ec2-9b8f-c0bccc6cebb3",
+  "action_user_id": "22222222-2222-2222-2222-222222222222",
+  "content": "test_user2 commented on your post",
+  "post_id": null
+}
+
+### Test getting notifications for test_user
+GET http://localhost:3000/api/notification/k_salaiev
+
+### Mark notification as read
+PUT http://localhost:3000/api/notification/update
+Content-Type: application/json
+
+{
+  "id": "f7bc8c4d-7064-4471-b993-65f6abb61729",
+  "isRead": true
+}
+
+### Delete notification by ID
+DELETE http://localhost:3000/api/notification/deleteById/427cab9f-c6fe-49d5-9fed-adecd0f75755
+
+
+
+
