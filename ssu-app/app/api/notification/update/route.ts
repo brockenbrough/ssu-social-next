@@ -1,73 +1,51 @@
-// app/api/notifications/update/route.ts
+// app/api/notification/route.ts
 import { NextResponse } from "next/server";
- 
 import { corsHeaders } from "@/utilities/cors";
-
-export const runtime = "nodejs"; // required for 'postgres' client
-
 import sql from "@/utilities/db";
 
-type UpdateBody = {
-  id?: string;
-  text?: string;
-  isRead?: boolean;
-};
-
-// UUID validation (hyphenated)
 const UUID_RE =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
-// Preflight
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
 
 export async function PUT(req: Request) {
   try {
-    const body = (await req.json().catch(() => ({}))) as UpdateBody;
-    const { id, text, isRead } = body ?? {};
+    const { id, isRead, text } = await req.json();
 
-    // Validate ID
-    if (!id) {
+    if (!id || !UUID_RE.test(id)) {
       return NextResponse.json(
-        { message: "Notification ID is required." },
-        { status: 400, headers: corsHeaders }
-      );
-    }
-    if (!UUID_RE.test(id)) {
-      return NextResponse.json(
-        { message: "Invalid notification ID format." },
+        { message: "Invalid notification ID" },
         { status: 400, headers: corsHeaders }
       );
     }
 
-    // Build patch
-    const patch: Record<string, any> = {};
-    if (typeof text !== "undefined") patch.content = String(text).trim();
+    const patch: any = {};
     if (typeof isRead !== "undefined") patch.is_read = Boolean(isRead);
+    if (typeof text !== "undefined") patch.content = text.trim();
 
     if (Object.keys(patch).length === 0) {
       return NextResponse.json(
-        { message: "No updatable fields provided." },
+        { message: "No fields to update." },
         { status: 400, headers: corsHeaders }
       );
     }
 
-    // Exists?
-    const [existing] = await sql/* sql */`
+    const existing = await sql`
       SELECT notification_id
       FROM notifications
       WHERE notification_id = ${id}::uuid
     `;
-    if (!existing) {
+
+    if (existing.length === 0) {
       return NextResponse.json(
         { message: "Notification not found." },
         { status: 404, headers: corsHeaders }
       );
     }
 
-    // Update
-    const [updated] = await sql/* sql */`
+    const [updated] = await sql`
       UPDATE notifications
       SET ${sql(patch)}
       WHERE notification_id = ${id}::uuid
@@ -75,13 +53,14 @@ export async function PUT(req: Request) {
     `;
 
     return NextResponse.json(
-      { message: "Notification updated successfully.", notification: updated },
+      { message: "Updated successfully", notification: updated },
       { status: 200, headers: corsHeaders }
     );
-  } catch (err: any) {
-    console.error("Error updating notification:", err);
+
+  } catch (err) {
+    console.error(err);
     return NextResponse.json(
-      { message: "Server error", error: err?.message },
+      { message: "Server error" },
       { status: 500, headers: corsHeaders }
     );
   }
