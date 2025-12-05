@@ -112,7 +112,6 @@ export async function GET(
         FROM posts p
         WHERE p.user_id = ${targetUserId}::uuid
         ORDER BY p.created_at DESC
-        LIMIT 20
         ON CONFLICT (user_id, post_id) DO NOTHING
       `;
     }
