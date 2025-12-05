@@ -101,7 +101,6 @@ export async function GET(
         )
   
       ORDER BY p.created_at DESC
-      LIMIT 20
     `;
     const postsWithDates = reviveDates(rows);
 
