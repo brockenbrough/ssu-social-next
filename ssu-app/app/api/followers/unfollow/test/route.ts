@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import sql from "@/utilities/db";
 import { corsHeaders } from "@/utilities/cors";
 
-// Row shape returned from /api/followers/[username]
+// Response shape of GET /followers/[username]
 type FollowersRow = { username: string; followers: string[] };
 
 /**
@@ -17,46 +17,44 @@ export async function OPTIONS() {
 /**
  * GET /api/followers/unfollow/test
  *
- * Integration test for:
+ * Full integration test for:
  *   DELETE /api/followers/unfollow
  *
  * Steps:
- *   1) Prepare DB: ensure test_user1 follows test_user2
- *   2) Confirm via GET /api/followers/test_user2 that test_user1 is in followers
- *   3) Call DELETE /api/followers/unfollow with body { userId: "test_user1", targetUserId: "test_user2" }
- *   4) Confirm test_user1 is no longer in followers of test_user2
- *   5) Call DELETE again and verify idempotence (removed = 0)
+ *   1) Clean: ensure test_user1 *IS* following test_user2.
+ *   2) Validate precondition via GET /followers/[username].
+ *   3) Call DELETE /followers/unfollow.
+ *   4) Expect status 200 + success.
+ *   5) Validate test_user1 is removed from followers.
+ *   6) Call DELETE again → expect 404 (already unfollowed).
  */
 export async function GET() {
   try {
     const baseUrl = "http://localhost:3000";
 
-    // These values must match your seed script:
+    // Must match seed or test DB setup
     const TEST_USER1_ID = "11111111-1111-1111-1111-111111111111"; // test_user1
     const TEST_USER2_ID = "22222222-2222-2222-2222-222222222222"; // test_user2
+
     const followerUsername = "test_user1";
     const targetUsername = "test_user2";
 
     // =====================================================
-    // 1) Prepare DB: ensure test_user1 follows test_user2
-    //    followers table: follower_id = test_user1, user_id = test_user2
+    // 1) Insert follower relationship → ensure precondition for unfollow
     // =====================================================
-
-    // Remove existing relation to avoid duplicates
     await sql`
       DELETE FROM followers
       WHERE user_id = ${TEST_USER2_ID}::uuid
         AND follower_id = ${TEST_USER1_ID}::uuid
     `;
 
-    // Insert one clean relation
     await sql`
       INSERT INTO followers (user_id, follower_id, created_at)
       VALUES (${TEST_USER2_ID}::uuid, ${TEST_USER1_ID}::uuid, NOW())
     `;
 
     // =====================================================
-    // 2) Check precondition via GET /api/followers/test_user2
+    // 2) Confirm precondition via GET /followers/[username]
     // =====================================================
     const beforeRes = await fetch(
       `${baseUrl}/api/followers/${encodeURIComponent(targetUsername)}`
@@ -77,13 +75,14 @@ export async function GET() {
     }
 
     const beforeFollowers: string[] = beforeJson[0].followers ?? [];
+
     if (!beforeFollowers.includes(followerUsername)) {
       return NextResponse.json(
         {
           success: false,
           step: "precondition validation",
           message:
-            "Precondition failed: test_user1 is not a follower of test_user2 before unfollow.",
+            "Precondition failed: test_user1 is NOT a follower of test_user2 before unfollow.",
           data: { followers: beforeFollowers },
         },
         { status: 500, headers: corsHeaders }
@@ -91,49 +90,50 @@ export async function GET() {
     }
 
     // =====================================================
-    // 3) Call DELETE /api/followers/unfollow
+    // 3) First call: DELETE /api/followers/unfollow
     // =====================================================
-    const unfollowRes = await fetch(`${baseUrl}/api/followers/unfollow`, {
+    const unfollowRes1 = await fetch(`${baseUrl}/api/followers/unfollow`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        userId: followerUsername,      // matches route.ts: can be username or UUID
-        targetUserId: targetUsername,  // same
+        // Unfollow route accepts both formats:
+        // userId/targetUserId OR username/targetUsername
+        userId: followerUsername,
+        targetUserId: targetUsername,
       }),
     });
 
-    const unfollowJson = await unfollowRes.json().catch(() => null);
+    const unfollowJson1 = await unfollowRes1.json().catch(() => null);
 
-    if (!unfollowRes.ok || !unfollowJson?.ok) {
+    if (!unfollowRes1.ok) {
       return NextResponse.json(
         {
           success: false,
-          step: "DELETE /followers/unfollow",
-          message: "Unfollow operation returned error.",
-          data: { status: unfollowRes.status, body: unfollowJson },
+          step: "DELETE /followers/unfollow (first call)",
+          message: "First unfollow call returned non-OK status.",
+          data: { status: unfollowRes1.status, body: unfollowJson1 },
         },
         { status: 500, headers: corsHeaders }
       );
     }
 
-    const removedFirst = typeof unfollowJson.removed === "number"
-      ? unfollowJson.removed
-      : parseInt(String(unfollowJson.removed ?? "0"), 10);
-
-    if (removedFirst !== 1) {
+    if (
+      unfollowRes1.status !== 200 ||
+      unfollowJson1?.success !== true
+    ) {
       return NextResponse.json(
         {
           success: false,
-          step: "DELETE /followers/unfollow first call",
-          message: "Expected exactly 1 row removed on first unfollow call.",
-          data: { removed: removedFirst },
+          step: "DELETE /followers/unfollow (first call) validation",
+          message: "Expected status 200 + success: true on first unfollow.",
+          data: { status: unfollowRes1.status, body: unfollowJson1 },
         },
         { status: 500, headers: corsHeaders }
       );
     }
 
     // =====================================================
-    // 4) Confirm that test_user1 is no longer a follower of test_user2
+    // 4) Confirm follower was removed
     // =====================================================
     const afterRes = await fetch(
       `${baseUrl}/api/followers/${encodeURIComponent(targetUsername)}`
@@ -154,13 +154,14 @@ export async function GET() {
     }
 
     const afterFollowers: string[] = afterJson[0].followers ?? [];
+
     if (afterFollowers.includes(followerUsername)) {
       return NextResponse.json(
         {
           success: false,
           step: "post-unfollow validation",
           message:
-            "test_user1 is still listed as follower of test_user2 after unfollow.",
+            "Follower still exists after unfollow — unfollow did not work.",
           data: { followers: afterFollowers },
         },
         { status: 500, headers: corsHeaders }
@@ -168,9 +169,9 @@ export async function GET() {
     }
 
     // =====================================================
-    // 5) Call DELETE again – should be idempotent (removed = 0)
+    // 5) Second call: should return "was not following" (idempotent behavior)
     // =====================================================
-    const secondRes = await fetch(`${baseUrl}/api/followers/unfollow`, {
+    const unfollowRes2 = await fetch(`${baseUrl}/api/followers/unfollow`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -179,39 +180,26 @@ export async function GET() {
       }),
     });
 
-    const secondJson = await secondRes.json().catch(() => null);
+    const unfollowJson2 = await unfollowRes2.json().catch(() => null);
 
-    if (!secondRes.ok || !secondJson?.ok) {
+    if (
+      unfollowRes2.status !== 404 ||
+      unfollowJson2?.message?.includes("was not following") !== true
+    ) {
       return NextResponse.json(
         {
           success: false,
-          step: "DELETE /followers/unfollow second call",
+          step: "DELETE /followers/unfollow (second call)",
           message:
-            "Second unfollow call should be ok (idempotent), but returned error.",
-          data: { status: secondRes.status, body: secondJson },
-        },
-        { status: 500, headers: corsHeaders }
-      );
-    }
-
-    const removedSecond = typeof secondJson.removed === "number"
-      ? secondJson.removed
-      : parseInt(String(secondJson.removed ?? "0"), 10);
-
-    if (removedSecond !== 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          step: "idempotence check",
-          message: "Expected 0 rows removed on second unfollow call.",
-          data: { removed: removedSecond },
+            'Expected 404 + "<user> was not following <user>" on second call.',
+          data: { status: unfollowRes2.status, body: unfollowJson2 },
         },
         { status: 500, headers: corsHeaders }
       );
     }
 
     // =====================================================
-    // All checks passed
+    // ALL TESTS PASSED 🎉
     // =====================================================
     return NextResponse.json(
       {
@@ -220,8 +208,6 @@ export async function GET() {
         data: {
           follower: followerUsername,
           target: targetUsername,
-          removedFirst,
-          removedSecond,
         },
       },
       { status: 200, headers: corsHeaders }

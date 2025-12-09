@@ -131,3 +131,7 @@ Accept: application/json
 ### Search POST by phrase — /api/post/search/This%20is
 GET http://localhost:3000/api/post/search/This%20is
 Accept: application/json
+
+### Get full feed for a user
+GET http://localhost:3000/api/feed/tylerlad
+Accept: application/json

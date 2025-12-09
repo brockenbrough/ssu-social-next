@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { corsHeaders } from "@/utilities/cors";
 import sql from "@/utilities/db";
 
+// Handle preflight (CORS)
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 200, headers: corsHeaders });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
