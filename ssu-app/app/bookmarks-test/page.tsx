@@ -31,7 +31,7 @@ export default function BookmarksTestPage() {
   // Check bookmark status on mount
   useEffect(() => {
     if (userId) {
-      checkBookmarkStatus();
+     // checkBookmarkStatus();
     }
   }, [userId]);
 
