@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export default function BookmarksTestPage() {
   const [isBookmarked, setIsBookmarked] = useState(false);
