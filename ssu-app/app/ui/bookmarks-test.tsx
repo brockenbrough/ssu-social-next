@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 type Post = {
   _id: string;
@@ -91,14 +91,16 @@ function PostCard({
       {/* Post Image */}
       {post.imageUri && (
         <div className="relative mb-4">
-          <img
-            src={post.imageUri}
-            alt="Post"
-            onClick={() => setShowImageModal(true)}
-            className={`w-full rounded-lg cursor-pointer ${
-              post.isSensitive && isBlurred ? 'blur-lg' : ''
-            } transition-all duration-300`}
-          />
+            <div className="relative w-full overflow-hidden rounded-lg">
+              <img
+                src={post.imageUri}
+                alt="Post"
+                onClick={() => setShowImageModal(true)}
+                className={`h-auto w-full cursor-pointer ${
+                  post.isSensitive && isBlurred ? 'blur-lg' : ''
+                } transition-all duration-300`}
+              />
+            </div>
           {post.isSensitive && isBlurred && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white rounded-lg">
               <p className="mb-2 text-center font-medium">
@@ -133,11 +135,14 @@ function PostCard({
           onClick={() => setShowImageModal(false)}
         >
           <div className="relative max-w-4xl max-h-screen p-4">
-            <img
-              src={post.imageUri}
-              alt="Enlarged Post"
-              className="max-w-full max-h-screen rounded-lg shadow-lg"
-            />
+              <div className="relative max-w-[90vw] max-h-[80vh]">
+                <img
+                  src={post.imageUri}
+                  alt="Enlarged Post"
+                  className="h-auto w-full rounded-lg shadow-lg"
+                  style={{ objectFit: 'contain' }}
+                />
+              </div>
             <button
               className="absolute top-4 right-4 text-white text-2xl font-semibold bg-black/50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-black/70"
               onClick={() => setShowImageModal(false)}
@@ -207,6 +212,34 @@ export default function BookmarksTest() {
     }
   }, []);
 
+  // Check bookmark status for multiple posts
+  const checkBookmarkStatusesForPosts = useCallback(
+    async (posts: Post[]) => {
+      if (!userId) return;
+
+      const statuses: Record<string, boolean> = {};
+      
+      await Promise.all(
+        posts.map(async (post) => {
+          try {
+            const response = await fetch(
+              `/api/bookmarks/manage?user_id=${encodeURIComponent(userId)}&post_id=${encodeURIComponent(post._id)}`
+            );
+            if (response.ok) {
+              const data = await response.json();
+              statuses[post._id] = Array.isArray(data) && data.length > 0;
+            }
+          } catch (error) {
+            console.error(`Error checking bookmark status for post ${post._id}:`, error);
+          }
+        })
+      );
+
+      setBookmarkStatuses(statuses);
+    },
+    [userId]
+  );
+
   // Fetch all posts (first 10)
   useEffect(() => {
     const fetchAllPosts = async () => {
@@ -232,7 +265,7 @@ export default function BookmarksTest() {
     if (activeTab === 'all') {
       fetchAllPosts();
     }
-  }, [activeTab, userId]);
+  }, [activeTab, userId, checkBookmarkStatusesForPosts]);
 
   // Fetch bookmarked posts
   useEffect(() => {
@@ -289,50 +322,28 @@ export default function BookmarksTest() {
     }
   }, [activeTab, userId]);
 
-  // Check bookmark status for multiple posts
-  const checkBookmarkStatusesForPosts = async (posts: Post[]) => {
-    if (!userId) return;
-
-    const statuses: Record<string, boolean> = {};
-    
-    await Promise.all(
-      posts.map(async (post) => {
-        try {
-          const response = await fetch(
-            `/api/bookmarks/manage?user_id=${encodeURIComponent(userId)}&post_id=${encodeURIComponent(post._id)}`
-          );
-          if (response.ok) {
-            const data = await response.json();
-            statuses[post._id] = Array.isArray(data) && data.length > 0;
-          }
-        } catch (error) {
-          console.error(`Error checking bookmark status for post ${post._id}:`, error);
-        }
-      })
-    );
-
-    setBookmarkStatuses(statuses);
-  };
-
   // Check bookmark status for a single post
-  const checkBookmarkStatus = async (postId: string) => {
-    if (!userId || !postId) return;
+  const checkBookmarkStatus = useCallback(
+    async (postId: string) => {
+      if (!userId || !postId) return;
 
-    try {
-      const response = await fetch(
-        `/api/bookmarks/manage?user_id=${encodeURIComponent(userId)}&post_id=${encodeURIComponent(postId)}`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        const bookmarked = Array.isArray(data) && data.length > 0;
-        setBookmarkStatuses((prev) => ({ ...prev, [postId]: bookmarked }));
-        return bookmarked;
+      try {
+        const response = await fetch(
+          `/api/bookmarks/manage?user_id=${encodeURIComponent(userId)}&post_id=${encodeURIComponent(postId)}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          const bookmarked = Array.isArray(data) && data.length > 0;
+          setBookmarkStatuses((prev) => ({ ...prev, [postId]: bookmarked }));
+          return bookmarked;
+        }
+      } catch (error) {
+        console.error('Error checking bookmark status:', error);
       }
-    } catch (error) {
-      console.error('Error checking bookmark status:', error);
-    }
-    return false;
-  };
+      return false;
+    },
+    [userId]
+  );
 
   // Handle bookmark toggle
   const handleBookmarkClick = async (postId: string) => {
