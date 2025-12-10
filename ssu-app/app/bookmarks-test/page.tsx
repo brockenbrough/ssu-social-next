@@ -1,6 +1,7 @@
+// hopefully this works
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export default function BookmarksTestPage() {
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -28,14 +29,7 @@ export default function BookmarksTestPage() {
     }
   }, []);
 
-  // Check bookmark status on mount
-  useEffect(() => {
-    if (userId) {
-     // checkBookmarkStatus();
-    }
-  }, [userId]);
-
-  const checkBookmarkStatus = async () => {
+  const checkBookmarkStatus = useCallback(async () => {
     if (!userId) return;
 
     try {
@@ -47,7 +41,14 @@ export default function BookmarksTestPage() {
     } catch (error) {
       console.error('Error checking bookmark status:', error);
     }
-  };
+  }, [userId, postId]);
+
+  // Check bookmark status on mount
+  useEffect(() => {
+    if (userId) {
+      checkBookmarkStatus();
+    }
+  }, [userId, checkBookmarkStatus]);
 
   const handleBookmarkClick = async () => {
     if (!userId || isLoading) return;
@@ -104,7 +105,7 @@ export default function BookmarksTestPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
       <div className="w-full max-w-2xl rounded-lg bg-white p-8 shadow-lg">
         <h1 className="mb-6 text-2xl font-bold text-gray-800">Bookmark Test Page</h1>
-        
+   
         {/* Test Post */}
         <div className="relative rounded-lg border border-gray-200 bg-white p-6 shadow-md">
           <div className="mb-4">
